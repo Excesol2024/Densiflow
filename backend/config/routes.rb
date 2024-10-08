@@ -1,0 +1,32 @@
+Rails.application.routes.draw do
+  devise_for :users, controllers: {
+    sessions: 'users/sessions',
+    registrations: 'users/registrations'
+}
+   get "/me" => "users#current_user_info"
+
+   post 'initial_registration', to: 'otp#initial_registration'
+   post 'payment', to: 'stripes#payment_intent'
+   get 'payment/:id', to: "stripes#show_payment_details"
+   post 'subscribe', to: "stripes#create"
+
+   # UPDATE PASSWORD
+    post 'users/set_otp', to: 'users#set_otp'
+    post 'users/validate_otp', to: 'users#check_otp'
+    patch 'users/update_password', to: 'users#update_password'
+
+    # DELETE ACCOUNT
+    delete 'users/delete', to: 'users#delete_account'
+
+    #GET USER WEATHER
+    post 'user/weather', to: 'weather#weather_for_user'
+
+  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
+
+  # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
+  # Can be used by load balancers and uptime monitors to verify that the app is live.
+  get "up" => "rails/health#show", as: :rails_health_check
+
+  # Defines the root path route ("/")
+  root "otp#home"
+end

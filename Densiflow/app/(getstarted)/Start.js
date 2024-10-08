@@ -1,0 +1,37 @@
+import { View, Text, Image, Pressable } from 'react-native'
+import React from 'react'
+import FontLoader from "../../components/Fontloader"
+import Image1 from "../../assets/img1.png"
+import { useRouter } from 'expo-router'
+
+const Start = () => {
+
+  const router = useRouter();
+
+  return (
+   <FontLoader>
+       <View className="flex-1 justify-center items-center bg-secondary">
+      <Text style={{ fontFamily: 'PoppinsBold' }} className="text-white text-2xl text-center">Navigate Your World with Confidence</Text>
+      <Image source={Image1} className="mt-5"/>
+    <View className="w-56 mb-5 mt-4">
+    <Text style={{ fontFamily: 'PoppinsThin' }} className="mt-3 font-[300] text-white text-center">Delivers real-time crowd density data for smarter urban exploration.</Text>
+    </View>
+
+      <View className="flex flex-row  gap-2">
+        <View className="h-3 w-3 bg-primary rounded-full"></View>
+        <View className="h-3 w-3 bg-white rounded-full"></View>
+        <View className="h-3 w-3 bg-white rounded-full"></View>
+      </View>
+
+      <Pressable onPress={()=>{router.replace('/(getstarted)/Steptwo')}} className="bg-primary p-2 mt-5 pl-10 pr-10 rounded-xl">
+        <Text style={{ fontFamily: 'PoppinsMedium' }} className="text-white text-md">Next</Text>
+      </Pressable>
+
+      <Text onPress={()=>{router.replace('/(auth)/Login')}}  style={{ fontFamily: 'PoppinsMedium' }} className="text-white text-md mt-4">Sign In</Text>
+
+    </View>
+   </FontLoader>
+  )
+}
+
+export default Start

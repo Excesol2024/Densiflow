@@ -1,0 +1,63 @@
+{
+  "project_info": {
+    "project_number": "401998714323",
+    "project_id": "densiflowapp",
+    "storage_bucket": "densiflowapp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:401998714323:android:3d8c30ada677320e72cb26",
+        "android_client_info": {
+          "package_name": "com.baos.Densiflow"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "401998714323-32h6mrr69kl6jkjjcbud1f71s4hiuo82.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.baos.Densiflow",
+            "certificate_hash": "f504024894fc813fbe489bd396ff25a33f77b78e"
+          }
+        },
+        {
+          "client_id": "401998714323-b2lou1entantjpnuu27loj20r1fac6p6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.baos.Densiflow",
+            "certificate_hash": "b71946006cdb4395e1ef1b56847cfa78481dc2c0"
+          }
+        },
+        {
+          "client_id": "401998714323-t3ieppo27q8cntb39qrlnpiogqjoh7s8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.baos.Densiflow",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "401998714323-e76k10at7c8qm1e6fpm0n71kf01upj9q.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyABI29rebymvuKtfDF6I3Co1b-JEPVaRpc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "401998714323-e76k10at7c8qm1e6fpm0n71kf01upj9q.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
