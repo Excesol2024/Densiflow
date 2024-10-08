@@ -40,39 +40,45 @@ import {
     });
    },[])
 
-   const onFacebookButtonPress = async () => {
-    try {
-      // Attempt login with permissions
-      const result = await LoginManager.logInWithPermissions(['public_profile', 'email']);
-    
-      if (result.isCancelled) {
-        throw 'User cancelled the login process';
+    const onFacebookButtonPress = async () => {
+      setIsLoading(true)
+      try {
+        // Attempt login with permissions
+        const result = await LoginManager.logInWithPermissions(['public_profile', 'email']);
+      
+        if (result.isCancelled) {
+          throw 'User cancelled the login process';
+        }
+      
+        // Once signed in, get the user's AccessToken
+        const data = await AccessToken.getCurrentAccessToken();
+      
+        if (!data) {
+          console.log("ERROR ACCESSTOKEN")
+          return
+        }
+        
+        console.log('Access Token:', data.accessToken);
+        // Create a Firebase credential with the AccessToken
+        const facebookCredential = auth.FacebookAuthProvider.credential(data.accessToken);
+      
+        // Sign-in the user with the credential
+        const userCredential = await auth().signInWithCredential(facebookCredential);
+      
+        // Log the signed-in user's info
+        if(userCredential){
+          handleManualSignedIn(userCredential)
+        }else {
+          console.log('NOTHING USER INFO');
+        }
+      } catch (error) {
+        console.error('Facebook login error:', error);
       }
-    
-      // Once signed in, get the user's AccessToken
-      const data = await AccessToken.getCurrentAccessToken();
-    
-      if (!data) {
-        throw 'Something went wrong obtaining access token';
-      }
-    
-      // Create a Firebase credential with the AccessToken
-      const facebookCredential = auth.FacebookAuthProvider.credential(data.accessToken);
-    
-      // Sign-in the user with the credential
-      const userCredential = await auth().signInWithCredential(facebookCredential);
+    };
   
-      // Log the signed-in user's info
-      console.log('User Info:', userCredential.user);
-    } catch (error) {
-      console.error('Facebook login error:', error);
-    }
-  };
-  
-    
-   
 
    const onGoogleButtonPress = async () => {
+    setIsLoading(true)
     try {
       await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
       const response = await GoogleSignin.signIn();
@@ -88,16 +94,51 @@ import {
   
       const googleCredential = auth.GoogleAuthProvider.credential(idToken);
       const userInfo = await auth().signInWithCredential(googleCredential);
-      console.log('User Info:', userInfo);
-      if(userInfo){
-        router.push('/(tabs)/Home')
-      }
+      handleManualSignedIn(userInfo)
+      // if(userInfo){
+      //   router.push('/(tabs)/Home')
+      // }
     } catch (error) {
       console.error('Error during Google Sign-in:', error.message);
       Alert.alert("Error", error.message); // Display the error to the user
     }
   };
+
+ 
   
+  const handleManualSignedIn = async (user) =>{
+    const payload = {
+      user: {
+        email: user.user.email,
+        password: user.user.uid
+      }
+    }
+
+    try {
+      const response = await API.loginUser(payload);
+      console.log(response.data)
+      if (response.data.status === "ok") {
+        setIsloggedIn({
+          authUser: true,
+        });
+        await AsyncStorage.setItem('Authorization', JSON.stringify(response.data.token));
+        await AsyncStorage.setItem('Email', email);
+        Alert.alert("suucessfully Logged In");
+        setIsLoading(false);
+        setTimeout(() => {
+          router.push("/(tabs)/Home");
+        }, 1000);
+      } else {
+        setIsLoading(false);
+        Alert.alert("Please Sign Up First Using Google");
+      }
+    } catch (error) {
+      console.log(error);
+      Alert.alert("Please Sign Up First Using Google or Facebook");
+      setIsLoading(false);
+    }
+  
+  }
 
     const handleLogin = async () => {
       setIsLoading(true);
@@ -121,24 +162,21 @@ import {
       try {
         const response = await API.loginUser(body);
         console.log(response.data)
-        const tokenWithBearer = response.headers.get("Authorization");
-        const token = tokenWithBearer.split(" ")[1]
-        if (response.data.status === "ok") {
-          setIsloggedIn({
-            authUser: true,
-          });
-          await AsyncStorage.setItem('Authorization', JSON.stringify(token));
-          await AsyncStorage.setItem('Email', email);
-  
-          Alert.alert("suucessfully Logged In");
-          setIsLoading(false);
-          setTimeout(() => {
-            router.push("/(tabs)/home");
-          }, 1000);
-        } else {
-          setIsLoading(false);
-          Alert.alert("Invalid Username or Password");
-        }
+        // if (response.data.status === "ok") {
+        //   setIsloggedIn({
+        //     authUser: true,
+        //   });
+        //   await AsyncStorage.setItem('Authorization', JSON.stringify(response.data.token));
+        //   await AsyncStorage.setItem('Email', email);
+        //   Alert.alert("suucessfully Logged In");
+        //   setIsLoading(false);
+        //   setTimeout(() => {
+        //     router.push("/(tabs)/Home");
+        //   }, 1000);
+        // } else {
+        //   setIsLoading(false);
+        //   Alert.alert("Invalid Username or Password");
+        // }
       } catch (error) {
         console.log(error);
         Alert.alert("Invalid Username or Password");
@@ -217,7 +255,7 @@ import {
         </Text>
           </View>
         <Text
-          onPress={() => router.push("/forgotpassword")}
+          onPress={() => router.push("/Forgotpassword")}
           style={{ fontFamily: "PoppinsMedium" }}
           className="text-md mb-4"
         >

@@ -13,17 +13,110 @@ import Arrowright from "../../components/svg/Arrowright";
 import User from "../../components/svg/User";
 import Google from "../../components/svg/Google";
 import Facebook from "../../components/svg/Facebook";
+import auth from '@react-native-firebase/auth';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import { LoginManager, AccessToken } from 'react-native-fbsdk-next';
 
 const Registration = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [isModalVisible, setIsModalVisible] = useState(true);
+  const [isModalVisible, setIsModalVisible] = useState(false);
   const [otp, setOtp] = useState(''); // State for OTP input
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [timer, setTimer] = useState(60); // Timer starting at 60 seconds
   const [isTimerActive, setIsTimerActive] = useState(true);
+
+
+  useEffect(()=>{
+    GoogleSignin.configure({
+      webClientId: '401998714323-e76k10at7c8qm1e6fpm0n71kf01upj9q.apps.googleusercontent.com',
+    });
+   },[])
+
+    const onFacebookButtonPress = async () => {
+      console.log("ATEMTING FB LOGIG")
+      try {
+        // Attempt login with permissions
+        const result = await LoginManager.logInWithPermissions(['public_profile', 'email']);
+      
+        if (result.isCancelled) {
+          throw 'User cancelled the login process';
+        }
+      
+        // Once signed in, get the user's AccessToken
+        const data = await AccessToken.getCurrentAccessToken();
+      
+        if (!data) {
+          console.log("ERROR ACCESSTOKEN")
+          return
+        }
+        
+        console.log('Access Token:', data.accessToken);
+        // Create a Firebase credential with the AccessToken
+        const facebookCredential = auth.FacebookAuthProvider.credential(data.accessToken);
+      
+        // Sign-in the user with the credential
+        const userCredential = await auth().signInWithCredential(facebookCredential);
+      
+        // Log the signed-in user's info
+        if(userCredential){
+          handleManualcreateAccount(userCredential)
+        }else {
+          console.log('NOTHING USER INFO');
+        }
+      } catch (error) {
+        console.error('Facebook login error:', error);
+      }
+    };
+  
+
+   const onGoogleButtonPress = async () => {
+    try {
+      await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
+      const response = await GoogleSignin.signIn();
+      const idToken = response.data.idToken; // Update this line
+      console.log('ID Token:', idToken);
+
+      
+  
+      if (!idToken) {
+        console.log('ID token not received');
+        return;
+      }
+  
+      const googleCredential = auth.GoogleAuthProvider.credential(idToken);
+      const userInfo = await auth().signInWithCredential(googleCredential);
+      handleManualcreateAccount(userInfo)
+      // if(userInfo){
+      //   router.push('/(tabs)/Home')
+      // }
+    } catch (error) {
+      console.error('Error during Google Sign-in:', error.message);
+      Alert.alert("Error", error.message); // Display the error to the user
+    }
+  };
+  
+  const handleManualcreateAccount = async (user) =>{
+    const payload = {
+      user: {
+        email: user.user.email,
+        password: user.user.uid,
+        password_confirmation: user.user.uid
+      }
+    }
+
+   try {
+    const response = await API.createManualAccount(payload);
+    console.log(response.data)
+    Alert.alert("Successfully Created...")
+   } catch (error) {
+    console.log(error)
+    Alert.alert("Email has Already Signed In")
+   }
+   
+  }
 
   const handleRegister = async () => {
 
@@ -237,14 +330,18 @@ const Registration = () => {
        OR
       </Text>
      <View className="flex-2 justify-center items-center">
-     <View className="flex flex-row p-3 bg-white shadow-md w-64 rounded-xl shadow-gray-400 justify-center items-center mt-1">
+   <Pressable onPress={onGoogleButtonPress}>
+   <View className="flex flex-row p-3 bg-white shadow-md w-64 rounded-xl shadow-gray-400 justify-center items-center mt-1">
        <Google/>
-       <Text style={{ fontFamily: "PoppinsMedium" }} className="ml-3">Login with Google</Text>
+       <Text style={{ fontFamily: "PoppinsMedium" }} className="ml-3">Sign up with Google</Text>
       </View>
-      <View className="flex flex-row p-3 bg-white shadow-md w-64 rounded-xl shadow-gray-400 justify-center items-center mt-2">
+   </Pressable>
+    <Pressable onPress={onFacebookButtonPress}>
+    <View className="flex flex-row p-3 bg-white shadow-md w-64 rounded-xl shadow-gray-400 justify-center items-center mt-2">
        <Facebook/>
-       <Text style={{ fontFamily: "PoppinsMedium" }} className="ml-3">Login with Facebook</Text>
+       <Text style={{ fontFamily: "PoppinsMedium" }} className="ml-3">Sign up with Facebook</Text>
       </View>
+    </Pressable>
      </View>
      <View className="flex-row items-center justify-center">
      <Text

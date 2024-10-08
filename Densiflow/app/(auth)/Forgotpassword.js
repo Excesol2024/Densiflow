@@ -149,7 +149,7 @@ const Forgotpassword = () => {
         const response = await API.resetPassword(body)
         if(response.data.status === "success"){
           setTimeout(() => {
-            router.push('/success')
+            router.push('/Success')
           }, 1000);
         }
       } catch (error) {

@@ -29,4 +29,5 @@ export const API = {
     sendOtp: (body)=> apiHelper(Authentication.sendOtp, "POST", body),
     validateOtp: (body)=> apiHelper(Authentication.validateOtp, "POST", body),
     resetPassword: (body)=> apiHelper(Authentication.resetPassword, "PATCH", body),
+    createManualAccount: (body)=> apiHelper(Authentication.createManualAccount, "POST", body),
 }

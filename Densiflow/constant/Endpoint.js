@@ -11,6 +11,7 @@ export const Authentication = {
     validateOtp: "/users/validate_otp",
     resetPassword: "/users/update_password",
     deleteAccount: "/users/delete",
+    createManualAccount: "/users/sign_up"
 }
 
 export const CurrentUser = {

@@ -1,5 +1,5 @@
 import { View, Text, Pressable, ScrollView } from 'react-native'
-import React, { useContext } from 'react'
+import React, { useContext, useState, useEffect } from 'react'
 import AntDesign from "@expo/vector-icons/AntDesign";
 import First from '../../components/svg/profile/First';
 import Second from '../../components/svg/profile/Second';
@@ -11,10 +11,26 @@ import Flag from '../../components/svg/profile/Flag';
 import Logout from '../../components/svg/profile/Logout';
 import { useRouter } from "expo-router"
 import { AuthenticatedContext } from '../../context/Authenticateduser'
+import auth from '@react-native-firebase/auth';
 
 const Profile = () => {
   const router = useRouter();
   const { handleLogoutUser } = useContext(AuthenticatedContext)
+  const [initializing, setInitializing] = useState(true);
+  const [user, setUser] = useState();
+
+  function onAuthStateChanged(user) {
+    setUser(user);
+    if (initializing) setInitializing(false);
+  }
+
+  useEffect(() => {
+    const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
+    return subscriber; // unsubscribe on unmount
+  }, []);
+
+  if (initializing) return null;
+
   return (
     <View className="flex-1">
        <View className="flex-2 flex-row top-10 gap-3 items-center p-3">
@@ -27,7 +43,8 @@ const Profile = () => {
       <View className="flex-1 p-5 mt-10 mb-14">
       <ScrollView contentContainerStyle={{ paddingVertical: 20 }}>
       <View className="flex-2">
-            <Text style={{ fontFamily: "PoppinsBold" }} className="text-xl">Account</Text>
+            <Text onPress={()=>console.log(user)} style={{ fontFamily: "PoppinsBold" }} className="text-xl">{user.uid}</Text>
+            <Text style={{ fontFamily: "PoppinsBold" }} className="text-xl">{user.email}</Text>
             <View  className="flex-2 bg-gray-200 mt-2 p-4 rounded-xl">
              <Pressable onPress={()=>{router.replace('/(profile)/Account')}}>
              <View className="flex-row gap-3 items-center mb-3">

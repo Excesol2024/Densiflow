@@ -104,8 +104,11 @@ const Home =  () => {
 useEffect(()=>{
  getUserCurrentLocation();
  getCurrentDate();
- getCurrentUserWeather();
 },[])
+
+useEffect(()=>{
+  getCurrentUserWeather();
+},[userCity, userSubregion])
 
   const handleShowPopularPlace = () =>{
     setPopularPlace(true);

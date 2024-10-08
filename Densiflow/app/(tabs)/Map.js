@@ -1,7 +1,5 @@
 import { View, Text, Image, Pressable } from "react-native";
 import React, { useState } from "react";
-import MapView from "react-native-maps";
-import { Marker } from "react-native-maps";
 import Image1 from "../../assets/tabs/img1.png";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import Entypo from "@expo/vector-icons/Entypo";
@@ -17,22 +15,7 @@ const Map = () => {
 
   return (
     <View className="flex-1">
-      <MapView
-        initialRegion={{
-          latitude: 8.11079635863886,
-          longitude: 122.66760161090592,
-          latitudeDelta: 0.0922,
-          longitudeDelta: 0.0421,
-        }}
-        className="w-[100%] h-[100%]"
-      >
-        <Marker
-          coordinate={{
-            latitude: 8.11079635863886,
-            longitude: 122.66760161090592,
-          }}
-        />
-      </MapView>
+     
 
       <View className="p-3 flex-1 justify-center items-center">
       <View className="flex flex-row gap-2 p-3 w-full bg-slate-50 absolute bottom-64 shadow-2xl shadow-gray-700 rounded-lg z-50">

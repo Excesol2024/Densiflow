@@ -24,7 +24,7 @@ const Index = () => {
       }else if(Token){
         setTimeout(() => {
           setIsShowSplashScreen(false);
-          router.replace('/(tabs)/home')
+          router.replace('/(tabs)/Home')
         }, 2000)
       }else{
         setTimeout(() => {

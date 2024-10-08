@@ -3,6 +3,7 @@
     "name": "Densiflow",
     "slug": "Densiflow",
     "version": "1.0.0",
+    "scheme": "Densiflow",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -57,6 +58,5 @@
         "projectId": "67aff93e-33f4-48c3-9f07-958375977b40"
       }
     }
-  },
-  "scheme": "Densiflow"
+  }
 }
