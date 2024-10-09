@@ -1,5 +1,5 @@
 class UsersController < ApplicationController
-  before_action :authenticate_user!, except: [:set_otp, :check_otp, :update_password, :delete_account]
+  before_action :authenticate_user!, except: [:set_otp, :check_otp, :update_password, :delete_account, :create]
 
   def current_user_info
     if current_user 
@@ -55,14 +55,42 @@ class UsersController < ApplicationController
         render json: { errors: ['Invalid email or password.'], status: "error" }, status: :unprocessable_entity
       end
     end
+
+    def create
+      user = User.new(user_params)
+      if user.save
+        render json: { message: 'User created successfully', user: user }, status: :created
+      else
+        render json: { error: user.errors.full_messages }, status: :unprocessable_entity
+      end
+    end
     
+    def update_user_current_location
+      if current_user
+        # Extract longitude and latitude from params
+        longitude = params[:longitude]
+        latitude = params[:latitude]
     
+        # Update the user's location attributes
+        if current_user.update(lat: latitude, long: longitude)
+          render json: { status: :ok, message: 'Location updated successfully', user: current_user }, status: :ok
+        else
+          render json: { status: 'error', message: 'Failed to update location', errors: current_user.errors.full_messages }, status: :unprocessable_entity
+        end
+      else
+        render json: { status: 'error', message: 'User not authenticated' }, status: :unauthorized
+      end
+    end
 
 
     private
 
     def generate_otp
       rand(1000..9999).to_s 
+    end
+
+    def user_params
+      params.require(:user).permit(:email, :password, :password_confirmation)
     end
  
 end

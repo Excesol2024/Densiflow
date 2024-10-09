@@ -3,13 +3,13 @@
 class Users::SessionsController < Devise::SessionsController
   # before_action :configure_sign_in_params, only: [:create]
 
-  respond_to :json
 
   def create
-    self.resource = warden.authenticate!(auth_options)
-    if resource.persisted?
-      sign_in(resource_name, resource)
-      render json: { status: :ok, message: 'Login successful', user: resource }
+    user = User.find_by(email: params[:user][:email])
+    if user && user.valid_password?(params[:user][:password])
+      sign_in(user)
+      user.update(expo_token: params[:expo_token])  
+      render json: { status: :ok, message: 'Login successful', user: user }
     else
       render json: { status: 'error', message: 'Login Failed', errors: ['Invalid email or password'] }, status: :unprocessable_entity
     end
@@ -51,4 +51,7 @@ class Users::SessionsController < Devise::SessionsController
   # def configure_sign_in_params
   #   devise_parameter_sanitizer.permit(:sign_in, keys: [:attribute])
   # end
+
+  
+
 end

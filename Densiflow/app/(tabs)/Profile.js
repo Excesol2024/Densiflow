@@ -43,8 +43,7 @@ const Profile = () => {
       <View className="flex-1 p-5 mt-10 mb-14">
       <ScrollView contentContainerStyle={{ paddingVertical: 20 }}>
       <View className="flex-2">
-            <Text onPress={()=>console.log(user)} style={{ fontFamily: "PoppinsBold" }} className="text-xl">{user.uid}</Text>
-            <Text style={{ fontFamily: "PoppinsBold" }} className="text-xl">{user.email}</Text>
+            <Text style={{ fontFamily: "PoppinsBold" }} className="text-xl">Account</Text>
             <View  className="flex-2 bg-gray-200 mt-2 p-4 rounded-xl">
              <Pressable onPress={()=>{router.replace('/(profile)/Account')}}>
              <View className="flex-row gap-3 items-center mb-3">

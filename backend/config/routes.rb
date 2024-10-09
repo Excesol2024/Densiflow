@@ -18,6 +18,9 @@ Rails.application.routes.draw do
     # DELETE ACCOUNT
     delete 'users/delete', to: 'users#delete_account'
 
+    # CREATE MANUAL ACCOUNT
+    post "users/sign_up", to: 'users#create'
+
     #GET USER WEATHER
     post 'user/weather', to: 'weather#weather_for_user'
 

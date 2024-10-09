@@ -41,6 +41,9 @@ ActiveRecord::Schema[7.1].define(version: 2024_09_13_124911) do
     t.string "jti", null: false
     t.string "password_key"
     t.datetime "key_expires"
+    t.string "expo_token"
+    t.string "lat"
+    t.string "long"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["jti"], name: "index_users_on_jti", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true

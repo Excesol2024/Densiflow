@@ -4,5 +4,8 @@ class AddJtiToUsers < ActiveRecord::Migration[7.1]
     add_index :users, :jti, unique: true
     add_column :users, :password_key, :string
     add_column :users, :key_expires, :datetime
+    add_column :users, :expo_token, :string
+    add_column :users, :lat, :string
+    add_column :users, :long, :string
   end
 end
