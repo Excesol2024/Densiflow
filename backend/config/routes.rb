@@ -24,6 +24,13 @@ Rails.application.routes.draw do
     #GET USER WEATHER
     post 'user/weather', to: 'weather#weather_for_user'
 
+
+    #SEND NOTIFICATIONS
+    post "user/notifications", to: 'weather#send_push_notification'
+
+    #GET ACCESS_TOKE
+    get "access", to: 'weather#show_access_token'
+
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.

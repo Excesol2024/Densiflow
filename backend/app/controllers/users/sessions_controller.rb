@@ -3,7 +3,6 @@
 class Users::SessionsController < Devise::SessionsController
   # before_action :configure_sign_in_params, only: [:create]
 
-
   def create
     user = User.find_by(email: params[:user][:email])
     if user && user.valid_password?(params[:user][:password])
@@ -14,7 +13,7 @@ class Users::SessionsController < Devise::SessionsController
       render json: { status: 'error', message: 'Login Failed', errors: ['Invalid email or password'] }, status: :unprocessable_entity
     end
   end
-
+  
   # DELETE /users/sign_out
   def destroy
     if current_user

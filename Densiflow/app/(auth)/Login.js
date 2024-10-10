@@ -24,8 +24,20 @@ import Toggle from "react-native-toggle-input";
 import auth from "@react-native-firebase/auth";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { LoginManager, AccessToken } from "react-native-fbsdk-next";
+import * as Device from 'expo-device';
+import * as Notifications from 'expo-notifications';
+import Constants from 'expo-constants';
+import messaging from '@react-native-firebase/messaging';
 
-const Login = () => {
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
+
+export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
@@ -39,6 +51,65 @@ const Login = () => {
         "401998714323-e76k10at7c8qm1e6fpm0n71kf01upj9q.apps.googleusercontent.com",
     });
   }, []);
+
+
+  async function requestUserPermission() {
+    const authStatus = await messaging().requestPermission();
+    const enabled =
+      authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+      authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+  
+    if (enabled) {
+      console.log('Authorization status:', authStatus);
+    }
+  }
+
+  const getUserToken = async () =>{
+    const token = await messaging().getToken()
+    console.log("firebase token", token)
+  }
+
+
+  //PUSH NOTIFICATIONS
+  const [expoPushToken, setExpoPushToken] = useState('');
+ 
+  useEffect(() => {
+    requestUserPermission();
+    getUserToken();
+    registerForPushNotificationsAsync()
+      .then(token => {
+        setExpoPushToken(token);
+        console.log(token);
+      })
+      .catch((error) => setExpoPushToken(`${error}`));
+
+  }, []);
+
+  // Function to register for push notifications
+async function registerForPushNotificationsAsync() {
+  let token;
+  const { status: existingStatus } = await Notifications.getPermissionsAsync();
+  let finalStatus = existingStatus;
+
+  if (existingStatus !== 'granted') {
+    const { status } = await Notifications.requestPermissionsAsync();
+    finalStatus = status;
+  }
+
+  if (finalStatus !== 'granted') {
+    alert('Failed to get push token for push notification!');
+    return;
+  }
+  try {
+    token = (await Notifications.getExpoPushTokenAsync()).data;
+    console.log("expo token", token)
+  } catch (error) {
+    console.error('Error fetching push token:', error);
+  }
+  return token;
+}
+
+
 
   const onFacebookButtonPress = async () => {
     setIsLoading(true);
@@ -351,4 +422,3 @@ const Login = () => {
   );
 };
 
-export default Login;
