@@ -24,8 +24,8 @@ const TabsHomeScreen = () => {
             title: 'Alerts',
             headerShown: false
         }} />
-          <Tabs.Screen name='Profile' options={{
-            title: 'Profile',
+          <Tabs.Screen name='Settings' options={{
+            title: 'Settings',
             headerShown: false
         }} />
     </Tabs>

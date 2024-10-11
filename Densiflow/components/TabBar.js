@@ -13,7 +13,7 @@ const TabBar = ({ state, descriptors, navigation }) => {
       Saved: (props) => <MapSvg {...props} />,
       Map: (props) => <WorldSvg {...props} />,
       Alerts: (props) => <NotifSvg {...props} />,
-      Profile: (props) => <ProfileSvg {...props} />,
+      Settings: (props) => <ProfileSvg {...props} />,
     }
 
   return (

@@ -23,6 +23,10 @@ import Mooncloud from "../../components/svg/weather/night/Mooncloud"
 import Sun from "../../components/svg/weather/day/Sun"
 import Light from "../../components/svg/weather/day/Light"
 import Rain from "../../components/svg/weather/day/Rain"
+import LocationPermission from "../../components/modal/androidpopup/LocationPermission";
+import Notifications from "../../components/modal/androidpopup/Notifications";
+import Maps from "../../components/modal/androidpopup/Maps";
+import MessageSent from "../../components/modal/androidpopup/MessageSent";
 
 const Home =  () => {
   const [searchText, setSearchText] = useState("");
@@ -348,8 +352,17 @@ useEffect(()=>{
     }
   };
 
+  const [locationsPermission, setLocationPermission] = useState(false);
+  const [notificationsPermission, setNotificationsPermission] = useState(false);
+  const [mapsPermission, setMapsPermission] = useState(false);
+  const [messageSent, setMessageSent] = useState(false)
+
   return (
     <View className="flex-1 ">
+      <LocationPermission visible={locationsPermission} />
+      <Notifications visible={notificationsPermission}/>
+      <Maps visible={mapsPermission}/>
+      <MessageSent visible={messageSent}/>
       <View className="">
         <View className=" w-full p-3 mt-14">
           <LinearGradient

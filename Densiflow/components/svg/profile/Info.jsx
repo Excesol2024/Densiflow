@@ -1,6 +1,6 @@
 import * as React from "react";
 import Svg, { G, Path, Defs, ClipPath, Rect } from "react-native-svg";
-const Flag = (props) => (
+const Info = (props) => (
   <Svg
     width={20}
     height={20}
@@ -22,4 +22,4 @@ const Flag = (props) => (
     </Defs>
   </Svg>
 );
-export default Flag;
+export default Info;

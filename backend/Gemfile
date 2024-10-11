@@ -16,6 +16,8 @@ gem 'rack-cors'
 gem 'mail'
 gem 'stripe'
 gem 'googleauth'
+gem 'redis'
+gem 'sidekiq'
 
 
 # Use the Puma web server [https://github.com/puma/puma]

@@ -25,6 +25,13 @@ export default function Layout() {
           tabBarStyle: { display: 'none' },
         }}
       />
+         <Tabs.Screen
+        name="Feedback"
+        options={{
+          headerShown: false,
+          tabBarStyle: { display: 'none' },
+        }}
+      />
     </Tabs>
   );
 }

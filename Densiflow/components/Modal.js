@@ -13,8 +13,7 @@ const Lodingscreen = ({ isLoading }) => {
             >
                 <View style={styles.modalOverlay}>
                     <View style={styles.modalContent}>
-                        <ActivityIndicator size="large" color="#007BFF" />
-                        <Text style={styles.loadingText}>Please Wait....</Text>
+                        <ActivityIndicator size="large" color="#007AFF" />
                     </View>
                 </View>
             </Modal>
@@ -42,10 +41,8 @@ const styles = StyleSheet.create({
     modalContent: {
         width: '80%', // Responsive width
         padding: 20,
-        backgroundColor: 'white',
         borderRadius: 10,
         alignItems: 'center',
-        elevation: 5, // Shadow effect for Android
     },
     loadingText: {
         marginTop: 15,
