@@ -29,9 +29,9 @@ const Account = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleDeleteAccount = async () => {
-    const email = await AsyncStorage.getItem("Email");
+  
     const body = {
-      email: email,
+      email: currentUser.user.email,
       password: password,
     };
 
@@ -156,7 +156,7 @@ const Account = () => {
     <SafeAreaView className="flex-1">
       <Loadingscreen isLoading={isLoading} />
       <View className="flex-row items-center p-3">
-        <TouchableOpacity onPress={() => router.push("/(tabs)/Profile")}>
+        <TouchableOpacity onPress={() => router.push("/Details")}>
           <AntDesign name="arrowleft" size={30} color="black" />
         </TouchableOpacity>
         <Text className="ml-3 text-lg" style={{ fontFamily: "PoppinsMedium" }}>

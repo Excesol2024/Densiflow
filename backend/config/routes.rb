@@ -3,6 +3,8 @@ Rails.application.routes.draw do
     sessions: 'users/sessions',
     registrations: 'users/registrations'
 }
+
+
    get "/me" => "users#current_user_info"
 
    post 'initial_registration', to: 'otp#initial_registration'
@@ -27,6 +29,10 @@ Rails.application.routes.draw do
 
     #SEND NOTIFICATIONS
     post "user/notifications", to: 'weather#send_push_notification'
+
+    #CREATE NOTIFICATIONS
+    post "user/notify", to: 'notifications#create'
+
 
     #GET ACCESS_TOKE
     get "access", to: 'weather#show_access_token'

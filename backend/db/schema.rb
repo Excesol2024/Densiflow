@@ -10,16 +10,19 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_10_11_144632) do
+ActiveRecord::Schema[7.1].define(version: 2024_10_14_112758) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
-  create_table "feedbacks", force: :cascade do |t|
+  create_table "notifications", force: :cascade do |t|
+    t.string "lat"
+    t.string "long"
     t.string "name"
-    t.string "email"
-    t.text "message"
+    t.time "scheduled_time"
+    t.bigint "user_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_notifications_on_user_id"
   end
 
   create_table "pendings", force: :cascade do |t|
@@ -46,15 +49,19 @@ ActiveRecord::Schema[7.1].define(version: 2024_10_11_144632) do
     t.datetime "remember_created_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "name"
     t.string "jti", null: false
     t.string "password_key"
     t.datetime "key_expires"
     t.string "expo_token"
+    t.string "firebase_token"
     t.string "lat"
     t.string "long"
+    t.string "photo_url"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["jti"], name: "index_users_on_jti", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  add_foreign_key "notifications", "users"
 end

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -27,6 +27,7 @@ import LocationPermission from "../../components/modal/androidpopup/LocationPerm
 import Notifications from "../../components/modal/androidpopup/Notifications";
 import Maps from "../../components/modal/androidpopup/Maps";
 import MessageSent from "../../components/modal/androidpopup/MessageSent";
+import { AuthenticatedContext } from "../../context/Authenticateduser";
 
 const Home =  () => {
   const [searchText, setSearchText] = useState("");
@@ -37,7 +38,7 @@ const Home =  () => {
   const [dateToday, setDateToday] = useState('')
   const [celcius, setCelcius] = useState('')
   const [weatherStatus, setWeatherStatus] = useState('')
-
+  const {   handleLoggedInUser } = useContext(AuthenticatedContext);
   const getCurrentDate = () => {
     const today = new Date();
     const options = { weekday: 'long', month: 'long', day: '2-digit' };
@@ -108,6 +109,7 @@ const Home =  () => {
 useEffect(()=>{
  getUserCurrentLocation();
  getCurrentDate();
+ handleLoggedInUser();
 },[])
 
 useEffect(()=>{
@@ -359,10 +361,10 @@ useEffect(()=>{
 
   return (
     <View className="flex-1 ">
-      <LocationPermission visible={locationsPermission} />
+      {/* <LocationPermission visible={locationsPermission} />
       <Notifications visible={notificationsPermission}/>
       <Maps visible={mapsPermission}/>
-      <MessageSent visible={messageSent}/>
+      <MessageSent visible={messageSent}/> */}
       <View className="">
         <View className=" w-full p-3 mt-14">
           <LinearGradient

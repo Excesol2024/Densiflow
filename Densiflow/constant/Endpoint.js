@@ -21,3 +21,8 @@ export const CurrentUser = {
 export const Weather = {
     getCurrentweather: "/user/weather",
 }
+
+
+export const Feedbacks = {
+    shareFeedbacks: "/user/feedbacks"
+}

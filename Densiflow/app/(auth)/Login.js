@@ -44,6 +44,7 @@ export default function Login() {
   const { setIsloggedIn } = useContext(AuthenticatedContext);
   const [isLoading, setIsLoading] = useState(false);
   const [isToggle, setIsToggle] = useState(true);
+  
 
   useEffect(() => {
     GoogleSignin.configure({
@@ -53,6 +54,7 @@ export default function Login() {
   }, []);
 
 
+  const [firebaseToken, setFirebaseToken] = useState('')
   async function requestUserPermission() {
     const authStatus = await messaging().requestPermission();
     const enabled =
@@ -67,6 +69,7 @@ export default function Login() {
   const getUserToken = async () =>{
     const token = await messaging().getToken()
     console.log("firebase token", token)
+    setFirebaseToken(token)
   }
 
 
@@ -187,6 +190,8 @@ async function registerForPushNotificationsAsync() {
         email: user.user.email,
         password: user.user.uid,
       },
+       expo_token: expoPushToken,
+       firebase_token: firebaseToken
     };
 
     try {
@@ -200,10 +205,9 @@ async function registerForPushNotificationsAsync() {
         const token = tokenWithBearer.split(" ")[1];
         await AsyncStorage.setItem("Authorization", JSON.stringify(token));
         await AsyncStorage.setItem("Email", email);
-        Alert.alert("suucessfully Logged In");
         setIsLoading(false);
         setTimeout(() => {
-          router.push("/(tabs)/Home");
+          router.push("/");
         }, 1000);
       } else {
         setIsLoading(false);
@@ -223,6 +227,8 @@ async function registerForPushNotificationsAsync() {
         email: email,
         password: password,
       },
+      expo_token: expoPushToken,
+      firebase_token: firebaseToken
     };
 
     if (email === "") {
@@ -245,10 +251,9 @@ async function registerForPushNotificationsAsync() {
         const token = tokenWithBearer.split(" ")[1];
         await AsyncStorage.setItem("Authorization", JSON.stringify(token));
         await AsyncStorage.setItem("Email", email);
-        Alert.alert("suucessfully Logged In");
         setIsLoading(false);
         setTimeout(() => {
-          router.push("/(tabs)/Home");
+          router.push("/");
         }, 1000);
       } else {
         setIsLoading(false);

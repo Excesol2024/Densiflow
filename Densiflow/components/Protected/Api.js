@@ -1,5 +1,5 @@
 import axios from "axios";
-import {paymentIntent, CurrentUser, Authentication, Weather } from "../../constant/Endpoint"
+import {paymentIntent, CurrentUser, Authentication, Weather, Feedbacks } from "../../constant/Endpoint"
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const baseURL = process.env.EXPO_PUBLIC_API_URL;
@@ -9,10 +9,10 @@ const apiHelper = async (endpoint, method, body = {}, params = {}) => {
   const token  = await AsyncStorage.getItem('Authorization');
 
   // If the token is null, do not proceed
-  // if (!token) {
-  //   console.log("Token is null, skipping API call.");
-  //   return null; // Or throw an error if you want to handle it differently
-  // }
+  if (!token) {
+    console.log("Token is null, skipping API call.");
+    return null; // Or throw an error if you want to handle it differently
+  }
 
   
   const url = endpoint.replace(/:\w+/g, (match) => {
@@ -50,4 +50,5 @@ export const API = {
   logout: () => apiHelper(Authentication.logoutUser, "DELETE"),
   deleteAccount: (body) => apiHelper(Authentication.deleteAccount, "DELETE", body),
   getCurrentUserWeather: (body)=> apiHelper(Weather.getCurrentweather, "POST", body),
+  shareFeedbacks: (body)=> apiHelper(Feedbacks.shareFeedbacks, "POST", body),
 };

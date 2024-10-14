@@ -47,13 +47,22 @@ class UsersController < ApplicationController
 
     def delete_account
       user = User.find_by(email: params[:email])
-      
+    
       if user && user.valid_password?(params[:password])  
+        # Delete associated notifications
+        user.notifications.destroy_all  # This deletes all notifications associated with the user
+    
+        # Now, delete the user
         user.destroy
+    
         render json: { message: 'Account deleted successfully.', status: "success" }, status: :ok
       else
         render json: { errors: ['Invalid email or password.'], status: "error" }, status: :unprocessable_entity
       end
+    rescue ActiveRecord::RecordNotFound
+      render json: { errors: ['User not found.'], status: "error" }, status: :not_found
+    rescue => e
+      render json: { errors: [e.message], status: "error" }, status: :internal_server_error
     end
 
     def create
@@ -90,7 +99,7 @@ class UsersController < ApplicationController
     end
 
     def user_params
-      params.require(:user).permit(:email, :password, :password_confirmation)
+      params.require(:user).permit(:name, :email, :password, :password_confirmation, :photo_url)
     end
  
 end

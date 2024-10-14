@@ -7,7 +7,7 @@ class Users::SessionsController < Devise::SessionsController
     user = User.find_by(email: params[:user][:email])
     if user && user.valid_password?(params[:user][:password])
       sign_in(user)
-      user.update(expo_token: params[:expo_token])  
+      user.update(expo_token: params[:expo_token], firebase_token: params[:firebase_token])  
       render json: { status: :ok, message: 'Login successful', user: user }
     else
       render json: { status: 'error', message: 'Login Failed', errors: ['Invalid email or password'] }, status: :unprocessable_entity

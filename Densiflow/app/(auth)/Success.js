@@ -17,7 +17,7 @@ const Success = () => {
         <View className=" mt-4">
     <TouchableOpacity
         className="bg-secondary p-4 rounded-xl shadow-2xl shadow-primary"
-        onPress={()=>{router.push('/login')}}
+        onPress={()=>{router.push('/Login')}}
       >
         <Text style={{ fontFamily: "PoppinsMedium" }} className="text-white text-center text-lg tracking-widest">
           BACK TO SIGN IN

@@ -18,6 +18,7 @@ import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { LoginManager, AccessToken } from 'react-native-fbsdk-next';
 
 const Registration = () => {
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -101,9 +102,11 @@ const Registration = () => {
   const handleManualcreateAccount = async (user) =>{
     const payload = {
       user: {
+        name: user.user.displayName,
         email: user.user.email,
         password: user.user.uid,
-        password_confirmation: user.user.uid
+        password_confirmation: user.user.uid,
+        photo_url: user.user.photoURL
       }
     }
 
@@ -140,8 +143,15 @@ const Registration = () => {
       return;
     }
 
+    if (name === "") {
+      Alert.alert('Error', 'Name must not be empty');
+      setIsLoading(false)
+      return;
+    }
+
     const body = {
         pending: {
+          name: name,
           email: email,
           password: password
         }
@@ -268,8 +278,8 @@ const Registration = () => {
           placeholder="Full name"
           className="ml-3 flex-1"
           style={{ fontFamily: "PoppinsMedium" }}
-          value={email}
-          onChangeText={setEmail}
+          value={name}
+          onChangeText={setName}
         />
       </View>
       <View className="flex-row items-center border border-gray-300 rounded-lg p-3 mb-3">

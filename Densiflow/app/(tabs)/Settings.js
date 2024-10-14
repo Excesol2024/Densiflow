@@ -47,13 +47,13 @@ const Profile = () => {
       <ScrollView contentContainerStyle={{ paddingVertical: 20 }}>
       <View className="flex-2">
             <View  className="flex-2 bg-gray-200  p-4 rounded-lg">
-             <Pressable onPress={()=>{router.replace('/(profile)/Account')}}>
+             <Pressable onPress={()=>{router.replace('/(profile)/Details')}}>
              <View className="flex-row gap-3 items-center mb-4">
                 <First/>
                 <Text style={{ fontFamily: "PoppinsMedium" }} className="text-lg">Account</Text>
               </View>
              </Pressable>
-            <Pressable>
+            <Pressable onPress={()=>{router.replace('/(auth)/Forgotpassword')}}>
               
             <View className="flex-row gap-3 items-center mb-4">
                 <Second/>

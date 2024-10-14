@@ -6,7 +6,7 @@ class OtpController < ApplicationController
 
   def initial_registration
     # Extract user params
-    user_params = params.require(:pending).permit(:email, :password)
+    user_params = params.require(:pending).permit(:name, :email, :password)
   
     # Check if the email already exists in `users` or `pendings` tables
     if User.exists?(email: user_params[:email])
@@ -24,6 +24,7 @@ class OtpController < ApplicationController
   
       # Update the existing pending user record with the new OTP, expiration time, and password
       pending_user.update(
+        name: user_params[:name],
         otp: otp_code,
         otp_expires: otp_expiration,
         password: user_params[:password]  # Update the password here
@@ -43,6 +44,7 @@ class OtpController < ApplicationController
   
       # Create a new pending user record
       pending_user = Pending.create(
+        name: user_params[:name],
         email: user_params[:email],
         password: user_params[:password],
         otp: otp_code,
@@ -60,37 +62,7 @@ class OtpController < ApplicationController
   end
   
 
-  # def resend_otp
-  #   # Extract user params
-  #   user_params = params.require(:pending).permit(:email)
-
-  #   # Find the pending user record
-  #   pending_user = Pending.find_by(email: user_params[:email])
-
-  #   if pending_user.nil?
-  #     render json: { error: "Email not found" }, status: :not_found
-  #     return
-  #   end
-
-  #   # Generate a new OTP
-  #   otp_code = generate_otp
-  #   otp_expiration = 10.minutes.from_now
-
-  #   # Update the pending user record with the new OTP and expiration time
-  #   pending_user.update(
-  #     otp: otp_code,
-  #     otp_expires: otp_expiration
-  #   )
-
-  #   if pending_user.save
-  #     # Resend OTP to the user's email
-  #     UserMailer.send_otp(pending_user, otp_code).deliver_now
-
-  #     render json: { message: "New OTP sent to your email. Please verify." }, status: :ok
-  #   else
-  #     render json: { errors: pending_user.errors.full_messages }, status: :unprocessable_entity
-  #   end
-  # end
+  
 
   private
 

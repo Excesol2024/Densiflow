@@ -32,6 +32,13 @@ export default function Layout() {
           tabBarStyle: { display: 'none' },
         }}
       />
+            <Tabs.Screen
+        name="Details"
+        options={{
+          headerShown: false,
+          tabBarStyle: { display: 'none' },
+        }}
+      />
     </Tabs>
   );
 }

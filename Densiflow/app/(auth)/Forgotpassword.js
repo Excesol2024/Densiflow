@@ -169,7 +169,7 @@ const Forgotpassword = () => {
     </> : <>
     <View className="flex-1  p-4">
     <View className="mt-8 flex-row items-center">
-        <TouchableOpacity onPress={() => router.push("/login")}>
+        <TouchableOpacity onPress={() => router.push("/")}>
           <AntDesign name="arrowleft" size={30} color="black" />
         </TouchableOpacity>
       </View>

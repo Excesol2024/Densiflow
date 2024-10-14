@@ -26,14 +26,9 @@ export const AuthenticatedProvider = ({ children }) => {
     const dataresponse = await API.getCurrentUser();
     setCurrentUser(dataresponse.data)
     console.log("CURRENT USER", dataresponse.data)
-    if(Token){
       setIsloggedIn({
         authUser: true
       })
-      router.replace('/(tabs)/home')
-    }else {
-      router.replace('/(auth)/login')
-    }
   };
 
   useEffect(() => {
@@ -48,12 +43,10 @@ export const AuthenticatedProvider = ({ children }) => {
 
   const handleLogoutUser = async () => {
     await AsyncStorage.removeItem('Authorization');
-    await AsyncStorage.clear()
     
       setIsloggedIn({
         authUser: false,
       });
-      console.log('You are Logged Out');
       router.replace('/')
   
   };
@@ -61,7 +54,7 @@ export const AuthenticatedProvider = ({ children }) => {
 
 
   return (
-    <AuthenticatedContext.Provider value={{ isloggedIn, setIsloggedIn, currentUser, handleLogoutUser }}>
+    <AuthenticatedContext.Provider value={{ isloggedIn, setIsloggedIn, currentUser, handleLogoutUser, handleLoggedInUser }}>
       {children}
     </AuthenticatedContext.Provider>
   );

@@ -4,14 +4,13 @@ import PropTypes from 'prop-types';
 import Sent from '../../svg/Sent';
 import Fontloader from '../../Fontloader';
 
-const MessageSent = ({ visible, onRequestPermission, onClose }) => {
+const MessageSent = ({ visible }) => {
   return (
     <Fontloader>
       <Modal
         animationType="slide"
         transparent={true}
         visible={visible}
-        onRequestClose={onClose}
       >
         <View style={styles.overlay}>
           <View style={styles.container}>
@@ -62,7 +61,5 @@ const styles = StyleSheet.create({
 export default MessageSent;
 
 MessageSent.propTypes = {
-  visible: PropTypes.bool.isRequired,
-  onRequestPermission: PropTypes.func.isRequired,
-  onClose: PropTypes.func.isRequired,
+  visible: PropTypes.bool.isRequired
 };
