@@ -26,6 +26,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_10_14_112758) do
   end
 
   create_table "pendings", force: :cascade do |t|
+    t.string "name"
     t.string "email"
     t.string "password"
     t.string "otp"

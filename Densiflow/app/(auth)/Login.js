@@ -28,6 +28,7 @@ import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
 import Constants from 'expo-constants';
 import messaging from '@react-native-firebase/messaging';
+import * as Location from 'expo-location';
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -51,6 +52,7 @@ export default function Login() {
       webClientId:
         "401998714323-e76k10at7c8qm1e6fpm0n71kf01upj9q.apps.googleusercontent.com",
     });
+    
   }, []);
 
 
@@ -91,6 +93,7 @@ export default function Login() {
   // Function to register for push notifications
 async function registerForPushNotificationsAsync() {
   let token;
+  await Location.requestForegroundPermissionsAsync();
   const { status: existingStatus } = await Notifications.getPermissionsAsync();
   let finalStatus = existingStatus;
 

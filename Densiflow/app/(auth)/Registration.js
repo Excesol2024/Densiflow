@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Alert, Pressable, SafeAreaView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Alert, Pressable, SafeAreaView, Keyboard } from 'react-native';
 import { useRouter } from 'expo-router';
 import { API } from "../../components/Unprotected/Api"
 import AntDesign from '@expo/vector-icons/AntDesign';
@@ -254,6 +254,30 @@ const Registration = () => {
     return () => clearInterval(interval);
   }, [isTimerActive, timer]);
 
+  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
+
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      "keyboardDidShow",
+      () => {
+        setIsKeyboardVisible(true);
+      }
+    );
+
+    const keyboardDidHideListener = Keyboard.addListener(
+      "keyboardDidHide",
+      () => {
+        setIsKeyboardVisible(false);
+      }
+    );
+
+    // Cleanup the listeners on unmount
+    return () => {
+      keyboardDidHideListener.remove();
+      keyboardDidShowListener.remove();
+    };
+  }, []);
+
   return (
    <SafeAreaView className="flex-1 bg-white">
       {isModalVisible ? <Otp email={email} 
@@ -332,43 +356,45 @@ const Registration = () => {
     </View>
     </View>
 
-<View className="flex-3 mt-2">
-<Text
-        style={{ fontFamily: "PoppinsMedium" }}
-        className="text-center text-lg text-gray-400 mt-5"
-      >
-       OR
-      </Text>
-     <View className="flex-2 justify-center items-center">
-   <Pressable onPress={onGoogleButtonPress}>
-   <View className="flex flex-row p-3 bg-white shadow-md w-64 rounded-xl shadow-gray-400 justify-center items-center mt-1">
-       <Google/>
-       <Text style={{ fontFamily: "PoppinsMedium" }} className="ml-3">Sign up with Google</Text>
-      </View>
-   </Pressable>
-    <Pressable onPress={onFacebookButtonPress}>
-    <View className="flex flex-row p-3 bg-white shadow-md w-64 rounded-xl shadow-gray-400 justify-center items-center mt-2">
-       <Facebook/>
-       <Text style={{ fontFamily: "PoppinsMedium" }} className="ml-3">Sign up with Facebook</Text>
-      </View>
-    </Pressable>
-     </View>
-     <View className="flex-row items-center justify-center">
-     <Text
-        style={{ fontFamily: "PoppinsMedium" }}
-        className="text-center text-md mt-7"
-      >
-       Already have an account?
-      </Text>
+      {isKeyboardVisible ? '' : 
+      <View className="flex-3 mt-2">
       <Text
-        style={{ fontFamily: "PoppinsMedium" }}
-        onPress={() => router.push("/login")}
-        className="text-center text-md mt-7 text-secondary ml-2"
-      >
-       Sign In
-      </Text>
-     </View>
-</View>
+              style={{ fontFamily: "PoppinsMedium" }}
+              className="text-center text-lg text-gray-400 mt-5"
+            >
+             OR
+            </Text>
+           <View className="flex-2 justify-center items-center">
+         <Pressable onPress={onGoogleButtonPress}>
+         <View className="flex flex-row p-3 bg-white shadow-md w-64 rounded-xl shadow-gray-400 justify-center items-center mt-1">
+             <Google/>
+             <Text style={{ fontFamily: "PoppinsMedium" }} className="ml-3">Sign up with Google</Text>
+            </View>
+         </Pressable>
+          <Pressable onPress={onFacebookButtonPress}>
+          <View className="flex flex-row p-3 bg-white shadow-md w-64 rounded-xl shadow-gray-400 justify-center items-center mt-2">
+             <Facebook/>
+             <Text style={{ fontFamily: "PoppinsMedium" }} className="ml-3">Sign up with Facebook</Text>
+            </View>
+          </Pressable>
+           </View>
+           <View className="flex-row items-center justify-center">
+           <Text
+              style={{ fontFamily: "PoppinsMedium" }}
+              className="text-center text-md mt-7"
+            >
+             Already have an account?
+            </Text>
+            <Text
+              style={{ fontFamily: "PoppinsMedium" }}
+              onPress={() => router.push("/Login")}
+              className="text-center text-md mt-7 text-secondary ml-2"
+            >
+             Sign In
+            </Text>
+           </View>
+      </View>
+      }
 
     </View>
    }

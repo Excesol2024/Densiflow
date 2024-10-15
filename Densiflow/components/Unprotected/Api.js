@@ -1,7 +1,6 @@
 import axios from "axios"
 import { Authentication} from "../../constant/Endpoint"
-
-const baseURL = process.env.EXPO_PUBLIC_API_URL;
+import { SERVER_URL } from '@env'
 
 const apiHelper = async (endpoint, method, body, params)=>{
     const headers = {
@@ -11,7 +10,7 @@ const apiHelper = async (endpoint, method, body, params)=>{
     try {
         const response = await axios({
             method: method,
-            url: `${baseURL}${endpoint}`,
+            url: `${SERVER_URL}${endpoint}`,
             headers: headers,
             data: body,
             params: params

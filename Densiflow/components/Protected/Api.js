@@ -1,8 +1,8 @@
 import axios from "axios";
 import {paymentIntent, CurrentUser, Authentication, Weather, Feedbacks } from "../../constant/Endpoint"
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { SERVER_URL } from '@env'
 
-const baseURL = process.env.EXPO_PUBLIC_API_URL;
 
 const apiHelper = async (endpoint, method, body = {}, params = {}) => {
 
@@ -29,7 +29,7 @@ const apiHelper = async (endpoint, method, body = {}, params = {}) => {
   try {
     const response = await axios({
       method: method,
-      url: `${baseURL}${url}`,
+      url: `${SERVER_URL}${url}`,
       headers: headers,
       data: body,   // Send data if there's a request body (POST, PUT)
       params: method === 'GET' ? params : {}, // Attach params only for GET requests

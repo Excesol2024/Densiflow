@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Users::RegistrationsController < Devise::RegistrationsController
-  # before_action :configure_sign_up_params, only: [:create]
+  before_action :configure_sign_up_params, only: [:create]
   # before_action :configure_account_update_params, only: [:update]
   
   def create
@@ -11,6 +11,7 @@ class Users::RegistrationsController < Devise::RegistrationsController
     if pending_user && pending_user.otp == params[:otp] && pending_user.otp_expires > Time.now
       # Prepare sign-up parameters using the pending user's details
       sign_up_params = {
+          name: pending_user.name
           email: pending_user.email,
           password: pending_user.password,
           password_confirmation: pending_user.password
@@ -74,9 +75,9 @@ class Users::RegistrationsController < Devise::RegistrationsController
   # protected
 
   # If you have extra params to permit, append them to the sanitizer.
-  # def configure_sign_up_params
-  #   devise_parameter_sanitizer.permit(:sign_up, keys: [:attribute])
-  # end
+  def configure_sign_up_params
+    devise_parameter_sanitizer.permit(:sign_up, keys: [:name])
+  end
 
   # If you have extra params to permit, append them to the sanitizer.
   # def configure_account_update_params

@@ -89,12 +89,12 @@ const Details = () => {
     <View className="flex-1 mt-10 items-center">
     <View className="flex justify-center items-center w-44">
    
-    {/* <Image source={{ uri: currentUser.user.photo_url }} className="h-36 w-36 rounded-full border-2 border-secondary" /> */}
+    <Image source={{ uri: currentUser.user.photo_url }} className="h-36 w-36 rounded-full border-2 border-secondary" />
     
     <Pressable onPress={pickImage}>
       <Text style={{fontFamily: "PoppinsMedium"}} className="text-secondary mt-1">set Picture</Text>
     </Pressable>
-      <Text style={{fontFamily: "PoppinsBold"}} className="border-b-2 mb-2 w-full border-gray-300 text-center text-secondary p-1 text-lg"></Text>
+      <Text style={{fontFamily: "PoppinsBold"}} className="border-b-2 mb-2 w-full border-gray-300 text-center text-secondary p-1 text-lg">{currentUser.user.name}</Text>
       <Text style={{fontFamily: "PoppinsMedium"}} className="text-gray-400 text-md">username</Text>
     </View>
     </View>
