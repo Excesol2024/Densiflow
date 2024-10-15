@@ -11,7 +11,7 @@ class Users::RegistrationsController < Devise::RegistrationsController
     if pending_user && pending_user.otp == params[:otp] && pending_user.otp_expires > Time.now
       # Prepare sign-up parameters using the pending user's details
       sign_up_params = {
-          name: pending_user.name
+          name: pending_user.name,
           email: pending_user.email,
           password: pending_user.password,
           password_confirmation: pending_user.password
