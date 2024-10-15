@@ -51,4 +51,5 @@ export const API = {
   deleteAccount: (body) => apiHelper(Authentication.deleteAccount, "DELETE", body),
   getCurrentUserWeather: (body)=> apiHelper(Weather.getCurrentweather, "POST", body),
   shareFeedbacks: (body)=> apiHelper(Feedbacks.shareFeedbacks, "POST", body),
+  uploadProfilePicture: (body)=> apiHelper(CurrentUser.uploadProfilePicture, "PUT", body),
 };
