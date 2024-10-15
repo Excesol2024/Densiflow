@@ -1,7 +1,7 @@
 databases:
   - name: densiflow
     databaseName: densiflow
-    user: densiflow_user
+    user: densiflow_h80h_user
     plan: free
 
 services:
