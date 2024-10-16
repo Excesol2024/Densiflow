@@ -22,10 +22,11 @@ Rails.application.routes.draw do
 
     # CREATE MANUAL ACCOUNT
     post "users/sign_up", to: 'users#create'
+    put "/user/update_photo", to: 'users#update_photo'
 
     #GET USER WEATHER
     post 'user/weather', to: 'weather#weather_for_user'
-
+    get 'users/all', to: 'users#all_users'
 
     #SEND NOTIFICATIONS
     post "user/notifications", to: 'weather#send_push_notification'

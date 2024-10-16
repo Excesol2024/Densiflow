@@ -2,10 +2,20 @@ import { View, Text, Image, Pressable } from 'react-native'
 import React from 'react'
 import Image1 from "../../assets/pana.png"
 import { useRouter } from 'expo-router'
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Steptwo = () => {
 
   const router = useRouter();
+  const handleGetStarted = async () => {
+    try {
+      await AsyncStorage.setItem("history", "true");
+      console.log("History set to true");
+      router.replace('/(auth)/Login');
+    } catch (error) {
+      console.error("Error saving history:", error);
+    }
+  };
 
   return (
 
@@ -27,7 +37,7 @@ const Steptwo = () => {
         <Text style={{ fontFamily: 'PoppinsMedium' }} className="text-white text-md">Next</Text>
       </Pressable>
 
-      <Text onPress={()=>{router.replace('/(auth)/Login')}}  style={{ fontFamily: 'PoppinsMedium' }} className="text-white text-md mt-4">Sign In</Text>
+      <Text onPress={handleGetStarted}  style={{ fontFamily: 'PoppinsMedium' }} className="text-white text-md mt-4">Sign In</Text>
 
     </View>
   )

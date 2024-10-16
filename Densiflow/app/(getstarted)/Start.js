@@ -3,10 +3,20 @@ import React from 'react'
 import FontLoader from "../../components/Fontloader"
 import Image1 from "../../assets/img1.png"
 import { useRouter } from 'expo-router'
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Start = () => {
 
   const router = useRouter();
+  const handleGetStarted = async () => {
+    try {
+      await AsyncStorage.setItem("history", "true");
+      console.log("History set to true");
+      router.replace('/(auth)/Login');
+    } catch (error) {
+      console.error("Error saving history:", error);
+    }
+  };
 
   return (
    <FontLoader>
@@ -27,7 +37,7 @@ const Start = () => {
         <Text style={{ fontFamily: 'PoppinsMedium' }} className="text-white text-md">Next</Text>
       </Pressable>
 
-      <Text onPress={()=>{router.replace('/(auth)/Login')}}  style={{ fontFamily: 'PoppinsMedium' }} className="text-white text-md mt-4">Sign In</Text>
+      <Text onPress={handleGetStarted}  style={{ fontFamily: 'PoppinsMedium' }} className="text-white text-md mt-4">Sign In</Text>
 
     </View>
    </FontLoader>

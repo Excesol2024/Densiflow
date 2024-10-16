@@ -54,7 +54,9 @@ const Details = () => {
         console.log('File uploaded successfully! Download URL: ', url);
         if(url){
           const body = {
+            user: {
             photo_url: url
+            }
           }
           const response = await API.uploadProfilePicture(body)
           if(response.data){
@@ -89,7 +91,13 @@ const Details = () => {
     <View className="flex-1 mt-10 items-center">
     <View className="flex justify-center items-center w-44">
    
-    <Image source={{ uri: currentUser.user.photo_url }} className="h-36 w-36 rounded-full border-2 border-secondary" />
+    <Image source={{ uri: currentUser.user.photo_url }}  style={{
+    height: 144, // h-36 in Tailwind is 144px
+    width: 144,  // w-36 in Tailwind is 144px
+    borderRadius: 72,  // Rounded full circle for a 144x144 image
+    borderWidth: 2,  // Border thickness (2px)
+    borderColor: '#007AFF',  // Replace with your secondary color (use a hex value or color name)
+  }} />
     
     <Pressable onPress={pickImage}>
       <Text style={{fontFamily: "PoppinsMedium"}} className="text-secondary mt-1">set Picture</Text>

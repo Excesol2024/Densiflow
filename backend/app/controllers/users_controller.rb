@@ -91,6 +91,20 @@ class UsersController < ApplicationController
       end
     end
 
+    def update_photo
+      if current_user.update(photo_url_params)
+        render json: { message: 'Photo updated successfully', photo_url: current_user.photo_url }, status: :ok
+      else
+        render json: { error: 'Failed to update photo' }, status: :unprocessable_entity
+      end
+    end
+
+    def all_users
+      @users = User.all # Fetch all users from the database
+      render json: @users # Render the users as JSON
+    end
+
+
 
     private
 
@@ -100,6 +114,10 @@ class UsersController < ApplicationController
 
     def user_params
       params.require(:user).permit(:name, :email, :password, :password_confirmation, :photo_url)
+    end
+
+    def photo_url_params
+      params.require(:user).permit(:photo_url)
     end
  
 end

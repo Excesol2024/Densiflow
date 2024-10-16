@@ -19,11 +19,11 @@ const Otp = ({ email, otp, setOtp, handleVerifyOtp, handleCancelOtp, timer, isTi
         <Text style={{ fontFamily: 'PoppinsMedium' }} className="text-3xl mb-2">
           Verification 
         </Text>
-        <Text style={{ fontFamily: 'PoppinsMedium' }} className="mb-6 text-lg">
-        We’ve send you the verification
-        code on  
-          <Text style={{ fontFamily: 'PoppinsMedium' }} className="text-blue-500">{email}</Text>
-        </Text>
+      <Text style={{ fontFamily: 'PoppinsMedium' }} className="mb-6 text-lg">
+  We’ve sent you the verification code on
+  {" "}
+  <Text style={{ fontFamily: 'PoppinsMedium' }} className="text-blue-500">{email}</Text>
+</Text>
         <View className="flex flex-row justify-center gap-6 mb-6">
         {[...Array(4)].map((_, index) => (
         <TextInput

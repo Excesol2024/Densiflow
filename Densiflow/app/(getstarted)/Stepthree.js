@@ -37,8 +37,6 @@ const stepthree = () => {
         <Text style={{ fontFamily: 'PoppinsMedium' }} className="text-white text-md">Get started</Text>
       </Pressable>
 
-      <Text onPress={()=>{router.replace('/(auth)/Login')}}  style={{ fontFamily: 'PoppinsMedium' }} className="text-white text-md mt-4">Sign In</Text>
-
     </View>
   )
 }

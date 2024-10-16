@@ -120,7 +120,7 @@ const Forgotpassword = () => {
         }
       } catch (error) {
         console.log("ERROR",error)
-        Alert.alert('OTP Verification', error.error);
+        Alert.alert('Invalid OTP', error.error);
         setIsLoading(false)
       }
     }

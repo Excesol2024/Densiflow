@@ -38,6 +38,7 @@ const Registration = () => {
 
     const onFacebookButtonPress = async () => {
       console.log("ATEMTING FB LOGIG")
+      setIsLoading(true)
       try {
         // Attempt login with permissions
         const result = await LoginManager.logInWithPermissions(['public_profile', 'email']);
@@ -74,6 +75,7 @@ const Registration = () => {
   
 
    const onGoogleButtonPress = async () => {
+    setIsLoading(true)
     try {
       await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
       const response = await GoogleSignin.signIn();
@@ -113,10 +115,12 @@ const Registration = () => {
    try {
     const response = await API.createManualAccount(payload);
     console.log(response.data)
-    Alert.alert("Successfully Created...")
+    router.push('/')
+    setIsLoading(false)
    } catch (error) {
     console.log(error)
     Alert.alert("Email has Already Signed In")
+    setIsLoading(false)
    }
    
   }
