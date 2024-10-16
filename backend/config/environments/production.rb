@@ -87,6 +87,17 @@ Rails.application.configure do
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false
 
+  config.action_mailer.default_url_options = { host: 'https://densiflow.onrender.com', port: 3000 }
+  config.action_mailer.smtp_settings = {
+    address:         "smtp.gmail.com",
+    port:            587,
+    host:            "https://densiflow.onrender.com",
+    user_name:       "info.excesol@gmail.com",
+    password:        "oflhyxwyuoidbcht",
+    authentication:  'plain',
+  }
+
+
   # Enable DNS rebinding protection and other `Host` header attacks.
   # config.hosts = [
   #   "example.com",     # Allow requests from example.com
