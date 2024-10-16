@@ -4,19 +4,19 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { useRouter } from "expo-router";
 
-const Privacy = () => {
+const Help = () => {
   const router = useRouter();
   return (
     <SafeAreaView className="flex-1">
       <View style={{ flexDirection: "row", alignItems: "center", padding: 10 }}>
-      <TouchableOpacity onPress={()=>{router.push('/Info')}}>
+      <TouchableOpacity className="flex-row items-center" onPress={()=>{router.push('/Info')}}>
           <AntDesign name="arrowleft" size={30} color="black" />
-        </TouchableOpacity>
-        <Text
+          <Text
           style={{ fontFamily: "PoppinsMedium", fontSize: 20, marginLeft: 10 }}
         >
           Back
         </Text>
+        </TouchableOpacity>
       </View>
 
       <View className="flex-1">
@@ -25,7 +25,7 @@ const Privacy = () => {
             className="text-center text-secondary"
             style={{ fontFamily: "PoppinsMedium", fontSize: 24 }}
           >
-            Privacy Policy
+            Help
           </Text>
           <View className="p-6">
             <Text style={{ fontFamily: "PoppinsMedium", fontSize: 16 }}>
@@ -119,4 +119,4 @@ const Privacy = () => {
   );
 };
 
-export default Privacy;
+export default Help;

@@ -31,7 +31,7 @@ const Terms = () => {
       <View style={{ flexDirection: "row", alignItems: "center", padding: 10 }}>
         <TouchableOpacity
           onPress={() => {
-            router.push("/(tabs)/Settings");
+            router.push("/Info");
           }}
         >
           <AntDesign name="arrowleft" size={30} color="black" />

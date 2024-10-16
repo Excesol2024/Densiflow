@@ -2,6 +2,7 @@ import { Stack } from 'expo-router';
 import { AuthenticatedProvider } from '../context/Authenticateduser';
 import FontLoader from '../components/Fontloader';
 import { SafeAreaView } from 'react-native';
+import Subscribed from './subscriptions/Subscribed';
 
 
 const StackLayout = () => {
@@ -21,6 +22,7 @@ const RootLayout = () => {
   return <AuthenticatedProvider>
     <FontLoader>
     <SafeAreaView style={{ flex: 1 }}>
+      <Subscribed/>
           <StackLayout />
         </SafeAreaView>
     </FontLoader>

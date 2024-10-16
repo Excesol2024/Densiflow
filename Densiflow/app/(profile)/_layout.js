@@ -39,6 +39,27 @@ export default function Layout() {
           tabBarStyle: { display: 'none' },
         }}
       />
+              <Tabs.Screen
+        name="Info"
+        options={{
+          headerShown: false,
+          tabBarStyle: { display: 'none' },
+        }}
+      />
+              <Tabs.Screen
+        name="Help"
+        options={{
+          headerShown: false,
+          tabBarStyle: { display: 'none' },
+        }}
+      />
+              <Tabs.Screen
+        name="Subscriptions"
+        options={{
+          headerShown: false,
+          tabBarStyle: { display: 'none' },
+        }}
+      />
     </Tabs>
   );
 }

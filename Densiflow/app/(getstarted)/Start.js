@@ -4,6 +4,7 @@ import FontLoader from "../../components/Fontloader"
 import Image1 from "../../assets/img1.png"
 import { useRouter } from 'expo-router'
 import AsyncStorage from '@react-native-async-storage/async-storage';
+// import { GestureHandlerRootView, PanGestureHandler, State } from 'react-native-gesture-handler';
 
 const Start = () => {
 
@@ -18,8 +19,21 @@ const Start = () => {
     }
   };
 
+    // const handleGesture = (event) => {
+    //   const { translationX } = event.nativeEvent;
+  
+    //   if (translationX < -50) {
+    //     console.log("Swiped Left!");
+    //   } else if (translationX > 50) {
+    //     console.log("Swiped Right!");
+    //   }
+    // };
+
+
   return (
-   <FontLoader>
+    // <GestureHandlerRootView className="flex-1">
+    //   <PanGestureHandler onGestureEvent={handleGesture}>
+      <FontLoader>
        <View className="flex-1 justify-center items-center bg-secondary">
       <Text style={{ fontFamily: 'PoppinsBold' }} className="text-white text-2xl text-center">Navigate Your World with Confidence</Text>
       <Image source={Image1} className="mt-5"/>
@@ -41,6 +55,8 @@ const Start = () => {
 
     </View>
    </FontLoader>
+    //   </PanGestureHandler>
+    // </GestureHandlerRootView>
   )
 }
 

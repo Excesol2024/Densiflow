@@ -18,6 +18,7 @@ export const AuthenticatedProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+  const [subscribed, setSubscribed] = useState(false)
 
   const handleLoggedInUser = async () => {
     const token = await AsyncStorage.getItem('Authorization');
@@ -54,7 +55,7 @@ export const AuthenticatedProvider = ({ children }) => {
 
 
   return (
-    <AuthenticatedContext.Provider value={{ isloggedIn, setIsloggedIn, currentUser, handleLogoutUser, handleLoggedInUser }}>
+    <AuthenticatedContext.Provider value={{ isloggedIn, setIsloggedIn, currentUser, handleLogoutUser, handleLoggedInUser, subscribed, setSubscribed }}>
       {children}
     </AuthenticatedContext.Provider>
   );

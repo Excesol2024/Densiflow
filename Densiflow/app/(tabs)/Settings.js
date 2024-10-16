@@ -117,7 +117,7 @@ const Profile = () => {
               </View>
             </Pressable>
             </Pressable>
-              <Pressable onPress={()=>{router.replace('/(profile)/Terms')}}>
+              <Pressable onPress={()=>{router.replace('/(profile)/Info')}}>
               <View className="flex-row gap-3 items-center pl-1">
                 <Info/>
                 <Text style={{ fontFamily: "PoppinsMedium" }} className="text-lg">Info</Text>
@@ -129,7 +129,7 @@ const Profile = () => {
 
           <View className="flex-1 mt-3">
             <View  className="flex-2 bg-gray-200 mt-2 p-4 rounded-lg">
-            <Pressable onPress={()=>{router.replace('/(profile)/Privacy')}}>
+            <Pressable onPress={()=>{router.replace('/(profile)/Subscriptions')}}>
              <View className="flex-row items-center justify-between   ">
                <View className="flex-row gap-3 items-center">
                <Subscription/>

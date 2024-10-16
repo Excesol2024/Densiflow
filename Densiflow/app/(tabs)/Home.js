@@ -29,6 +29,7 @@ import Maps from "../../components/modal/androidpopup/Maps";
 import MessageSent from "../../components/modal/androidpopup/MessageSent";
 import { AuthenticatedContext } from "../../context/Authenticateduser";
 
+
 const Home =  () => {
   const [searchText, setSearchText] = useState("");
   const [popularPace, setPopularPlace] = useState(true);
@@ -38,7 +39,7 @@ const Home =  () => {
   const [dateToday, setDateToday] = useState('')
   const [celcius, setCelcius] = useState('')
   const [weatherStatus, setWeatherStatus] = useState('')
-  const {   handleLoggedInUser } = useContext(AuthenticatedContext);
+  const {   handleLoggedInUser, setSubscribed } = useContext(AuthenticatedContext);
   const getCurrentDate = () => {
     const today = new Date();
     const options = { weekday: 'long', month: 'long', day: '2-digit' };
@@ -106,7 +107,9 @@ const Home =  () => {
     }
   };
 
+
 useEffect(()=>{
+  setSubscribed(true)
  getUserCurrentLocation();
  getCurrentDate();
  handleLoggedInUser();
