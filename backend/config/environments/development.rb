@@ -79,8 +79,8 @@ Rails.application.configure do
     address:         "smtp.gmail.com",
     port:            587,
     host:            "localhost",
-    user_name:       "info.excesol@gmail.com",
-    password:        "oflhyxwyuoidbcht",
+    user_name:       Rails.application.credentials.email[:username],
+    password:        Rails.application.credentials.email[:password],
     authentication:  'plain',
   }
 
