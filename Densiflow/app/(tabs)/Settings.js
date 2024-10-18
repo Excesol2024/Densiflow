@@ -1,4 +1,4 @@
-import { View, Text, Pressable, ScrollView } from 'react-native'
+import { View, Text, Pressable, ScrollView, Linking } from 'react-native'
 import React, { useContext, useState, useEffect } from 'react'
 import AntDesign from "@expo/vector-icons/AntDesign";
 import First from '../../components/svg/profile/First';
@@ -14,6 +14,8 @@ import { AuthenticatedContext } from '../../context/Authenticateduser'
 import auth from '@react-native-firebase/auth';
 import Toggle from "react-native-toggle-input";
 import Subscription from '../../components/svg/profile/Subscription';
+import * as Location from 'expo-location';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Profile = () => {
   const router = useRouter();
@@ -21,13 +23,55 @@ const Profile = () => {
   const [initializing, setInitializing] = useState(true);
   const [user, setUser] = useState();
   const [isToggle, setIsToggle] = useState(true)
+  const [isToggleLocation, setIsToggleLocation] = useState(false)
 
   function onAuthStateChanged(user) {
     setUser(user);
     if (initializing) setInitializing(false);
   }
 
+  const handleOffNotifications = () => {
+
+  }
+
+  const handleOnNotifications = () => {
+    
+  }
+
+  const handleOnLoactions = async() => {
+    console.log("LOCATIONS");
+    
+    let { status } = await Location.requestForegroundPermissionsAsync();
+    
+    if (status !== 'granted') {
+      Alert.alert('Permission Denied');
+      return;
+    }
+
+   await AsyncStorage.setItem('LocationPermission', "granted");
+  }
+
+  const handleOffLocations = async () => {
+    // Set a flag in AsyncStorage to simulate location being turned off
+    await AsyncStorage.setItem('LocationPermission', 'denied');
+    
+    // Inform the user
+    Alert.alert('Location Access Disabled', 'Location access has been turned off within the app. You can turn it back on in the app settings.');
+    
+    // Here, you could also clear any location-related data or stop location tracking if applicable
+    console.log('Location permission has been disabled in the app.');
+  };
+
+  const handleGetLocations = async () =>{
+    const Location = await AsyncStorage.getItem('LocationPermission')
+    console.log(Location)
+    if(Location === "granted"){
+      setIsToggleLocation(true);
+    }
+  }
+
   useEffect(() => {
+    handleGetLocations()
     const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
     return subscriber; // unsubscribe on unmount
   }, []);
@@ -79,21 +123,21 @@ const Profile = () => {
               </View>
              </Pressable>
 
-             <Pressable onPress={()=>{router.replace('/(profile)/Privacy')}}>
+             <Pressable onPress={()=>{Linking.openSettings()}}>
              <View className="flex-row items-center justify-between">
                <View className="flex-row gap-3 items-center">
                <Fourth/>
                <Text style={{ fontFamily: "PoppinsMedium" }} className="text-lg pl-1">My Location and Sharing</Text>
                </View>
                <Toggle
-                toggle={isToggle}
-                setToggle={setIsToggle}
+                toggle={isToggleLocation}
+                setToggle={setIsToggleLocation}
                 color={"#007AFF"}
                 size={15}
                 filled={true}
                 circleColor={"white"}
-                // onTrue={}
-                // onFalse={}
+                onTrue={handleOnLoactions}
+                onFalse={handleOffLocations}
               />
               </View>
              </Pressable>

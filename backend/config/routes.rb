@@ -30,9 +30,11 @@ Rails.application.routes.draw do
 
     #SEND NOTIFICATIONS
     post "user/notifications", to: 'weather#send_push_notification'
+    get "user/notifications", to: 'weather#show_access_token'
 
-    #CREATE NOTIFICATIONS
+    #USERS NOTIFICATIONS
     post "user/notify", to: 'notifications#create'
+    get "user/all_notifications", to: "notifications#user_notifications"
 
 
     #GET ACCESS_TOKE
@@ -40,6 +42,7 @@ Rails.application.routes.draw do
 
     #FEEDBACKS
     post "user/feedbacks", to: 'feedbacks#create'
+
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 

@@ -18,7 +18,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_10_14_112758) do
     t.string "lat"
     t.string "long"
     t.string "name"
-    t.time "scheduled_time"
+    t.string "crowd_status"
+    t.datetime "scheduled_time"
     t.bigint "user_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false

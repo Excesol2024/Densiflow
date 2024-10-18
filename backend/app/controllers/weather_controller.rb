@@ -26,27 +26,21 @@ class WeatherController < ApplicationController
     # Send notification
     send_notification(user_token, title, body)
 
-    render json: { message: 'Notification sent' }, status: :ok
-  end
-
-  def show_access_token
-    token = FcmService.generate_access_token
-    render json: { access_token: token }
-  rescue StandardError => e
-    render json: { error: e.message }, status: :unprocessable_entity
+    render json: { message: 'Notification sent', status: "ok" }, status: :ok
   end
 
   private
 
   def send_notification(token, title, body)
-    uri = URI.parse("https://fcm.googleapis.com/v1/projects/densiflowapp/messages:send")
+    uri = URI.parse("https://fcm.googleapis.com/v1/projects/#{Rails.application.credentials[:project_id]}/messages:send")
+    token = FcmService.generate_access_token
 
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true
 
     request = Net::HTTP::Post.new(uri.request_uri)
     request["Content-Type"] = "application/json"
-    request["Authorization"] = "Bearer #{FcmService.generate_access_token}" 
+    request["Authorization"] = "Bearer #{token}" 
 
     # Prepare the payload
     payload = {

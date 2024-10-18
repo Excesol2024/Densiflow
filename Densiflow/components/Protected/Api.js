@@ -1,5 +1,5 @@
 import axios from "axios";
-import {paymentIntent, CurrentUser, Authentication, Weather, Feedbacks } from "../../constant/Endpoint"
+import {paymentIntent, CurrentUser, Authentication, Weather, Feedbacks, Notifications } from "../../constant/Endpoint"
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SERVER_URL } from '@env'
 
@@ -52,4 +52,5 @@ export const API = {
   getCurrentUserWeather: (body)=> apiHelper(Weather.getCurrentweather, "POST", body),
   shareFeedbacks: (body)=> apiHelper(Feedbacks.shareFeedbacks, "POST", body),
   uploadProfilePicture: (body)=> apiHelper(CurrentUser.uploadProfilePicture, "PUT", body),
+  addPlaceToNotify: (body)=> apiHelper(Notifications.addNotifications, "POST", body),
 };

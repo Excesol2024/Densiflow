@@ -27,3 +27,7 @@ export const Weather = {
 export const Feedbacks = {
     shareFeedbacks: "/user/feedbacks"
 }
+
+export const Notifications = {
+    addNotifications: "user/notify"
+}

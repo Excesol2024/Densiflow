@@ -1,14 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert, Pressable } from 'react-native';
 import { useRouter } from 'expo-router';
 import { API } from "../../components/Unprotected/Api"
 import AntDesign from '@expo/vector-icons/AntDesign';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
-import Lodingscreen from "../../components/Modal"
 import Passwordotp from './Passwordotp';
 import ResetPassword from './Resetpassword.js';
 import Email from "../../components/svg/Email";
 import Arrowright from "../../components/svg/Arrowright"; 
+import { LoadingEffectsContext } from '../../context/Loadingeffect.js';
 
 
 const Forgotpassword = () => {
@@ -20,9 +19,9 @@ const Forgotpassword = () => {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [otp, setOtp] = useState(''); // State for OTP input
     const router = useRouter();
-    const [isLoading, setIsLoading] = useState(false);
     const [timer, setTimer] = useState(60); // Timer starting at 60 seconds
     const [isTimerActive, setIsTimerActive] = useState(true);
+    const { setEffectLoading } = useContext(LoadingEffectsContext)
 
     useEffect(() => {
       if (!isTimerActive || timer <= 0) return;
@@ -42,7 +41,7 @@ const Forgotpassword = () => {
     }, [isTimerActive, timer]);
 
     const handleSendOtp = async () =>{
-      setIsLoading(true);
+      setEffectLoading(true);
       if(email === ""){
         Alert.alert("Email should not be empty")
         return
@@ -56,7 +55,7 @@ const Forgotpassword = () => {
         const response = await API.sendOtp(body)
         if(response.data.status === "success"){
           Alert.alert("Otp sent successfully")
-          setIsLoading(false);
+          setEffectLoading(false);
           setTimeout(() => {
             setIsVerifyOtp(true);
             setTimer(60); 
@@ -64,18 +63,18 @@ const Forgotpassword = () => {
           }, 1000);
         }else if(response.data.status === "error"){
           Alert.alert("User not found");
-          setIsLoading(false);
+          setEffectLoading(false);
           return
         }
       } catch (error) {
         console.log(error)
         Alert.alert("User not found");
-        setIsLoading(false);
+        setEffectLoading(false);
       }
     }
 
     const handleResendOtp = async() => {
-      setIsLoading(true);
+      setEffectLoading(true);
       const body = {
         email: email
       }
@@ -84,7 +83,7 @@ const Forgotpassword = () => {
         const response = await API.sendOtp(body)
         if(response.data.status === "success"){
           Alert.alert("New Otp sent successfully")
-          setIsLoading(false);
+          setEffectLoading(false);
           setTimeout(() => {
             setTimer(60); 
             setIsTimerActive(true); 
@@ -101,7 +100,7 @@ const Forgotpassword = () => {
     }
 
     const handleValidateOtp = async () =>{
-    setIsLoading(true)
+    setEffectLoading(true)
       const body = {
         email: email,
         otp: otp
@@ -110,9 +109,9 @@ const Forgotpassword = () => {
       try {
         const response = await API.validateOtp(body);
         if(response.data.status === "success"){
-          setIsLoading(false)
+          setEffectLoading(false)
             Alert.alert('OTP Verification', response.data.message);
-            setIsLoading(false)
+            setEffectLoading(false)
             setTimeout(() => {
              setIsVerifyOtp(false);
              setIsVerifyPassword(true)
@@ -121,7 +120,7 @@ const Forgotpassword = () => {
       } catch (error) {
         console.log("ERROR",error)
         Alert.alert('Invalid OTP', error.error);
-        setIsLoading(false)
+        setEffectLoading(false)
       }
     }
 
@@ -137,7 +136,7 @@ const Forgotpassword = () => {
         return;
       }
 
-      setIsLoading(true)
+      setEffectLoading(true)
       const body = {
         email: email,
         otp: otp,
@@ -159,7 +158,6 @@ const Forgotpassword = () => {
 
   return (
     <>
-    <Lodingscreen isLoading={isLoading}/>
     {isVerifyOtp ? <>
     <Passwordotp email={email} otp={otp} setOtp={setOtp} isTimerActive={isTimerActive} 
     timer={timer} handleResendOtp={handleResendOtp} handleVerifyOtp={handleValidateOtp}/>

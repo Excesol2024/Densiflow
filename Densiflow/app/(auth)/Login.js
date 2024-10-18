@@ -13,7 +13,6 @@ import { useRouter } from "expo-router";
 import { API } from "../../components/Unprotected/Api";
 import { AuthenticatedContext } from "../../context/Authenticateduser";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import Lodingscreen from "../../components/Modal";
 import Lock from "../../components/svg/Lock";
 import Email from "../../components/svg/Email";
 import Eye from "../../components/svg/Eye";
@@ -29,6 +28,7 @@ import * as Notifications from 'expo-notifications';
 import Constants from 'expo-constants';
 import messaging from '@react-native-firebase/messaging';
 import * as Location from 'expo-location';
+import { LoadingEffectsContext } from "../../context/Loadingeffect";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -43,9 +43,8 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const router = useRouter();
   const { setIsloggedIn } = useContext(AuthenticatedContext);
-  const [isLoading, setIsLoading] = useState(false);
   const [isToggle, setIsToggle] = useState(true);
-  
+  const { setEffectLoading } = useContext(LoadingEffectsContext)
 
   useEffect(() => {
     GoogleSignin.configure({
@@ -107,6 +106,8 @@ async function registerForPushNotificationsAsync() {
     return;
   }
   try {
+    await AsyncStorage.setItem('NotificationPermission', "granted");
+    await AsyncStorage.setItem('LocationPermission', "granted");
     token = (await Notifications.getExpoPushTokenAsync()).data;
     console.log("expo token", token)
   } catch (error) {
@@ -118,7 +119,7 @@ async function registerForPushNotificationsAsync() {
 
 
   const onFacebookButtonPress = async () => {
-    setIsLoading(true);
+    setEffectLoading(true);
     try {
       // Attempt login with permissions
       const result = await LoginManager.logInWithPermissions([
@@ -161,7 +162,7 @@ async function registerForPushNotificationsAsync() {
   };
 
   const onGoogleButtonPress = async () => {
-    setIsLoading(true);
+    setEffectLoading(true);
     try {
       await GoogleSignin.hasPlayServices({
         showPlayServicesUpdateDialog: true,
@@ -208,23 +209,23 @@ async function registerForPushNotificationsAsync() {
         const token = tokenWithBearer.split(" ")[1];
         await AsyncStorage.setItem("Authorization", JSON.stringify(token));
         await AsyncStorage.setItem("Email", email);
-        setIsLoading(false);
+        setEffectLoading(false);
         setTimeout(() => {
           router.push("/");
         }, 1000);
       } else {
-        setIsLoading(false);
+        setEffectLoading(false);
         Alert.alert("Please Sign Up First Using Google");
       }
     } catch (error) {
       console.log(error);
       Alert.alert("Please Sign Up First Using Google or Facebook");
-      setIsLoading(false);
+      setEffectLoading(false);
     }
   };
 
   const handleLogin = async () => {
-    setIsLoading(true);
+    setEffectLoading(true);
     const body = {
       user: {
         email: email,
@@ -236,11 +237,11 @@ async function registerForPushNotificationsAsync() {
 
     if (email === "") {
       Alert.alert("Email must not be empty");
-      setIsLoading(false);
+      setEffectLoading(false);
       return;
     } else if (password === "") {
       Alert.alert("Password must not be empty");
-      setIsLoading(false);
+      setEffectLoading(false);
       return;
     }
     try {
@@ -254,18 +255,18 @@ async function registerForPushNotificationsAsync() {
         const token = tokenWithBearer.split(" ")[1];
         await AsyncStorage.setItem("Authorization", JSON.stringify(token));
         await AsyncStorage.setItem("Email", email);
-        setIsLoading(false);
+        setEffectLoading(false);
         setTimeout(() => {
           router.push("/");
         }, 1000);
       } else {
-        setIsLoading(false);
+        setEffectLoading(false);
         Alert.alert("Invalid Username or Password");
       }
     } catch (error) {
       console.log(error);
       Alert.alert("Invalid Username or Password");
-      setIsLoading(false);
+      setEffectLoading(false);
     }
   };
 
@@ -296,7 +297,6 @@ async function registerForPushNotificationsAsync() {
   return (
     <ScrollView contentContainerStyle={{ flex: 1, height: 50 }}>
       <View className="flex-1 justify-center p-4 bg-white">
-        <Lodingscreen isLoading={isLoading} />
         <View className="flex-1 justify-end">
           <Text
             style={{ fontFamily: "PoppinsMedium" }}

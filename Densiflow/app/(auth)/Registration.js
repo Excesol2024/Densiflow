@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert, Pressable, SafeAreaView, Keyboard } from 'react-native';
 import { useRouter } from 'expo-router';
 import { API } from "../../components/Unprotected/Api"
@@ -16,6 +16,7 @@ import Facebook from "../../components/svg/Facebook";
 import auth from '@react-native-firebase/auth';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { LoginManager, AccessToken } from 'react-native-fbsdk-next';
+import { LoadingEffectsContext } from '../../context/Loadingeffect';
 
 const Registration = () => {
   const [name, setName] = useState('');
@@ -25,10 +26,9 @@ const Registration = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [otp, setOtp] = useState(''); // State for OTP input
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
   const [timer, setTimer] = useState(60); // Timer starting at 60 seconds
   const [isTimerActive, setIsTimerActive] = useState(true);
-
+  const { setEffectLoading } = useContext(LoadingEffectsContext)
 
   useEffect(()=>{
     GoogleSignin.configure({
@@ -38,7 +38,7 @@ const Registration = () => {
 
     const onFacebookButtonPress = async () => {
       console.log("ATEMTING FB LOGIG")
-      setIsLoading(true)
+      setEffectLoading(true)
       try {
         // Attempt login with permissions
         const result = await LoginManager.logInWithPermissions(['public_profile', 'email']);
@@ -75,7 +75,7 @@ const Registration = () => {
   
 
    const onGoogleButtonPress = async () => {
-    setIsLoading(true)
+    setEffectLoading(true)
     try {
       await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
       const response = await GoogleSignin.signIn();
@@ -116,40 +116,40 @@ const Registration = () => {
     const response = await API.createManualAccount(payload);
     console.log(response.data)
     router.push('/')
-    setIsLoading(false)
+    setEffectLoading(false)
    } catch (error) {
     console.log(error)
     Alert.alert("Email has Already Signed In")
-    setIsLoading(false)
+    setEffectLoading(false)
    }
    
   }
 
   const handleRegister = async () => {
 
-    setIsLoading(true)
+    setEffectLoading(true)
     
     if (password !== confirmPassword) {
       Alert.alert('Error', 'Passwords do not match');
-      setIsLoading(false)
+      setEffectLoading(false)
       return;
     }
 
     if (password === "" || confirmPassword === "") {
       Alert.alert('Error', 'Password must not be empty');
-      setIsLoading(false)
+      setEffectLoading(false)
       return;
     }
 
     if (email === "") {
       Alert.alert('Error', 'Email must not be empty');
-      setIsLoading(false)
+      setEffectLoading(false)
       return;
     }
 
     if (name === "") {
       Alert.alert('Error', 'Name must not be empty');
-      setIsLoading(false)
+      setEffectLoading(false)
       return;
     }
 
@@ -164,7 +164,7 @@ const Registration = () => {
     try {
      const response = await API.initialRegister(body)
      if(response.data){
-      setIsLoading(false)
+      setEffectLoading(false)
       Alert.alert('Success', 'Registration successful. Please check your email for OTP.');
       setTimer(60)
       setIsTimerActive(true); 
@@ -174,7 +174,7 @@ const Registration = () => {
      }
     } catch (error) {
       console.log(error)
-      setIsLoading(false)
+      setEffectLoading(false)
     }
   
   };
@@ -190,7 +190,7 @@ const Registration = () => {
     // Handle OTP verification logic here
     // Alert.alert('OTP Verification', 'OTP verified successfully');
     // setIsModalVisible(false); // Close the modal after verification
-    setIsLoading(true)
+    setEffectLoading(true)
     const body = {
         email: email,
         otp: otp
@@ -199,7 +199,7 @@ const Registration = () => {
       const response = await API.register(body)
       console.log("FINAL REGISTER", response.data.status)
       if(response.data.status === "success"){
-        setIsLoading(false)
+        setEffectLoading(false)
           Alert.alert('OTP Verification', response.data.message);
           setIsModalVisible(false);
           setTimeout(() => {
@@ -209,13 +209,13 @@ const Registration = () => {
     } catch (error) {
       console.log("ERROR",error)
       Alert.alert('OTP Verification', error.error);
-      setIsLoading(false)
+      setEffectLoading(false)
     }
   
   };
 
   const handleResendCode = async () => {
-    setIsLoading(true)
+    setEffectLoading(true)
 
     const body = {
         pending: {
@@ -227,7 +227,7 @@ const Registration = () => {
     try {
      const response = await API.initialRegister(body)
      if(response.data){
-      setIsLoading(false)
+      setEffectLoading(false)
       Alert.alert('Success', 'New Otp sent to your email');
       setTimeout(() => {
         setIsModalVisible(true);
@@ -237,7 +237,7 @@ const Registration = () => {
      }
     } catch (error) {
       console.log(error)
-      setIsLoading(false)
+      setEffectLoading(false)
     }
   };
 
@@ -288,8 +288,6 @@ const Registration = () => {
    otp={otp} setOtp={setOtp}
    handleVerifyOtp={handleVerifyOtp} handleCancelOtp={handleCancelOtp} timer={timer} isTimerActive={isTimerActive} handleResendCode={handleResendCode} /> : 
     <View className="flex-1 justify-center p-4">
-      <Lodingscreen isLoading={isLoading}/>
-
       <View className="mt-6 flex-row items-center">
         <TouchableOpacity onPress={() => router.push("/Login")}>
           <AntDesign name="arrowleft" size={30} color="black" />

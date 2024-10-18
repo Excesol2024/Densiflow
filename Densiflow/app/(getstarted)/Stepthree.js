@@ -3,6 +3,7 @@ import React from 'react'
 import Image1 from "../../assets/rafiki.png"
 import { useRouter } from 'expo-router'
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { GestureHandlerRootView, PanGestureHandler, State } from 'react-native-gesture-handler';
 
 const stepthree = () => {
 
@@ -18,8 +19,21 @@ const stepthree = () => {
     }
   };
 
+  const handleGesture = (event) => {
+    const { translationX } = event.nativeEvent;
+
+    if (translationX < -50) {
+      console.log("swipe")
+    } else if (translationX > 50) {
+      router.replace('/(getstarted)/Steptwo')
+    }
+  };
+
   return (
-       <View className="flex-1 justify-center items-center bg-secondary">
+    <GestureHandlerRootView className="flex-1">
+    <PanGestureHandler onGestureEvent={handleGesture}>
+
+    <View className="flex-1 justify-center items-center bg-secondary">
       <Text style={{ fontFamily: 'PoppinsBold' }} className="text-white text-2xl text-center">Never miss the</Text>
       <Text style={{ fontFamily: 'PoppinsBold' }} className="text-white text-2xl text-center">Perfect Moment</Text>
       <Image source={Image1} className="mt-5"/>
@@ -36,8 +50,10 @@ const stepthree = () => {
       <Pressable onPress={handleGetStarted} className="bg-primary p-2 mt-5 pl-10 pr-10 rounded-xl">
         <Text style={{ fontFamily: 'PoppinsMedium' }} className="text-white text-md">Get started</Text>
       </Pressable>
-
+      <Text onPress={handleGetStarted}  style={{ fontFamily: 'PoppinsMedium' }} className="text-white text-md mt-4">Sign In</Text>
     </View>
+</PanGestureHandler>
+</GestureHandlerRootView>
   )
 }
 

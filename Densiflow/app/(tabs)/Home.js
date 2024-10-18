@@ -322,8 +322,7 @@ useEffect(()=>{
     ],
   };
 
-  const [currentCategoryIndex, setCurrentCategoryIndex] = useState(0);
-  const [goodPlace, setGoodPlace] = useState([]);
+
   const [isPM , setIsPm] = useState(false);
 
   const handleDayOrNight = () => {
@@ -341,21 +340,31 @@ useEffect(()=>{
 
 
 
-  useEffect(() => {
-    setGoodPlace(Object.values(goodPlaces)[currentCategoryIndex]);
-    handleDayOrNight();
-  }, [currentCategoryIndex]);
-
-  const nextGoodPlaces = () => {
-    const categories = Object.keys(goodPlaces);
-    const lastIndex = categories.length - 1;
-    if (currentCategoryIndex === lastIndex) {
-      setCurrentCategoryIndex(0);
-      return;
+  const [goodPlace, setGoodPlace] = useState([]);
+  const [currentCategory, setCurrentCategory] = useState("coffee");
+  
+  const updatePlaceBasedOnTime = () => {
+    const currentHour = new Date().getHours();
+  
+    if (currentHour >= 3 && currentHour < 10) {
+      setCurrentCategory("coffee");
+    } else if (currentHour >= 10 && currentHour < 17) {
+      setCurrentCategory("lunch");
     } else {
-      setCurrentCategoryIndex((prev) => prev + 1);
+      setCurrentCategory("dinner");
     }
   };
+  
+  useEffect(() => {
+    updatePlaceBasedOnTime();
+  }, []);
+  
+  useEffect(() => {
+    setGoodPlace(goodPlaces[currentCategory]);
+  }, [currentCategory]);
+
+
+
 
   const [locationsPermission, setLocationPermission] = useState(false);
   const [notificationsPermission, setNotificationsPermission] = useState(false);
@@ -721,77 +730,66 @@ ${
           </View>
 
           {goodPlace.length > 0 && (
-            <View key={currentCategoryIndex} className="flex-1 mt-4 mb-8">
-              <View className="flex-row items-center gap-4 flex-1 relative">
-                <View className="absolute right-0 top-0">
-                  <Pressable onPress={nextGoodPlaces}>
-                    <AntDesign name="arrowright" size={26} color="#007AFF" />
-                  </Pressable>
-                </View>
-                <Image source={goodPlace[0].image} className="h-26" />
-                <View>
+      <View key={currentCategory} className="flex-1 mt-4 mb-8">
+        <View className="flex-row items-center gap-4 flex-1 relative">
+          <Image source={goodPlace[0].image} className="h-26" />
+          <View>
+            <Text
+              style={{ fontFamily: "PoppinsBold" }}
+              className="text-lg break-words text-secondary"
+            >
+              {goodPlace[0].title}
+            </Text>
+            <Text
+              style={{ fontFamily: "PoppinsBold" }}
+              className="text-lg break-words text-secondary"
+            >
+              {goodPlace[0].subtitle}
+            </Text>
+          </View>
+        </View>
+
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{ alignItems: "center" }}
+          className="mt-3"
+        >
+          {goodPlace[0].places.map((currentplace, idx) => (
+            <View key={idx} className="mr-2 rounded-3xl w-52 overflow-hidden">
+              <Image source={currentplace.image} className="w-full h-32 " />
+              <View className="bg-secondary flex flex-row justify-between pl-4 pr-3 py-2 rounded-b-xl">
+                <Text
+                  style={{ fontFamily: "PoppinsThin" }}
+                  className="text-sm text-white"
+                >
+                  {currentplace.name}
+                </Text>
+                <View className="flex flex-row items-center">
                   <Text
-                    style={{ fontFamily: "PoppinsBold" }}
-                    className="text-lg break-words text-secondary"
+                    style={{ fontFamily: "PoppinsThin" }}
+                    className="text-sm text-white"
                   >
-                    “{goodPlace[0].title}
+                    {currentplace.km}
                   </Text>
-                  <Text
-                    style={{ fontFamily: "PoppinsBold" }}
-                    className="text-lg break-words text-secondary"
-                  >
-                    {goodPlace[0].subtitle}”
-                  </Text>
+                  <View
+                    className={`w-3 h-3 rounded-full ${
+                      currentplace.busyness === "red"
+                        ? "bg-red-500"
+                        : currentplace.busyness === "yellow"
+                        ? "bg-yellow-300"
+                        : currentplace.busyness === "green"
+                        ? "bg-green-500"
+                        : ""
+                    } ml-1`}
+                  />
                 </View>
               </View>
-
-              <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={{ alignItems: "center" }}
-                className="mt-3"
-              >
-                {goodPlace[0].places.map((currentplace, idx) => (
-                  <View
-                    key={idx}
-                    className="mr-2 rounded-3xl w-52 overflow-hidden"
-                  >
-                    <Image
-                      source={currentplace.image}
-                      className="w-full h-32 "
-                    />
-                    <View className="bg-secondary flex flex-row justify-between pl-4 pr-3 py-2 rounded-b-xl">
-                      <Text
-                        style={{ fontFamily: "PoppinsThin" }}
-                        className="text-sm text-white"
-                      >
-                        {currentplace.name}
-                      </Text>
-                      <View className="flex flex-row items-center">
-                        <Text
-                          style={{ fontFamily: "PoppinsThin" }}
-                          className="text-sm text-white"
-                        >
-                          {currentplace.km}
-                        </Text>
-                        <View
-                          className={`w-3 h-3 rounded-full ${
-                            currentplace.busyness === "red"
-                              ? "bg-red-500"
-                              : currentplace.busyness === "yellow"
-                              ? "bg-yellow-300"
-                              : currentplace.busyness === "green"
-                              ? "bg-green-500"
-                              : ""
-                          } ml-1`}
-                        />
-                      </View>
-                    </View>
-                  </View>
-                ))}
-              </ScrollView>
             </View>
-          )}
+          ))}
+        </ScrollView>
+      </View>
+    )}
 
           <View className=" flex-1 mb-20">
             <Text style={{ fontFamily: "PoppinsThin" }} className="text-xl">

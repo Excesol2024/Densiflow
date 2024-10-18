@@ -20,13 +20,13 @@ import FacebookIcon from "../../components/svg/Facebook";
 import auth from "@react-native-firebase/auth";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { LoginManager, AccessToken } from "react-native-fbsdk-next";
-import Loadingscreen from "../../components/Modal";
+
 
 const Account = () => {
   const router = useRouter();
   const { currentUser } = useContext(AuthenticatedContext);
   const [password, setPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+
 
   const handleDeleteAccount = async () => {
   
@@ -59,7 +59,7 @@ const Account = () => {
   }, []);
 
   const onFacebookButtonPress = async () => {
-    setIsLoading(true);
+    setEffectLoading(true);
     try {
       // Attempt login with permissions
       const result = await LoginManager.logInWithPermissions([
@@ -102,7 +102,7 @@ const Account = () => {
   };
 
   const onGoogleButtonPress = async () => {
-    setIsLoading(true);
+    setEffectLoading(true);
     try {
       await GoogleSignin.hasPlayServices({
         showPlayServicesUpdateDialog: true,
@@ -140,7 +140,7 @@ const Account = () => {
       if (response.data.status === "success") {
         Alert.alert("SUCCESFFULLY DELETED ACCOUNT");
         await AsyncStorage.clear();
-        setIsLoading(false);
+        setEffectLoading(false);
         setTimeout(() => {
           router.push("/");
         }, 2000);
@@ -148,13 +148,12 @@ const Account = () => {
     } catch (error) {
       console.log(error);
       Alert.alert("INVALID ACCOUNT");
-      setIsLoading(false);
+      setEffectLoading(false);
     }
   };
 
   return (
     <SafeAreaView className="flex-1">
-      <Loadingscreen isLoading={isLoading} />
       <View className="flex-row items-center p-3">
         <TouchableOpacity onPress={() => router.push("/Details")}>
           <AntDesign name="arrowleft" size={30} color="black" />

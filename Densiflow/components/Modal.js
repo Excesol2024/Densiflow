@@ -1,19 +1,23 @@
 import { View, Text, Modal, ActivityIndicator, StyleSheet } from 'react-native';
-import React from 'react';
-import PropTypes from 'prop-types';
+import React, { useContext } from 'react';
+import { LoadingEffectsContext } from '../context/Loadingeffect';
 
-const Lodingscreen = ({ isLoading }) => {
+const Lodingscreen = () => {
+    const { effectLoading } = useContext(LoadingEffectsContext)
+
+   
+
     return (
       
             <Modal
                 transparent={true}
                 animationType="fade"
-                visible={isLoading}
+                visible={effectLoading}
                 onRequestClose={() => {}}
             >
                 <View style={styles.modalOverlay}>
                     <View style={styles.modalContent}>
-                        <ActivityIndicator size="large" color="#007AFF" />
+                        <ActivityIndicator size={70} color="#007AFF" />
                     </View>
                 </View>
             </Modal>
@@ -21,9 +25,6 @@ const Lodingscreen = ({ isLoading }) => {
     );
 };
 
-Lodingscreen.propTypes = {
-    isLoading: PropTypes.bool.isRequired,
-};
 
 const styles = StyleSheet.create({
     container: {

@@ -4,7 +4,7 @@ import FontLoader from "../../components/Fontloader"
 import Image1 from "../../assets/img1.png"
 import { useRouter } from 'expo-router'
 import AsyncStorage from '@react-native-async-storage/async-storage';
-// import { GestureHandlerRootView, PanGestureHandler, State } from 'react-native-gesture-handler';
+import { GestureHandlerRootView, PanGestureHandler, State } from 'react-native-gesture-handler';
 
 const Start = () => {
 
@@ -19,21 +19,21 @@ const Start = () => {
     }
   };
 
-    // const handleGesture = (event) => {
-    //   const { translationX } = event.nativeEvent;
+    const handleGesture = (event) => {
+      const { translationX } = event.nativeEvent;
   
-    //   if (translationX < -50) {
-    //     console.log("Swiped Left!");
-    //   } else if (translationX > 50) {
-    //     console.log("Swiped Right!");
-    //   }
-    // };
+      if (translationX < -50) {
+        router.replace('/(getstarted)/Steptwo')
+      } else if (translationX > 50) {
+        console.log("Swiped Right!");
+      }
+    };
 
 
   return (
-    // <GestureHandlerRootView className="flex-1">
-    //   <PanGestureHandler onGestureEvent={handleGesture}>
-      <FontLoader>
+    <GestureHandlerRootView className="flex-1">
+      <PanGestureHandler onGestureEvent={handleGesture}>
+
        <View className="flex-1 justify-center items-center bg-secondary">
       <Text style={{ fontFamily: 'PoppinsBold' }} className="text-white text-2xl text-center">Navigate Your World with Confidence</Text>
       <Image source={Image1} className="mt-5"/>
@@ -54,9 +54,8 @@ const Start = () => {
       <Text onPress={handleGetStarted}  style={{ fontFamily: 'PoppinsMedium' }} className="text-white text-md mt-4">Sign In</Text>
 
     </View>
-   </FontLoader>
-    //   </PanGestureHandler>
-    // </GestureHandlerRootView>
+  </PanGestureHandler>
+  </GestureHandlerRootView>
   )
 }
 

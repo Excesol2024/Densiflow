@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, TextInput } from "react-native";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import User from "../../components/svg/User";
 import Email from "../../components/svg/Email";
 import AntDesign from "@expo/vector-icons/AntDesign";
@@ -7,6 +7,7 @@ import { useRouter } from 'expo-router'
 import { API } from '../../components/Protected/Api'
 import Loadingscreen from '../../components/Modal'
 import MessageSent from '../../components/modal/androidpopup/MessageSent'
+import { LoadingEffectsContext } from "../../context/Loadingeffect";
 
 const Feedback = () => {
     const router = useRouter();
@@ -15,11 +16,11 @@ const Feedback = () => {
       email: "",
       message: ""
     })
-    const [isLoading, setIsLoading] = useState(false)
+   const { setEffectLoading } = useContext(LoadingEffectsContext)
     const [isVisible, setIsVisible] = useState(false)
 
     const handleShareFeedbacks = async () => {
-      setIsLoading(true)
+      setEffectLoading(true)
       const body = {
         name: user.name,
         email: user.email,
@@ -29,7 +30,7 @@ const Feedback = () => {
       try {
         const response = await API.shareFeedbacks(body)
         if(response.data){
-          setIsLoading(false)
+          setEffectLoading(false)
           setIsVisible(true)
           setTimeout(() => {
             setIsVisible(false)
@@ -48,7 +49,6 @@ const Feedback = () => {
 
   return (
     <View className="flex-1 p-4">
-      <Loadingscreen isLoading={isLoading}/>
       <MessageSent visible={isVisible} />
       <View className="mt-8 flex-row items-center">
         <TouchableOpacity className="flex-row items-center" onPress={() => router.push("/(tabs)/Settings")}>

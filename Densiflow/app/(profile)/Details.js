@@ -7,12 +7,12 @@ import * as ImagePicker from 'expo-image-picker';
 import storage from '@react-native-firebase/storage';
 import { utils } from '@react-native-firebase/app';
 import { API } from '../../components/Protected/Api';
-import Loadingscreen from '../../components/Modal'
+import { LoadingEffectsContext } from '../../context/Loadingeffect';
 const Details = () => {
   const router = useRouter()
   const { currentUser, handleLogoutUser } = useContext(AuthenticatedContext)
   const [downloadURL, setDownloadURL] = useState('');
-  const [isLoading, setIsLoading] = useState(false)
+  const { setEffectLoading } = useContext(LoadingEffectsContext)
 
   // Function to pick an image from the gallery
   const pickImage = async () => {
@@ -34,7 +34,7 @@ const Details = () => {
   };
 
   const uploadFile = async (uri) => {
-    setIsLoading(true)
+    setEffectLoading(true)
     try {
       // Generate a unique file name for Firebase Storage
       const filename = uri.substring(uri.lastIndexOf('/') + 1);
@@ -60,7 +60,7 @@ const Details = () => {
           }
           const response = await API.uploadProfilePicture(body)
           if(response.data){
-            setIsLoading(false);
+            setEffectLoading(false);
             router.push('/')
           }
         }
@@ -75,7 +75,6 @@ const Details = () => {
 
   return (
     <View className="flex-1 p-4">
-      <Loadingscreen isLoading={isLoading}/>
          <View className="mt-8 flex-row items-center">
         <TouchableOpacity className="flex-row items-center" onPress={() => router.push("/(tabs)/Settings")}>
           <AntDesign name="arrowleft" size={30} color="black" />
