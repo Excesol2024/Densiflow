@@ -30,6 +30,7 @@ import MessageSent from "../../components/modal/androidpopup/MessageSent";
 import { AuthenticatedContext } from "../../context/Authenticateduser";
 
 
+
 const Home =  () => {
   const [searchText, setSearchText] = useState("");
   const [popularPace, setPopularPlace] = useState(true);
@@ -44,10 +45,32 @@ const Home =  () => {
     const today = new Date();
     const options = { weekday: 'long', month: 'long', day: '2-digit' };
     const formattedDate = today.toLocaleDateString('en-US', options);
-    console.log('Today is:', formattedDate);
     setDateToday(formattedDate)
     return formattedDate;
   };
+
+  const [popularPlaces, setPopularPlaces] = useState([])
+  const [recommendedPlaces, setRecommendedPlaces] = useState([])
+
+  const handleGetPopularPlaces = async () => {
+    try {
+      const response = await API.getPopularPlacess();
+      setPopularPlaces(response.data)
+     
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  const handleGetRecommendedPlaces = async () => {
+    try {
+      const response = await API.getRecommededPlaces();
+      setRecommendedPlaces(response.data)
+     
+    } catch (error) {
+      console.log(error)
+    }
+  }
 
   const getUserCurrentLocation = async () => {
     let { status } = await Location.requestForegroundPermissionsAsync();
@@ -61,7 +84,6 @@ const Home =  () => {
     
     if (coords) {
       const { latitude, longitude } = coords;
-      console.log('Your position is', latitude, longitude);
       let response = await Location.reverseGeocodeAsync({
         latitude,
         longitude
@@ -86,18 +108,13 @@ const Home =  () => {
           longitude: longitude,
           latitude: latitude
         };
-
         const response = await API.getCurrentUserWeather(body)
-        console.log(response.data.weather[0].main)
-
         setWeatherStatus(response.data.weather[0].main)
 
-
+        handleLoggedInUser();
 
         const tempKelvin = response.data.main.temp;
         const tempCelsius = Math.round(tempKelvin - 273.15);
-        
-        console.log("Temperature in Celsius:", tempCelsius);
         setCelcius(tempCelsius);
 
       }
@@ -113,6 +130,8 @@ useEffect(()=>{
  getUserCurrentLocation();
  getCurrentDate();
  handleLoggedInUser();
+ handleGetPopularPlaces();
+ handleGetRecommendedPlaces();
 },[])
 
 useEffect(()=>{
@@ -129,26 +148,7 @@ useEffect(()=>{
     setRecommendedPlace(true)
   }
 
-  const popularPlaces = [
-    {
-      name: "Tartufo Ristorante",
-      image: `${require("../../assets/tabs/img1.png")}`,
-      km: "2.3 km",
-      busyness: "red",
-    },
-    {
-      name: "Tartufo Ristorante",
-      image: `${require("../../assets/tabs/img2.png")}`,
-      km: "2.3 km",
-      busyness: "green",
-    },
-    {
-      name: "Tartufo Ristorante",
-      image: `${require("../../assets/tabs/img1.png")}`,
-      km: "2.3 km",
-      busyness: "red",
-    },
-  ];
+
 
   const popularPlaces2 = [
     {
@@ -171,26 +171,6 @@ useEffect(()=>{
     },
   ];
 
-  const recommendedPlaces = [
-    {
-      name: "Silent Cafe",
-      image: `${require("../../assets/tabs/r1.png")}`,
-      km: "1.3 km",
-      busyness: "green",
-    },
-    {
-      name: "GameZone",
-      image: `${require("../../assets/tabs/r2.png")}`,
-      km: "2.3",
-      busyness: "green",
-    },
-    {
-      name: "GameZone",
-      image: `${require("../../assets/tabs/r1.png")}`,
-      km: "2.3 km",
-      busyness: "red",
-    },
-  ];
 
   const recommendedPlaces2 = [
     {
@@ -326,8 +306,7 @@ useEffect(()=>{
   const [isPM , setIsPm] = useState(false);
 
   const handleDayOrNight = () => {
-    console.log("NICE");
-    
+   
     const currentTime = new Date();
     const currentHour = currentTime.getHours();
     const isAM = currentHour < 12;
@@ -372,7 +351,7 @@ useEffect(()=>{
   const [messageSent, setMessageSent] = useState(false)
 
   return (
-    <View className="flex-1 ">
+    <View className="flex-1 bg-white">
       {/* <LocationPermission visible={locationsPermission} />
       <Notifications visible={notificationsPermission}/>
       <Maps visible={mapsPermission}/>
@@ -517,29 +496,31 @@ useEffect(()=>{
                 key={index}
                 className="mr-2 rounded-3xl w-52 overflow-hidden"
               >
-                <Image source={places.image} className="w-full h-32 " />
+                <Image source={{uri: `${places.image_url}`}} className="w-full h-32 " />
                 <View className="bg-secondary flex flex-row justify-evenly py-2 rounded-b-2xl">
-                  <Text
-                    style={{ fontFamily: "PoppinsThin" }}
-                    className="text-sm text-white"
-                  >
-                    {places.name}
-                  </Text>
+                <Text
+  style={{ fontFamily: "PoppinsThin", width: 100 }}  // Adjust the width as needed
+  className="text-sm text-white"
+  numberOfLines={1}               // Limit to one line
+  ellipsizeMode="tail"            // Adds the ellipsis at the end
+>
+  {places.name}
+</Text>
                   <View className="flex flex-row items-center">
                     <Text
                       style={{ fontFamily: "PoppinsThin" }}
                       className="text-sm text-white"
                     >
-                      {places.km}
+                    {places.kilometers}km
                     </Text>
                     <View
                       className={`w-3 h-3 rounded-full
 ${
-  places.busyness === "red"
+  places.crowd_status === "high"
     ? "bg-red-500"
-    : places.busyness === "yellow"
+    : places.crowd_status === "medium"
     ? "bg-yellow-300"
-    : places.busyness === "green"
+    : places.crowd_status === "low"
     ? "bg-green-500"
     : ""
 } ml-1`}
@@ -549,7 +530,7 @@ ${
               </View>
             ))}
           </ScrollView>
-          <ScrollView
+          {/* <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={{ alignItems: "center" }}
@@ -591,7 +572,7 @@ ${
                 </View>
               </View>
             ))}
-          </ScrollView>
+          </ScrollView> */}
         </View>: ''  
       }
 
@@ -609,29 +590,31 @@ ${
                   key={index}
                   className="mr-2 rounded-3xl w-52 overflow-hidden"
                 >
-                  <Image source={places.image} className="w-full h-32 " />
+                  <Image source={{uri: `${places.image_url}`}} className="w-full h-32 " />
                   <View className="bg-secondary flex flex-row justify-evenly py-2 rounded-b-2xl">
-                    <Text
-                      style={{ fontFamily: "PoppinsThin" }}
-                      className="text-sm text-white"
-                    >
-                      {places.name}
-                    </Text>
+                  <Text
+  style={{ fontFamily: "PoppinsThin", width: 100 }}  // Adjust the width as needed
+  className="text-sm text-white"
+  numberOfLines={1}               // Limit to one line
+  ellipsizeMode="tail"            // Adds the ellipsis at the end
+>
+  {places.name}
+</Text>
                     <View className="flex flex-row items-center">
                       <Text
                         style={{ fontFamily: "PoppinsThin" }}
                         className="text-sm text-white"
                       >
-                        {places.km}
+                        {places.kilometers}km
                       </Text>
                       <View
                         className={`w-3 h-3 rounded-full
   ${
-    places.busyness === "red"
+    places.crowd_status === "high"
       ? "bg-red-500"
-      : places.busyness === "yellow"
+      : places.crowd_status === "medium"
       ? "bg-yellow-300"
-      : places.busyness === "green"
+      : places.crowd_status === "low"
       ? "bg-green-500"
       : ""
   } ml-1`}
@@ -641,7 +624,7 @@ ${
                 </View>
               ))}
             </ScrollView>
-            <ScrollView
+            {/* <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={{ alignItems: "center" }}
@@ -683,7 +666,7 @@ ${
                   </View>
                 </View>
               ))}
-            </ScrollView>
+            </ScrollView> */}
           </View> : ''  
         }
 

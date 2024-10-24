@@ -29,5 +29,10 @@ export const Feedbacks = {
 }
 
 export const Notifications = {
-    addNotifications: "user/notify"
+    addNotifications: "/user/notify"
+}
+
+export const Places = {
+    getPopularPlaces: "/places/popular",
+    getRecommededPlaces: "/places/recommended"
 }

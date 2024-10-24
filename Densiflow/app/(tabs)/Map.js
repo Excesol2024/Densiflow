@@ -1,5 +1,5 @@
-import { View, Text, Image, Pressable, TextInput, ScrollView } from "react-native";
-import React, { useRef, useState } from "react";
+import { View, Text, Image, Pressable, TextInput, ScrollView, Modal } from "react-native";
+import React, { useRef, useState, useContext } from "react";
 import Image1 from "../../assets/tabs/img1.png";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import Entypo from "@expo/vector-icons/Entypo";
@@ -14,12 +14,16 @@ import Minus from '../../components/svg/map/Minus'
 import Mapviews from '../../components/svg/map/Mapview'
 import Locate from '../../components/svg/map/Locate'
 import MapView, { Marker } from 'react-native-maps';
+import axios from 'axios';
+import { AuthenticatedContext } from "../../context/Authenticateduser"
 
 const Map = () => {
   const mapRef = useRef(null);
-  const imageProfile = "https://firebasestorage.googleapis.com/v0/b/exceproducts.appspot.com/o/profile.png?alt=media&token=7253525a-bfaf-4b73-bd3b-d185550cd8dc"
+  const { currentUser } = useContext(AuthenticatedContext)
+  const imageProfile = `${currentUser.user.photo_url}`
   const [isAm, setIsAM] = useState(true)
 
+  
   const handleSelectPm = () =>{
     setIsAM(false)
   }
@@ -127,6 +131,67 @@ const Map = () => {
   };
 
 
+  const [selectedPlace, setSelectedPlace] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
+  const GOOGLE_API_KEY = process.env.GOOGLE_MAP_API_KEY;
+
+  const fetchPlaceDetails = async (latitude, longitude) => {
+    console.log("Fetching details for:", latitude, longitude);
+    try {
+      const response = await axios.get(
+        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${GOOGLE_API_KEY}`
+      );
+      
+      console.log("API Response:", response.data); // Log the API response
+  
+      if (response.data.results.length > 0) {
+        const place = response.data.results[0]; // Get the first result
+        const placeId = place.place_id;
+  
+        // Fetch detailed place info using the Place ID
+        const placeDetails = await getPlaceDetailsById(placeId);
+        setSelectedPlace(placeDetails); // Store the place details
+        setModalVisible(true); // Show modal with place details
+      } else {
+        Alert.alert('No place found at this location');
+      }
+    } catch (error) {
+      console.error("Error fetching place details:", error.response ? error.response.data : error.message);
+      Alert.alert('Error', 'Failed to fetch place details.');
+    }
+  };
+
+
+  const getPlaceDetailsById = async (placeId) => {
+    try {
+      const response = await axios.get(
+        `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=name,formatted_address,place_id,geometry&key=${GOOGLE_API_KEY}`
+      );
+      return response.data.result;
+    } catch (error) {
+      Alert.alert('Error', 'Failed to get details by place ID');
+      console.error(error);
+      return null;
+    }
+  };
+  const handleMapPress = (e) => {
+    console.log("Map Pressed");
+    const { latitude, longitude } = e.nativeEvent.coordinate;
+    console.log("Coordinates:", latitude, longitude);
+  };
+
+  const handleMarkerPress = (place) => {
+    console.log("Marker Pressed:", place);
+  };
+
+    // Example data for markers
+    const maplaces = [
+      { id: 1, title: "Place 1", description: "Description for Place 1", coordinate: { latitude: 37.78825, longitude: -122.4324 } },
+      { id: 2, title: "Place 2", description: "Description for Place 2", coordinate: { latitude: 37.78845, longitude: -122.4325 } },
+      // Add more places as needed
+    ];
+
+
   return (
     <View className="flex-1 ">
         {/** GOOGLE MAP */}
@@ -135,11 +200,12 @@ const Map = () => {
           initialRegion={region} 
           onRegionChangeComplete={setRegion}
           mapType={mapType}
+          onPress={handleMapPress}
         className="flex-1">
 
 
 
-<Marker coordinate={{ latitude: initialRegion.latitude, longitude: initialRegion.longitude }}>
+<Marker  onPress={() => handleMarkerPress("Place Title")} coordinate={{ latitude: initialRegion.latitude, longitude: initialRegion.longitude }}>
           <View className="flex-1 justify-center items-center"><Text className="text-secondary text-xl">YOU</Text></View>
           <View className="relative w-12 h-12 border-4 shadow-2xl shadow-gray-500 border-blue-500 rounded-full overflow-hidden">
             <Image 
@@ -148,8 +214,33 @@ const Map = () => {
             />
           </View>
         </Marker>
-
         </MapView>
+
+
+          {/* Modal to show place details */}
+      {selectedPlace && (
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={() => setModalVisible(false)}
+        >
+          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+            <View style={{ backgroundColor: 'white', padding: 20, borderRadius: 10 }}>
+              <Text style={{ fontSize: 20, fontWeight: 'bold' }}>{selectedPlace.name}</Text>
+              <Text>Place ID: {selectedPlace.place_id}</Text>
+              <Text>Address: {selectedPlace.formatted_address}</Text>
+
+              <TouchableOpacity
+                onPress={() => setModalVisible(false)}
+                style={{ marginTop: 10, backgroundColor: 'lightblue', padding: 10 }}
+              >
+                <Text>Close</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+      )}
 
       <View className="flex-1 absolute mt-10">
       <View className="flex-2 p-5 ">
@@ -205,6 +296,8 @@ const Map = () => {
         </View>
       </View>
       </View>
+
+      
       
     
     

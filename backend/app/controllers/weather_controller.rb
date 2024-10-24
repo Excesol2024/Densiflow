@@ -3,15 +3,37 @@ require 'uri'
 require 'json'
 
 class WeatherController < ApplicationController
+  before_action :authenticate_user!
 
   def weather_for_user
-    longitude = params[:longitude]
-    latitude = params[:latitude]
-    url = URI("https://api.openweathermap.org/data/2.5/weather?lat=#{latitude}&lon=#{longitude}&appid=#{Rails.application.credentials[:weatherAPI]}")
-    response = Net::HTTP.get(url)
-    weather_data = JSON.parse(response)
-    render json: weather_data
-  end
+    if current_user
+      # Check if latitude and longitude are present
+      if params[:latitude].present? && params[:longitude].present?
+        longitude = params[:longitude]
+        latitude = params[:latitude]
+  
+        # Update user's location
+        current_user.update(lat: latitude, long: longitude)
+  
+        # Fetch weather data
+        begin
+          url = URI("https://api.openweathermap.org/data/2.5/weather?lat=#{latitude}&lon=#{longitude}&appid=#{Rails.application.credentials[:weatherAPI]}")
+          response = Net::HTTP.get(url)
+          weather_data = JSON.parse(response)
+          
+          # Render weather data
+          render json: weather_data
+        rescue StandardError => e
+          # Handle API errors or any unexpected errors
+          render json: { error: 'Failed to fetch weather data', details: e.message }, status: :bad_request
+        end
+      else
+        render json: { error: 'Latitude and longitude are required' }, status: :unprocessable_entity
+      end
+    else
+      render json: { error: 'User must be logged in' }, status: :unauthorized
+    end
+  end  
 
   def send_push_notification
     user_token = params[:token]
