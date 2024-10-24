@@ -2,6 +2,7 @@
 
 # dependencies
 node_modules/
+android/
 /android
 /ios
 
@@ -72,6 +73,10 @@ yarn-error.*
 # local env files
 .env*.local
 .env
+
+.env
+*.env
+
 
 # typescript
 *.tsbuildinfo
