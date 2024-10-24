@@ -1,5 +1,5 @@
 import { View, Text, Image, Pressable, TextInput, ScrollView } from "react-native";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import Image1 from "../../assets/tabs/img1.png";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import Entypo from "@expo/vector-icons/Entypo";
@@ -11,11 +11,13 @@ import Bookmark from "../../components/svg/Bookmark";
 import Alert from "../../components/svg/Alert";
 import Plus from '../../components/svg/map/Plus'
 import Minus from '../../components/svg/map/Minus'
-import Mapview from '../../components/svg/map/Mapview'
+import Mapviews from '../../components/svg/map/Mapview'
 import Locate from '../../components/svg/map/Locate'
+import MapView, { Marker } from 'react-native-maps';
 
 const Map = () => {
-  const [isChecked, setChecked] = useState(false);
+  const mapRef = useRef(null);
+  const imageProfile = "https://firebasestorage.googleapis.com/v0/b/exceproducts.appspot.com/o/profile.png?alt=media&token=7253525a-bfaf-4b73-bd3b-d185550cd8dc"
   const [isAm, setIsAM] = useState(true)
 
   const handleSelectPm = () =>{
@@ -41,6 +43,15 @@ const Map = () => {
     },
   ]
 
+  const [region, setRegion] = useState({
+    latitude: 8.1130595, // Example latitude
+    longitude: 122.6678314, // Example longitude
+    latitudeDelta: 0.005, // Initial zoom level
+    longitudeDelta: 0.005, // Initial zoom level
+  });
+
+  const [mapType, setMapType] = useState('standard');
+
   const handleAddNotifications = async () => {
     try {
       
@@ -49,9 +60,98 @@ const Map = () => {
     }
   }
 
+  const handleZoomIn = () => {
+    const newLatitudeDelta = region.latitudeDelta / 2;
+    const newLongitudeDelta = region.longitudeDelta / 2;
+
+    mapRef.current.animateToRegion({
+      ...region,
+      latitudeDelta: newLatitudeDelta,
+      longitudeDelta: newLongitudeDelta,
+    }, 1000);
+
+    setRegion((prev) => ({
+      ...prev,
+      latitudeDelta: newLatitudeDelta,
+      longitudeDelta: newLongitudeDelta,
+    }));
+  };
+
+
+  const handleZoomOut = () => {
+    const newLatitudeDelta = region.latitudeDelta * 2;
+    const newLongitudeDelta = region.longitudeDelta * 2;
+
+    mapRef.current.animateToRegion({
+      ...region,
+      latitudeDelta: newLatitudeDelta,
+      longitudeDelta: newLongitudeDelta,
+    }, 1000);
+
+    setRegion((prev) => ({
+      ...prev,
+      latitudeDelta: newLatitudeDelta,
+      longitudeDelta: newLongitudeDelta,
+    }));
+  };
+
+  const handleCurrentUserLocation = () => {
+    mapRef.current.animateToRegion({
+      latitude: initialRegion.latitude,
+      longitude: initialRegion.longitude,
+      latitudeDelta: 0.002, // Adjust for more zoom
+      longitudeDelta: 0.002, // Adjust for more zoom
+    }, 1000);
+  };
+  
+  const initialRegion = {
+    latitude: 8.1130595, // Example latitude
+    longitude: 122.6678314, // Example longitude
+    latitudeDelta: 0.005, // Smaller value for more zoom
+    longitudeDelta: 0.005 // Adjust for zoom level (smaller means more zoomed in)
+  };
+
+  const toggleMapType = () => {
+    setMapType((prev) => {
+      switch (prev) {
+        case 'standard':
+          return 'satellite';
+        case 'satellite':
+          return 'hybrid';
+        case 'hybrid':
+          return 'terrain';
+        default:
+          return 'standard'; // Fallback to standard
+      }
+    });
+  };
+
+
   return (
     <View className="flex-1 ">
-      <View className="flex-1 mt-10">
+        {/** GOOGLE MAP */}
+        <MapView
+          ref={mapRef}
+          initialRegion={region} 
+          onRegionChangeComplete={setRegion}
+          mapType={mapType}
+        className="flex-1">
+
+
+
+<Marker coordinate={{ latitude: initialRegion.latitude, longitude: initialRegion.longitude }}>
+          <View className="flex-1 justify-center items-center"><Text className="text-secondary text-xl">YOU</Text></View>
+          <View className="relative w-12 h-12 border-4 shadow-2xl shadow-gray-500 border-blue-500 rounded-full overflow-hidden">
+            <Image 
+              source={{ uri: imageProfile }} // Replace with your image URL
+              className="w-12 h-12" // Image size
+            />
+          </View>
+        </Marker>
+
+        </MapView>
+
+      <View className="flex-1 absolute mt-10">
       <View className="flex-2 p-5 ">
      <View className="rounded-full bg-white shadow-lg shadow-gray-900">
       <View className="flex-row items-center bg-transparent rounded-full p-1">
@@ -89,24 +189,28 @@ const Map = () => {
      </View>
      <View className="flex-1  w-full">
         <View className="right-1 absolute">
-        <View className="bg-white w-10 flex justify-center items-center h-9 p-2 rounded-t-lg ">
+        <Pressable onPress={handleZoomIn} className="bg-white w-10 flex justify-center items-center h-9 p-2 rounded-t-lg ">
           <Plus/>
-        </View>
-        <View className="bg-white w-10 h-9 items-center flex-1 justify-center  p-2 mt-0.5 rounded-b-lg ">
+        </Pressable>
+        <Pressable onPress={handleZoomOut} className="bg-white w-10 h-9 items-center flex-1 justify-center  p-2 mt-0.5 rounded-b-lg ">
           <Minus/>
-        </View>
-        <View className="bg-white w-10 flex justify-center items-center mt-2 h-9 p-2 rounded-t-lg ">
-          <Mapview/>
-        </View>
-        <View className="bg-white w-10 h-9 items-center flex-1 justify-center  p-2 mt-0.5 rounded-b-lg ">
+        </Pressable>
+        <Pressable onPress={toggleMapType}  className="bg-white w-10 flex justify-center items-center mt-2 h-9 p-2 rounded-t-lg ">
+          <Mapviews/>
+        </Pressable>
+       <Pressable onPress={handleCurrentUserLocation} className="bg-white w-10 h-9 items-center flex-1 justify-center  p-2 mt-0.5 rounded-b-lg ">
           <Locate/>
-        </View>
+        </Pressable>
+   
         </View>
       </View>
       </View>
+      
     
-      <View className="p-3 flex-1 justify-center items-center">
-      <View className="flex flex-row gap-2 p-3 w-full bg-slate-50 absolute bottom-60 shadow-2xl shadow-gray-700 rounded-lg z-50">
+    
+      
+    <View className="flex-1 absolute w-full z-50 p-3 hidden" style={{bottom: `30%` }}>
+    <View className="flex flex-row p-4 bg-white shadow-2xl shadow-gray-700 rounded-2xl">
          <View className="flex-1 mb-2">
           <Text style={{fontFamily: 'PoppinsMedium'}} className="text-md text-secondary text-center mb-5">
           Set alerts to get notified when your favorite spots reach your preferred crowd level
@@ -136,9 +240,11 @@ const Map = () => {
          </View>
          </View>
         </View>
+    </View>
 
 
-        <View className="flex flex-row p-3 w-full bg-slate-50 absolute bottom-24 shadow-2xl shadow-gray-700 rounded-2xl z-50">
+       <View className="flex-1 absolute w-full p-2 bottom-24 z-50 hidden">
+       <View className="flex flex-row p-3 bg-white shadow-2xl shadow-gray-700 rounded-2xl">
           <View className="absolute right-3 top-3">
           <Bookmark/>
           </View>
@@ -163,7 +269,8 @@ const Map = () => {
             </View>
           </View>
         </View>
-      </View>
+       </View>
+      
     </View>
   );
 };

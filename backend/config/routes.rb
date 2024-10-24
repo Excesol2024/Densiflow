@@ -37,11 +37,15 @@ Rails.application.routes.draw do
     get "user/all_notifications", to: "notifications#user_notifications"
 
 
-    #GET ACCESS_TOKE
-    get "access", to: 'weather#show_access_token'
-
     #FEEDBACKS
     post "user/feedbacks", to: 'feedbacks#create'
+
+
+    #RECOMMENDED_PLACES
+    get "places/recommended", to: 'places#recommended'
+
+    #POPULAR_PLACE
+    get "places/popular", to: 'places#popular'
 
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html

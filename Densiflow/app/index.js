@@ -1,4 +1,3 @@
-import { View, Text } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import  SplashScreen  from './splashscreen';
 import Start from './(getstarted)/Start'
@@ -19,7 +18,7 @@ const Index = () => {
       if(history && !Token){
         setTimeout(() => {
           setIsShowSplashScreen(false);
-          router.replace('/(auth)/Login')
+          router.replace('/(tabs)/Home')
         }, 2000)
       }else if(Token){
         setTimeout(() => {

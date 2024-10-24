@@ -52,8 +52,6 @@ export const AuthenticatedProvider = ({ children }) => {
   
   };
 
-
-
   return (
     <AuthenticatedContext.Provider value={{ isloggedIn, setIsloggedIn, currentUser, handleLogoutUser, handleLoggedInUser, subscribed, setSubscribed }}>
       {children}
