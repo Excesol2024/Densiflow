@@ -47,6 +47,12 @@ Rails.application.routes.draw do
     #POPULAR_PLACE
     get "places/popular", to: 'places#popular'
 
+    #PLACES_TYPES
+    post "places/types", to: 'places#places_types'
+
+
+    post "sampleplaces/types", to: 'places#sampleplaces_types'
+
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 

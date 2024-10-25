@@ -146,6 +146,67 @@ class Googleapi
     # Filter out nil values (from skipped places)
     formatted_places.compact
   end
+
+
+  def places_types(lat, long, establishment_type)
+  
+
+     api_url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=#{lat},#{long}&radius=2000&type=#{establishment_type}&key=#{@api_key}"
+     uri = URI(api_url)
+    
+     # Perform the HTTP GET request
+     response = Net::HTTP.get(uri)
+     
+     # Parse the JSON response
+     places = JSON.parse(response)
+
+       # Extract the relevant information
+    formatted_places = places["results"].map do |place|
+      place_location = place.dig("geometry", "location")
+      place_lat = place_location["lat"]
+      place_lng = place_location["lng"]
+  
+      # Calculate distance from the user's location to the place
+      distance = haversine_distance(lat, long, place_lat, place_lng)
+  
+      # Construct the photo URL if a photo reference exists
+      photo_reference = place.dig("photos", 0, "photo_reference")
+      photo_url = photo_reference ? "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=#{photo_reference}&key=#{@api_key}" : nil
+  
+      # Skip the place if there is no photo URL
+      next if photo_url.nil?
+  
+      user_ratings_total = place["user_ratings_total"] || 0
+      status = case user_ratings_total
+               when 0..10
+                 "low"
+               when 11..20
+                 "medium"
+               else
+                 "high"
+               end
+  
+      {
+        location: place_location,
+        icon: place["icon"],
+        icon_background_color: place["icon_background_color"],
+        icon_mask_base_uri: place["icon_mask_base_uri"],
+        name: place["name"],
+        opening_hours: place["opening_hours"],
+        image_url: photo_url, 
+        place_id: place["place_id"],
+        rating: place["rating"],
+        reference: place["reference"],
+        user_ratings_total: user_ratings_total,
+        vicinity: place["vicinity"],
+        crowd_status: status,
+        kilometers: distance.round(2)
+      }
+    end.compact  # Removes any nil values from the array
+    
+    formatted_places
+
+  end
   
 
 

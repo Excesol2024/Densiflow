@@ -55,4 +55,5 @@ export const API = {
   addPlaceToNotify: (body)=> apiHelper(Notifications.addNotifications, "POST", body),
   getPopularPlacess: ()=> apiHelper(Places.getPopularPlaces, "GET"),
   getRecommededPlaces: ()=> apiHelper(Places.getRecommededPlaces, "GET"),
+  getPlacesTypes: (body)=> apiHelper(Places.placeTypes, "POST", body),
 };

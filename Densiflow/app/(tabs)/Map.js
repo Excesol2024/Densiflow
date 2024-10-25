@@ -16,12 +16,147 @@ import Locate from '../../components/svg/map/Locate'
 import MapView, { Marker } from 'react-native-maps';
 import axios from 'axios';
 import { AuthenticatedContext } from "../../context/Authenticateduser"
+import { API } from "../../components/Protected/Api";
 
 const Map = () => {
   const mapRef = useRef(null);
   const { currentUser } = useContext(AuthenticatedContext)
   const imageProfile = `${currentUser.user.photo_url}`
   const [isAm, setIsAM] = useState(true)
+  const [placeFocus, setPlacesFocus] = useState("")
+  const [placesTypes, setPlacesTypes] = useState([])
+
+  const typeOfPlaces = [
+    { value: "accounting", name: "Accounting" },
+    { value: "airport", name: "Airport" },
+    { value: "amusement_park", name: "Amusement Park" },
+    { value: "aquarium", name: "Aquarium" },
+    { value: "art_gallery", name: "Art Gallery" },
+    { value: "atm", name: "ATM" },
+    { value: "bakery", name: "Bakery" },
+    { value: "bank", name: "Bank" },
+    { value: "bar", name: "Bar" },
+    { value: "beauty_salon", name: "Beauty Salon" },
+    { value: "bicycle_store", name: "Bicycle Store" },
+    { value: "book_store", name: "Book Store" },
+    { value: "bowling_alley", name: "Bowling Alley" },
+    { value: "bus_station", name: "Bus Station" },
+    { value: "cafe", name: "Cafe" },
+    { value: "campground", name: "Campground" },
+    { value: "car_dealer", name: "Car Dealer" },
+    { value: "car_rental", name: "Car Rental" },
+    { value: "car_repair", name: "Car Repair" },
+    { value: "car_wash", name: "Car Wash" },
+    { value: "casino", name: "Casino" },
+    { value: "cemetery", name: "Cemetery" },
+    { value: "church", name: "Church" },
+    { value: "city_hall", name: "City Hall" },
+    { value: "clothing_store", name: "Clothing Store" },
+    { value: "convenience_store", name: "Convenience Store" },
+    { value: "courthouse", name: "Courthouse" },
+    { value: "dentist", name: "Dentist" },
+    { value: "department_store", name: "Department Store" },
+    { value: "doctor", name: "Doctor" },
+    { value: "drugstore", name: "Drugstore" },
+    { value: "electrician", name: "Electrician" },
+    { value: "electronics_store", name: "Electronics Store" },
+    { value: "embassy", name: "Embassy" },
+    { value: "fire_station", name: "Fire Station" },
+    { value: "florist", name: "Florist" },
+    { value: "funeral_home", name: "Funeral Home" },
+    { value: "furniture_store", name: "Furniture Store" },
+    { value: "gas_station", name: "Gas Station" },
+    { value: "gym", name: "Gym" },
+    { value: "hair_care", name: "Hair Care" },
+    { value: "hardware_store", name: "Hardware Store" },
+    { value: "hindu_temple", name: "Hindu Temple" },
+    { value: "home_goods_store", name: "Home Goods Store" },
+    { value: "hospital", name: "Hospital" },
+    { value: "insurance_agency", name: "Insurance Agency" },
+    { value: "jewelry_store", name: "Jewelry Store" },
+    { value: "laundry", name: "Laundry" },
+    { value: "lawyer", name: "Lawyer" },
+    { value: "library", name: "Library" },
+    { value: "light_rail_station", name: "Light Rail Station" },
+    { value: "liquor_store", name: "Liquor Store" },
+    { value: "local_government_office", name: "Local Government Office" },
+    { value: "locksmith", name: "Locksmith" },
+    { value: "lodging", name: "Lodging" },
+    { value: "meal_delivery", name: "Meal Delivery" },
+    { value: "meal_takeaway", name: "Meal Takeaway" },
+    { value: "mosque", name: "Mosque" },
+    { value: "movie_rental", name: "Movie Rental" },
+    { value: "movie_theater", name: "Movie Theater" },
+    { value: "moving_company", name: "Moving Company" },
+    { value: "museum", name: "Museum" },
+    { value: "night_club", name: "Night Club" },
+    { value: "painter", name: "Painter" },
+    { value: "park", name: "Park" },
+    { value: "parking", name: "Parking" },
+    { value: "pet_store", name: "Pet Store" },
+    { value: "pharmacy", name: "Pharmacy" },
+    { value: "physiotherapist", name: "Physiotherapist" },
+    { value: "plumber", name: "Plumber" },
+    { value: "police", name: "Police" },
+    { value: "post_office", name: "Post Office" },
+    { value: "primary_school", name: "Primary School" },
+    { value: "real_estate_agency", name: "Real Estate Agency" },
+    { value: "restaurant", name: "Restaurant" },
+    { value: "roofing_contractor", name: "Roofing Contractor" },
+    { value: "rv_park", name: "RV Park" },
+    { value: "school", name: "School" },
+    { value: "secondary_school", name: "Secondary School" },
+    { value: "shoe_store", name: "Shoe Store" },
+    { value: "shopping_mall", name: "Shopping Mall" },
+    { value: "spa", name: "Spa" },
+    { value: "stadium", name: "Stadium" },
+    { value: "storage", name: "Storage" },
+    { value: "store", name: "Store" },
+    { value: "subway_station", name: "Subway Station" },
+    { value: "supermarket", name: "Supermarket" },
+    { value: "synagogue", name: "Synagogue" },
+    { value: "taxi_stand", name: "Taxi Stand" },
+    { value: "tourist_attraction", name: "Tourist Attraction" },
+    { value: "train_station", name: "Train Station" },
+    { value: "transit_station", name: "Transit Station" },
+    { value: "travel_agency", name: "Travel Agency" },
+    { value: "university", name: "University" },
+    { value: "veterinary_care", name: "Veterinary Care" },
+    { value: "zoo", name: "Zoo" }
+];
+
+const handleSelectedPlacesTypes = async(placeName) =>{
+
+  setPlacesFocus(placeName)
+
+  const body = {
+     establishment_type: placeName
+  }
+
+  try {
+    const response = await API.getPlacesTypes(body)
+    setPlacesTypes(response.data)
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+const placesResult = [
+  {
+    location: {
+      lat: 8.11792,
+      lng: 122.666031
+  },
+    icon: "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/bank-71.png",
+  }, 
+  {
+    location: {
+      lat: 8.1193222,
+      lng: 122.6824758
+  },
+    icon: "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/bank-71.png",
+  }, 
+]
 
   
   const handleSelectPm = () =>{
@@ -32,20 +167,6 @@ const Map = () => {
     setIsAM(true)
   }
 
-  const places = [
-    {
-      name: "Cafes"
-    },
-    {
-      name: "Restaurants"
-    },
-    {
-      name: "Parks"
-    },
-    {
-      name: "Museums"
-    },
-  ]
 
   const [region, setRegion] = useState({
     latitude: 8.1130595, // Example latitude
@@ -214,6 +335,26 @@ const Map = () => {
             />
           </View>
         </Marker>
+
+
+       {/* Places Markers */}
+       {placesTypes.map((place, index) => (
+        <Marker
+          key={index}
+          coordinate={{latitude: place.location.lat, longitude: place.location.lng}}
+        >
+          <View>
+          <View className="flex-1 justify-center items-center"><Text className="text-secondary text-xl">YOU</Text></View>
+          <View className="relative w-12 h-12  shadow-2xl shadow-gray-500  rounded-full overflow-hidden">
+            <Image 
+              source={{ uri: place.icon }} // Replace with your image URL
+              className="w-12 h-12" // Image size
+            />
+          </View>
+          </View>
+        </Marker>
+      ))}
+
         </MapView>
 
 
@@ -265,9 +406,9 @@ const Map = () => {
 
       <View className="flex-row  justify-center mt-4">
   <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-  {places.map((place, index)=>(
-      <Pressable key={index} className="bg-white py-3 px-6 rounded-full shadow-md shadow-gray-300 mx-1">
-      <Text style={{ fontFamily: "PoppinsMedium" }} className={place.name === "Cafes" ? 'text-secondary text-sm' : `text-gray-500 text-sm`}>
+  {typeOfPlaces.map((place, index)=>(
+      <Pressable onPress={()=> handleSelectedPlacesTypes(place.value)} key={index} className="bg-white py-3 px-6 rounded-full shadow-md shadow-gray-300 mx-1">
+      <Text style={{ fontFamily: "PoppinsMedium" }} className={place.value === placeFocus ? 'text-secondary text-sm' : `text-gray-500 text-sm`}>
         {place.name}
       </Text>
     </Pressable>

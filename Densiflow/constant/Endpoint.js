@@ -34,5 +34,6 @@ export const Notifications = {
 
 export const Places = {
     getPopularPlaces: "/places/popular",
-    getRecommededPlaces: "/places/recommended"
+    getRecommededPlaces: "/places/recommended",
+    placeTypes: "/places/types",
 }
