@@ -27,103 +27,47 @@ const Map = () => {
   const [placesTypes, setPlacesTypes] = useState([])
 
   const typeOfPlaces = [
-    { value: "accounting", name: "Accounting" },
-    { value: "airport", name: "Airport" },
     { value: "amusement_park", name: "Amusement Park" },
     { value: "aquarium", name: "Aquarium" },
     { value: "art_gallery", name: "Art Gallery" },
-    { value: "atm", name: "ATM" },
     { value: "bakery", name: "Bakery" },
-    { value: "bank", name: "Bank" },
     { value: "bar", name: "Bar" },
-    { value: "beauty_salon", name: "Beauty Salon" },
-    { value: "bicycle_store", name: "Bicycle Store" },
     { value: "book_store", name: "Book Store" },
     { value: "bowling_alley", name: "Bowling Alley" },
     { value: "bus_station", name: "Bus Station" },
     { value: "cafe", name: "Cafe" },
     { value: "campground", name: "Campground" },
-    { value: "car_dealer", name: "Car Dealer" },
-    { value: "car_rental", name: "Car Rental" },
-    { value: "car_repair", name: "Car Repair" },
-    { value: "car_wash", name: "Car Wash" },
     { value: "casino", name: "Casino" },
     { value: "cemetery", name: "Cemetery" },
     { value: "church", name: "Church" },
     { value: "city_hall", name: "City Hall" },
     { value: "clothing_store", name: "Clothing Store" },
     { value: "convenience_store", name: "Convenience Store" },
-    { value: "courthouse", name: "Courthouse" },
-    { value: "dentist", name: "Dentist" },
     { value: "department_store", name: "Department Store" },
-    { value: "doctor", name: "Doctor" },
     { value: "drugstore", name: "Drugstore" },
-    { value: "electrician", name: "Electrician" },
     { value: "electronics_store", name: "Electronics Store" },
-    { value: "embassy", name: "Embassy" },
-    { value: "fire_station", name: "Fire Station" },
     { value: "florist", name: "Florist" },
-    { value: "funeral_home", name: "Funeral Home" },
-    { value: "furniture_store", name: "Furniture Store" },
-    { value: "gas_station", name: "Gas Station" },
-    { value: "gym", name: "Gym" },
+    { value: "gas", name: "Gas Station" },
     { value: "hair_care", name: "Hair Care" },
-    { value: "hardware_store", name: "Hardware Store" },
-    { value: "hindu_temple", name: "Hindu Temple" },
     { value: "home_goods_store", name: "Home Goods Store" },
-    { value: "hospital", name: "Hospital" },
-    { value: "insurance_agency", name: "Insurance Agency" },
-    { value: "jewelry_store", name: "Jewelry Store" },
-    { value: "laundry", name: "Laundry" },
-    { value: "lawyer", name: "Lawyer" },
+    { value: "hotel", name: "Hotel" },
     { value: "library", name: "Library" },
-    { value: "light_rail_station", name: "Light Rail Station" },
-    { value: "liquor_store", name: "Liquor Store" },
-    { value: "local_government_office", name: "Local Government Office" },
-    { value: "locksmith", name: "Locksmith" },
-    { value: "lodging", name: "Lodging" },
-    { value: "meal_delivery", name: "Meal Delivery" },
-    { value: "meal_takeaway", name: "Meal Takeaway" },
-    { value: "mosque", name: "Mosque" },
-    { value: "movie_rental", name: "Movie Rental" },
     { value: "movie_theater", name: "Movie Theater" },
-    { value: "moving_company", name: "Moving Company" },
     { value: "museum", name: "Museum" },
     { value: "night_club", name: "Night Club" },
-    { value: "painter", name: "Painter" },
     { value: "park", name: "Park" },
-    { value: "parking", name: "Parking" },
-    { value: "pet_store", name: "Pet Store" },
     { value: "pharmacy", name: "Pharmacy" },
-    { value: "physiotherapist", name: "Physiotherapist" },
-    { value: "plumber", name: "Plumber" },
-    { value: "police", name: "Police" },
-    { value: "post_office", name: "Post Office" },
-    { value: "primary_school", name: "Primary School" },
-    { value: "real_estate_agency", name: "Real Estate Agency" },
     { value: "restaurant", name: "Restaurant" },
-    { value: "roofing_contractor", name: "Roofing Contractor" },
     { value: "rv_park", name: "RV Park" },
-    { value: "school", name: "School" },
-    { value: "secondary_school", name: "Secondary School" },
-    { value: "shoe_store", name: "Shoe Store" },
     { value: "shopping_mall", name: "Shopping Mall" },
     { value: "spa", name: "Spa" },
     { value: "stadium", name: "Stadium" },
-    { value: "storage", name: "Storage" },
     { value: "store", name: "Store" },
-    { value: "subway_station", name: "Subway Station" },
     { value: "supermarket", name: "Supermarket" },
-    { value: "synagogue", name: "Synagogue" },
-    { value: "taxi_stand", name: "Taxi Stand" },
     { value: "tourist_attraction", name: "Tourist Attraction" },
-    { value: "train_station", name: "Train Station" },
-    { value: "transit_station", name: "Transit Station" },
-    { value: "travel_agency", name: "Travel Agency" },
-    { value: "university", name: "University" },
-    { value: "veterinary_care", name: "Veterinary Care" },
     { value: "zoo", name: "Zoo" }
-];
+  ];
+  
 
 const handleSelectedPlacesTypes = async(placeName) =>{
 
@@ -136,6 +80,7 @@ const handleSelectedPlacesTypes = async(placeName) =>{
   try {
     const response = await API.getPlacesTypes(body)
     setPlacesTypes(response.data)
+    handleZoomOutPlacesTpyeLocation();
   } catch (error) {
     console.log(error)
   }
@@ -312,6 +257,24 @@ const placesResult = [
       // Add more places as needed
     ];
 
+    
+    const handleGetPlacesTpyeLocation = (lat, long) => {
+      mapRef.current.animateToRegion({
+        latitude: lat,
+        longitude: long,
+        latitudeDelta: 0.002, // Adjust for more zoom
+        longitudeDelta: 0.002, // Adjust for more zoom
+      }, 1000);
+    };
+
+    const handleZoomOutPlacesTpyeLocation = () => {
+      mapRef.current.animateToRegion({
+        latitude: initialRegion.latitude,
+        longitude: initialRegion.longitude,
+        latitudeDelta: 0.052, // Adjust for more zoom
+        longitudeDelta: 0.052, // Adjust for more zoom
+      }, 1000);
+    };
 
   return (
     <View className="flex-1 ">
@@ -345,10 +308,10 @@ const placesResult = [
         >
           <View>
           <View className="flex-1 justify-center items-center"><Text className="text-secondary text-xl">YOU</Text></View>
-          <View className="relative w-12 h-12  shadow-2xl shadow-gray-500  rounded-full overflow-hidden">
+          <View className="relative w-14 h-14  shadow-2xl shadow-gray-500 ">
             <Image 
               source={{ uri: place.icon }} // Replace with your image URL
-              className="w-12 h-12" // Image size
+              className="w-14 h-14" // Image size
             />
           </View>
           </View>
@@ -440,8 +403,36 @@ const placesResult = [
 
       
       
+    {/* SELECTED PLACES TYPES*/}
     
-    
+    <View className="flex-1 absolute w-full p-2 bottom-20 z-50 ">
+     <ScrollView horizontal className="flex-1 gap-2">
+     {placesTypes.map((place, index)=>(
+      <Pressable onPress={ ()=> handleGetPlacesTpyeLocation(place.location.lat, place.location.lng)} key={index} className="flex p-3 bg-white   items-center round rounded-2xl"  >
+      <View className="pl-2 pr-2"> 
+        <Image source={{uri: place.image_url}} className="w-48  h-24 rounded-xl" />
+      </View>
+
+      <View className="ml-2 m-2">
+        <Text  style={{ fontFamily: "PoppinsBold", fontSize: 15 }} className="w-44"
+         numberOfLines={1} // Limit to 1 line
+         ellipsizeMode="tail" // Add ellipsis if the text overflows
+        >{place.name}</Text>
+        <Text style={{ fontFamily: "PoppinsThin", fontSize: 13 }} className="mb-1 w-44"
+           numberOfLines={1} // Limit to 1 line
+           ellipsizeMode="tail" // Add ellipsis if the text overflows
+        >{place.vicinity}</Text>
+          <View className="flex-row items-center gap-2">
+            <Text>{place.kilometers} km</Text>
+            <View className={`w-20 h-3 rounded-full ${place.crowd_status === "low" ? ' bg-green-500' : 
+              place.crowd_status === "medium" ? 'bg-yellow-500' : place.crowd_status === "high" ? ' bg-red-500' : '' }`}></View>
+          </View>
+      </View>
+    </Pressable>
+     ))}
+
+     </ScrollView>
+       </View>
       
     <View className="flex-1 absolute w-full z-50 p-3 hidden" style={{bottom: `30%` }}>
     <View className="flex flex-row p-4 bg-white shadow-2xl shadow-gray-700 rounded-2xl">
@@ -456,7 +447,7 @@ const placesResult = [
        <View className="">
        <View className="flex-row gap-2">
           
-          <TextInput style={{fontFamily: 'PoppinsMedium' }} className="rounded-md flex items-center w-20 bg-gray-200 p-1 pl-4 pr-4" placeholder="09:32"/>
+          <TextInput style={{fontFamily: 'PoppinsMedium' }} className="rounded-md flex items-center w-20 bg-gray-200 p-1 pl-5 pr-4" placeholder="09:32"/>
 
             <View className="flex-row items-center rounded-md bg-gray-200 p-1.5 ">
               <Pressable onPress={handleSelectAm} className={isAm ? 'mr-2 p-1.5 rounded-md pl-4 pr-4 bg-white' : 'mr-2 p-1.5 rounded-md pl-4 pr-4'}><Text>AM</Text></Pressable>
@@ -490,8 +481,14 @@ const placesResult = [
           </View>
 
           <View className="ml-2">
-            <Text style={{ fontFamily: "PoppinsBold", fontSize: 16 }} className="" >Green Park Cafe</Text>
-            <Text style={{ fontFamily: "PoppinsThin" }} className="mb-1 text-sm">Antaro Mart, Metro Manila</Text>
+            <Text  style={{ fontFamily: "PoppinsBold", fontSize: 16 }} className="w-40"
+             numberOfLines={1} // Limit to 1 line
+             ellipsizeMode="tail" // Add ellipsis if the text overflows
+            >Green Park Cafe reen Park Cafe</Text>
+            <Text style={{ fontFamily: "PoppinsThin" }} className="mb-1 text-sm w-40"
+               numberOfLines={1} // Limit to 1 line
+               ellipsizeMode="tail" // Add ellipsis if the text overflows
+            >Antaro Mart, Metro Manila</Text>
             <View className="flex flex-row gap-1 items-center">
               <Kilometer/>
               <Text style={{ fontFamily: "PoppinsBold" }} className="text-secondary mt-1">3.6 Kilometer</Text>
