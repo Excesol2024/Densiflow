@@ -9,9 +9,10 @@ export const LoadingEffectsContext = createContext({
 export const LoadingEffectsProvider = ({children}) => {
 
     const [effectLoading, setEffectLoading] = useState(false)
+    const [isSelecting, setIsSelecting] = useState(false)
 
     return(
-    <LoadingEffectsContext.Provider value={{effectLoading, setEffectLoading}}>
+    <LoadingEffectsContext.Provider value={{effectLoading, setEffectLoading, isSelecting, setIsSelecting}}>
         {children}
     </LoadingEffectsContext.Provider>
     )

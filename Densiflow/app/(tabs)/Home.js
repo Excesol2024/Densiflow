@@ -19,7 +19,7 @@ import { API } from "../../components/Protected/Api";
 import Moon from "../../components/svg/weather/night/Moon"
 import MoonLight from "../../components/svg/weather/night/Moonlight"
 import Mooncloud from "../../components/svg/weather/night/Mooncloud"
-
+import Notif from "../../components/svg/Notif"
 import Sun from "../../components/svg/weather/day/Sun"
 import Light from "../../components/svg/weather/day/Light"
 import Rain from "../../components/svg/weather/day/Rain"
@@ -28,13 +28,13 @@ import Notifications from "../../components/modal/androidpopup/Notifications";
 import Maps from "../../components/modal/androidpopup/Maps";
 import MessageSent from "../../components/modal/androidpopup/MessageSent";
 import { AuthenticatedContext } from "../../context/Authenticateduser";
+import { LoadingEffectsContext } from "../../context/Loadingeffect";
+import { router } from "expo-router";
 
 
 
 const Home =  () => {
   const [searchText, setSearchText] = useState("");
-  const [popularPace, setPopularPlace] = useState(true);
-  const [recommendedPlace, setRecommendedPlace] = useState(false);
   const [userCity, setUserCity] = useState('');
   const [userSubregion, setUserSubregion] = useState('');
   const [dateToday, setDateToday] = useState('')
@@ -138,60 +138,8 @@ useEffect(()=>{
   getCurrentUserWeather();
 },[userCity, userSubregion])
 
-  const handleShowPopularPlace = () =>{
-    setPopularPlace(true);
-    setRecommendedPlace(false)
-  }
-
-  const handleShowRecommendedPlace = () =>{
-    setPopularPlace(false);
-    setRecommendedPlace(true)
-  }
 
 
-
-  const popularPlaces2 = [
-    {
-      name: "Tartufo Ristorante",
-      image: `${require("../../assets/tabs/img3.png")}`,
-      km: "2.3 km",
-      busyness: "yellow",
-    },
-    {
-      name: "Tartufo Ristorante",
-      image: `${require("../../assets/tabs/img4.png")}`,
-      km: "2.3 km",
-      busyness: "green",
-    },
-    {
-      name: "Tartufo Ristorante",
-      image: `${require("../../assets/tabs/img3.png")}`,
-      km: "2.3 km",
-      busyness: "yellow",
-    },
-  ];
-
-
-  const recommendedPlaces2 = [
-    {
-      name: "Manila Museum",
-      image: `${require("../../assets/tabs/r3.png")}`,
-      km: "2.3 km",
-      busyness: "yellow",
-    },
-    {
-      name: "Xaylo Club",
-      image: `${require("../../assets/tabs/r4.png")}`,
-      km: "2.3 km",
-      busyness: "green",
-    },
-    {
-      name: "Manila Museum",
-      image: `${require("../../assets/tabs/r3.png")}`,
-      km: "2.3 km",
-      busyness: "yellow",
-    },
-  ];
 
   const recentPlaces = [
     {
@@ -229,19 +177,19 @@ useEffect(()=>{
             name: "Forest Cafe",
             image: `${require("../../assets/tabs/c1.png")}`,
             km: "1.3",
-            busyness: "green",
+            crowd_status: "low",
           },
           {
             name: "Green Coffee",
             image: `${require("../../assets/tabs/c2.png")}`,
             km: "5.3",
-            busyness: "red",
+            crowd_status: "high",
           },
           {
             name: "Tartufo Ristorante",
             image: `${require("../../assets/tabs/img1.png")}`,
             km: "2.3",
-            busyness: "red",
+            crowd_status: "medium",
           },
         ],
       },
@@ -256,19 +204,19 @@ useEffect(()=>{
             name: "Foodbox Resto",
             image: `${require("../../assets/tabs/l1.png")}`,
             km: "1.3",
-            busyness: "green",
+            crowd_status: "low",
           },
           {
             name: "Daff Pizza",
             image: `${require("../../assets/tabs/l2.png")}`,
             km: "5.3",
-            busyness: "red",
+            crowd_status: "high",
           },
           {
             name: "Tartufo Ristorante",
             image: `${require("../../assets/tabs/img1.png")}`,
             km: "2.3",
-            busyness: "red",
+            crowd_status: "yellow",
           },
         ],
       },
@@ -283,19 +231,19 @@ useEffect(()=>{
             name: "Happy Table",
             image: `${require("../../assets/tabs/d1.png")}`,
             km: "1.3",
-            busyness: "green",
+            crowd_status: "low",
           },
           {
             name: "Smiley Dinner",
             image: `${require("../../assets/tabs/d2.png")}`,
             km: "5.3",
-            busyness: "red",
+            crowd_status: "high",
           },
           {
             name: "Tartufo Ristorante",
             image: `${require("../../assets/tabs/img1.png")}`,
             km: "2.3",
-            busyness: "red",
+            crowd_status: "medium",
           },
         ],
       },
@@ -349,6 +297,7 @@ useEffect(()=>{
   const [notificationsPermission, setNotificationsPermission] = useState(false);
   const [mapsPermission, setMapsPermission] = useState(false);
   const [messageSent, setMessageSent] = useState(false)
+  const { isSelecting } = useContext(LoadingEffectsContext)
 
   return (
     <View className="flex-1 bg-white">
@@ -356,32 +305,54 @@ useEffect(()=>{
       <Notifications visible={notificationsPermission}/>
       <Maps visible={mapsPermission}/>
       <MessageSent visible={messageSent}/> */}
+
+     {isSelecting ?  <Image source={require('../../assets/blur.png')} className="absolute z-20"/> : ''}
+
       <View className="">
         <View className=" w-full p-3 mt-14">
-          <LinearGradient
-            colors={["#007AFF", "#007AFF", "#1F41BB"]} // Use two colors for a clean gradient
-            start={{ x: 0, y: 0 }} // Starting point of the gradient (left)
-            end={{ x: 1, y: 0 }} // Ending point of the gradient (right)
-            className="rounded-full shadow-lg shadow-gray-900"
+
+          <View className="flex-row items-center gap-2 mb-5">
+            <Notif/>
+            <View className="flex">
+              <View className="flex-row  gap-2">
+              <Text
+                      style={{ fontFamily: "PoppinsThin" }}
+                      className="text-black"
+                    >
+                      Current Location
+                    </Text>
+                    <AntDesign name="caretdown" size={13} color="gray" />
+              </View>
+            <Text
+                      style={{ fontFamily: "PoppinsBold" }}
+                      className="text-black "
+                    >
+                      {userCity}, {userSubregion}
+                    </Text>
+            </View>
+          </View>
+
+          <View
+            className="rounded-full shadow-lg shadow-gray-900 bg-white"
           >
-            <View className="flex-row items-center bg-transparent rounded-full p-1">
+            <View className="flex-row items-center bg-transparent rounded-full p-2">
               <AntDesign
                 name="search1"
                 size={27}
-                color="white"
+                color="gray"
                 paddingLeft={5}
                 onPress={getCurrentUserWeather}
               />
               <TextInput
                 style={{ fontFamily: "PoppinsThin" }}
                 className="flex-1 pl-2 py-1 text-gray-50 text-sm"
-                placeholderTextColor="whitesmoke"
+                placeholderTextColor="gray"
                 placeholder="Where are you going to?"
                 value={searchText}
                 onChangeText={setSearchText}
               />
             </View>
-          </LinearGradient>
+          </View>
         </View>
       </View>
 
@@ -389,103 +360,41 @@ useEffect(()=>{
         <ScrollView className="main-scrollview">
           <View className="mb-3">
 
-           {/**DAY AND NIGHT */} 
-          {isPM ?   
-            <LinearGradient
-              colors={["#536976", "#536976", "#292E49"]} // Use two colors for a clean gradient
-              start={{ x: 0, y: 0 }} // Starting point of the gradient (left)
-              end={{ x: 1, y: 0 }} // Ending point of the gradient (right)
-              className="rounded-md shadow-lg shadow-gray-900"
+            
+               {/**ANNOUCEMENTS */} 
+            <LinearGradient 
+                colors={["#006de4", "#3D50DF"]} // Use two colors for a clean gradient
+
+                className="w-full h-40 mt-2 rounded-xl overflow-hidden shadow-gray-900"
             >
-              <View className="flex-row justify-around items-center bg-transparent rounded-md p-2">
-                <View>
-                  <Text
-                    style={{ fontFamily: "PoppinsThin" }}
-                    className="text-white pl-1"
-                  >
-                    {dateToday}
-                  </Text>
-                  <View className="flex flex-row items-center gap-1">
-                    <Entypo name="location-pin" size={14} color="white" />
-                    <Text
-                      style={{ fontFamily: "PoppinsThin" }}
-                      className="text-white"
-                    >
-                      {userCity}, {userSubregion}
-                    </Text>
-                  </View>
-                </View>
+              <View className="flex-1 pl-5 justify-center">
+                <Text style={{fontFamily: "PoppinsBold"}} className="text-white text-lg">Welcome Everyone!</Text>
+                <Text style={{fontFamily: "PoppinsBold"}} className="text-white text-lg">Our Website is ready!</Text>
+                <Pressable className="bg-black w-24 items-center p-2 mt-2  rounded-full">
+                  <Text style={{fontFamily: "PoppinsMedium"}} className="text-white ">Visit Now</Text>
+                </Pressable>
+                </View> 
 
-                <View className="mt-3">
-                {weatherStatus === "Rain" ?  <Mooncloud/> : weatherStatus === "Clear" ?  <Moon/> :  <MoonLight/> }
-
-                  <View className="relative mt-2">
-                    <Text className="text-white text-4xl">{celcius}</Text>
-                    <Image
-                      className="absolute right-[-6] top-1"
-                      source={require("../../assets/icons/cel.png")}
-                    />
-                  </View>
+                <View className="absolute flex-row  justify-center items-center bg-white w-24 h-7 bottom-3 right-3 rounded-full">
+                 
+                      <View className="w-5 h-1.5 rounded-full bg-secondary"></View>
+                      <View className="w-5 h-1.5 rounded-full bg-gray-300 ml-1 mr-1"></View>
+                      <View className="w-5 h-1.5 rounded-full bg-gray-300"></View>
+                 
                 </View>
-              </View>
-            </LinearGradient> :    
-            <LinearGradient
-              colors={["#6cabf8", "#6cabf8", "#7a91d9"]} // Use two colors for a clean gradient
-              start={{ x: 0, y: 0 }} // Starting point of the gradient (left)
-              end={{ x: 1, y: 0 }} // Ending point of the gradient (right)
-              className="rounded-md shadow-lg shadow-gray-900"
-            >
-              <View className="flex-row justify-around items-center bg-transparent rounded-md p-2">
-                <View>
-                  <Text
-                    style={{ fontFamily: "PoppinsThin" }}
-                    className="text-white pl-1"
-                  >
-                    {dateToday}
-                  </Text>
-                  <View className="flex flex-row items-center gap-1">
-                    <Entypo name="location-pin" size={14} color="white" />
-                    <Text
-                      style={{ fontFamily: "PoppinsThin" }}
-                      className="text-white"
-                    >
-                      {userCity}, {userSubregion}
-                    </Text>
-                  </View>
-                </View>
-
-                <View className="mt-2"> 
-                {weatherStatus === "Rain" ?  <Rain/> : weatherStatus === "Clear" ?  <Sun/> :  <Light/> }
-                  <View className="relative mt-2">
-                    <Text className="text-white text-4xl">{celcius}</Text>
-                    <Image
-                      className="absolute right-[-6] top-1"
-                      source={require("../../assets/icons/cel.png")}
-                    />
-                  </View>
-                </View>
-              </View>
-            </LinearGradient>}
+            </LinearGradient>
          
           </View>
 
           {/**POPULAR AND RECOMMENDED */}
-          <View className="flex flex-row gap-5 w-full mb-2">
-            <Text
-              style={{ fontFamily: "PoppinsMedium" }}
-              className={`text-lg ${popularPace ? 'text-secondary' : ''}`}
-              onPress={handleShowPopularPlace}
-            >
-              Popular Near you
-            </Text>
-            <Text onPress={handleShowRecommendedPlace} style={{ fontFamily: "PoppinsMedium" }}  className={`text-lg ${recommendedPlace ? 'text-secondary' : ''}`}>
-              Recommended
-            </Text>
-          </View>
+       
 
             {/**POPULAR*/}
-        {popularPace ? 
-          <View className="">
+          <View className="mt-3">
+            <View className="flex-row mb-1 justify-between">
+              <Text className="text-lg" style={{fontFamily: "PoppinsBold"}}>Popular Near you</Text>
+              <Text onPress={()=> router.push('/places/Poppular')} className="text-lg text-secondary" style={{fontFamily: "PoppinsBold"}}>See all</Text>
+            </View>
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
@@ -494,34 +403,37 @@ useEffect(()=>{
             {popularPlaces.map((places, index) => (
               <View
                 key={index}
-                className="mr-2 rounded-3xl w-52 overflow-hidden"
+                className="mr-2 "
               >
-                <Image source={{uri: `${places.image_url}`}} className="w-full h-32 " />
-                <View className="bg-secondary flex flex-row justify-evenly py-2 rounded-b-2xl">
+                <View className="rounded-xl overflow-hidden w-48 h-36">
+                <Image source={{uri: `${places.image_url}`}} className="w-full h-full " />
+                </View>
+                <View className=" flex pl-2">
                 <Text
-  style={{ fontFamily: "PoppinsThin", width: 100 }}  // Adjust the width as needed
-  className="text-sm text-white"
+  style={{ fontFamily: "PoppinsBold", width: 140 }}  // Adjust the width as needed
+  className="text-md mt-2"
   numberOfLines={1}               // Limit to one line
   ellipsizeMode="tail"            // Adds the ellipsis at the end
 >
   {places.name}
 </Text>
-                  <View className="flex flex-row items-center">
+                  <View className="flex flex-row gap-1 items-center">
                     <Text
-                      style={{ fontFamily: "PoppinsThin" }}
-                      className="text-sm text-white"
+                      style={{ fontFamily: "PoppinsMedium" }}
+                      className="text-sm text-gray-400"
                     >
                     {places.kilometers}km
                     </Text>
+                    <View className="h-2 w-2 bg-gray-300 rounded-full "></View>
                     <View
-                      className={`w-3 h-3 rounded-full
+                      className={` h-3 rounded-full
 ${
   places.crowd_status === "high"
-    ? "bg-red-500"
+    ? "bg-red-500 w-20"
     : places.crowd_status === "medium"
-    ? "bg-yellow-300"
+    ? "bg-yellow-300 w-14"
     : places.crowd_status === "low"
-    ? "bg-green-500"
+    ? "bg-green-500 w-8"
     : ""
 } ml-1`}
                     />
@@ -573,102 +485,107 @@ ${
               </View>
             ))}
           </ScrollView> */}
-        </View>: ''  
-      }
+        </View>
 
 
             {/**RECOMMENDED*/}
-          {recommendedPlace ? 
-            <View>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={{ alignItems: "center" }}
-            >
-              {recommendedPlaces.map((places, index) => (
-                <View
-                  key={index}
-                  className="mr-2 rounded-3xl w-52 overflow-hidden"
-                >
-                  <Image source={{uri: `${places.image_url}`}} className="w-full h-32 " />
-                  <View className="bg-secondary flex flex-row justify-evenly py-2 rounded-b-2xl">
-                  <Text
-  style={{ fontFamily: "PoppinsThin", width: 100 }}  // Adjust the width as needed
-  className="text-sm text-white"
+          <View className="mt-3">
+            <View className="flex-row mb-1 justify-between">
+              <Text className="text-lg" style={{fontFamily: "PoppinsBold"}}>Recommended</Text>
+              <Text onPress={()=> router.push('/places/Recommended')} className="text-lg text-secondary" style={{fontFamily: "PoppinsBold"}}>See all</Text>
+            </View>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{ alignItems: "center" }}
+          >
+            {recommendedPlaces.map((places, index) => (
+              <View
+                key={index}
+                className="mr-2 "
+              >
+                <View className="rounded-xl overflow-hidden w-48 h-36">
+                <Image source={{uri: `${places.image_url}`}} className="w-full h-full " />
+                </View>
+                <View className=" flex pl-2">
+                <Text
+  style={{ fontFamily: "PoppinsBold", width: 140 }}  // Adjust the width as needed
+  className="text-md mt-2"
   numberOfLines={1}               // Limit to one line
   ellipsizeMode="tail"            // Adds the ellipsis at the end
 >
   {places.name}
 </Text>
-                    <View className="flex flex-row items-center">
-                      <Text
-                        style={{ fontFamily: "PoppinsThin" }}
-                        className="text-sm text-white"
-                      >
-                        {places.kilometers}km
-                      </Text>
-                      <View
-                        className={`w-3 h-3 rounded-full
-  ${
-    places.crowd_status === "high"
-      ? "bg-red-500"
-      : places.crowd_status === "medium"
-      ? "bg-yellow-300"
-      : places.crowd_status === "low"
-      ? "bg-green-500"
-      : ""
-  } ml-1`}
-                      />
-                    </View>
+                  <View className="flex flex-row gap-1 items-center">
+                    <Text
+                      style={{ fontFamily: "PoppinsMedium" }}
+                      className="text-sm text-gray-400"
+                    >
+                    {places.kilometers}km
+                    </Text>
+                    <View className="h-2 w-2 bg-gray-300 rounded-full "></View>
+                    <View
+                      className={` h-3 rounded-full
+${
+  places.crowd_status === "high"
+    ? "bg-red-500 w-20"
+    : places.crowd_status === "medium"
+    ? "bg-yellow-300 w-14"
+    : places.crowd_status === "low"
+    ? "bg-green-500 w-8"
+    : ""
+} ml-1`}
+                    />
                   </View>
                 </View>
-              ))}
-            </ScrollView>
-            {/* <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={{ alignItems: "center" }}
-              className="mt-2"
-            >
-              {recommendedPlaces2.map((places, index) => (
-                <View
-                  key={index}
-                  className="mr-2 rounded-3xl w-52 overflow-hidden"
-                >
-                  <Image source={places.image} className="w-full h-32 " />
-                  <View className="bg-secondary flex flex-row justify-evenly py-2 rounded-b-2xl">
+              </View>
+            ))}
+          </ScrollView>
+          {/* <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{ alignItems: "center" }}
+            className="mt-2"
+          >
+            {popularPlaces2.map((places, index) => (
+              <View
+                key={index}
+                className="mr-2 rounded-3xl w-52 overflow-hidden"
+              >
+                <Image source={places.image} className="w-full h-32 " />
+                <View className="bg-secondary flex flex-row justify-evenly py-2 rounded-b-2xl">
+                  <Text
+                    style={{ fontFamily: "PoppinsThin" }}
+                    className="text-sm text-white"
+                  >
+                    {places.name}
+                  </Text>
+                  <View className="flex flex-row items-center">
                     <Text
                       style={{ fontFamily: "PoppinsThin" }}
                       className="text-sm text-white"
                     >
-                      {places.name}
+                      {places.km}
                     </Text>
-                    <View className="flex flex-row items-center">
-                      <Text
-                        style={{ fontFamily: "PoppinsThin" }}
-                        className="text-sm text-white"
-                      >
-                        {places.km}
-                      </Text>
-                      <View
-                        className={`w-3 h-3 rounded-full
-  ${
-    places.busyness === "red"
-      ? "bg-red-500"
-      : places.busyness === "yellow"
-      ? "bg-yellow-300"
-      : places.busyness === "green"
-      ? "bg-green-500"
-      : ""
-  } ml-1`}
-                      />
-                    </View>
+                    <View
+                      className={`w-3 h-3 rounded-full
+${
+  places.busyness === "red"
+    ? "bg-red-500"
+    : places.busyness === "yellow"
+    ? "bg-yellow-300"
+    : places.busyness === "green"
+    ? "bg-green-500"
+    : ""
+} ml-1`}
+                    />
                   </View>
                 </View>
-              ))}
-            </ScrollView> */}
-          </View> : ''  
-        }
+              </View>
+            ))}
+          </ScrollView> */}
+        </View> 
+   
 
           <View className="flex-1 w-full mt-5 ">
             <Text style={{ fontFamily: "PoppinsThin" }} className="text-xl">
@@ -733,44 +650,54 @@ ${
         </View>
 
         <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ alignItems: "center" }}
-          className="mt-3"
-        >
-          {goodPlace[0].places.map((currentplace, idx) => (
-            <View key={idx} className="mr-2 rounded-3xl w-52 overflow-hidden">
-              <Image source={currentplace.image} className="w-full h-32 " />
-              <View className="bg-secondary flex flex-row justify-between pl-4 pr-3 py-2 rounded-b-xl">
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{ alignItems: "center" }}
+            className="mt-2"
+          >
+            {goodPlace[0].places.map((places, index) => (
+              <View
+                key={index}
+                className="mr-2 "
+              >
+                <View className="rounded-xl overflow-hidden w-48 h-36">
+                {/* <Image source={{uri: `${places.image_url}`}} className="w-full h-full " /> */}
+                <Image source={places.image} className="w-full h-full " />
+                </View>
+                <View className=" flex pl-2">
                 <Text
-                  style={{ fontFamily: "PoppinsThin" }}
-                  className="text-sm text-white"
-                >
-                  {currentplace.name}
-                </Text>
-                <View className="flex flex-row items-center">
-                  <Text
-                    style={{ fontFamily: "PoppinsThin" }}
-                    className="text-sm text-white"
-                  >
-                    {currentplace.km}
-                  </Text>
-                  <View
-                    className={`w-3 h-3 rounded-full ${
-                      currentplace.busyness === "red"
-                        ? "bg-red-500"
-                        : currentplace.busyness === "yellow"
-                        ? "bg-yellow-300"
-                        : currentplace.busyness === "green"
-                        ? "bg-green-500"
-                        : ""
-                    } ml-1`}
-                  />
+  style={{ fontFamily: "PoppinsBold", width: 140 }}  // Adjust the width as needed
+  className="text-md mt-2"
+  numberOfLines={1}               // Limit to one line
+  ellipsizeMode="tail"            // Adds the ellipsis at the end
+>
+  {places.name}
+</Text>
+                  <View className="flex flex-row gap-1 items-center">
+                    <Text
+                      style={{ fontFamily: "PoppinsMedium" }}
+                      className="text-sm text-gray-400"
+                    >
+                    {places.km}km
+                    </Text>
+                    <View className="h-2 w-2 bg-gray-300 rounded-full "></View>
+                    <View
+                      className={` h-3 rounded-full
+${
+  places.crowd_status === "high"
+    ? "bg-red-500 w-20"
+    : places.crowd_status === "medium"
+    ? "bg-yellow-300 w-14"
+    : places.crowd_status === "low"
+    ? "bg-green-500 w-8"
+    : ""
+} ml-1`}
+                    />
+                  </View>
                 </View>
               </View>
-            </View>
-          ))}
-        </ScrollView>
+            ))}
+          </ScrollView>
       </View>
     )}
 

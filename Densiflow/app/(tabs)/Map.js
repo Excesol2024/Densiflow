@@ -17,6 +17,7 @@ import MapView, { Marker } from 'react-native-maps';
 import axios from 'axios';
 import { AuthenticatedContext } from "../../context/Authenticateduser"
 import { API } from "../../components/Protected/Api";
+import { LoadingEffectsContext } from "../../context/Loadingeffect";
 
 const Map = () => {
   const mapRef = useRef(null);
@@ -25,6 +26,7 @@ const Map = () => {
   const [isAm, setIsAM] = useState(true)
   const [placeFocus, setPlacesFocus] = useState("")
   const [placesTypes, setPlacesTypes] = useState([])
+  const { isSelecting } = useContext(LoadingEffectsContext)
 
   const typeOfPlaces = [
     { value: "amusement_park", name: "Amusement Park" },

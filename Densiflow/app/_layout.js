@@ -6,7 +6,6 @@ import Subscribed from './subscriptions/Subscribed';
 import Lodingscreen from '../components/Modal';
 import { LoadingEffectsProvider } from '../context/Loadingeffect';
 
-
 const StackLayout = () => {
   return (
     <Stack>
@@ -16,6 +15,8 @@ const StackLayout = () => {
       <Stack.Screen name="(getstarted)" options={{ headerShown: false }} />
       <Stack.Screen name="(auth)" options={{ headerShown: false }} />
       <Stack.Screen name="(profile)" options={{ headerShown: false }} />
+      <Stack.Screen name={`places/Poppular`} options={{ headerShown: false }} />
+      <Stack.Screen name={`places/Recommended`} options={{ headerShown: false }} />
     </Stack>
   );
 };
@@ -25,7 +26,7 @@ const RootLayout = () => {
  <LoadingEffectsProvider>
  <FontLoader>
     <SafeAreaView style={{ flex: 1 }}>
-      <Subscribed/>
+      {/* <Subscribed/> */}
       <Lodingscreen/>
           <StackLayout />
         </SafeAreaView>

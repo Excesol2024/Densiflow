@@ -50,6 +50,9 @@ Rails.application.routes.draw do
     #PLACES_TYPES
     post "places/types", to: 'places#places_types'
 
+    #SUGGESTED_PLACE
+    get "places/suggested", to: 'places#suggested_places'
+
 
     post "sampleplaces/types", to: 'places#sampleplaces_types'
 
