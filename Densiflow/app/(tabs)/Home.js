@@ -269,16 +269,23 @@ useEffect(()=>{
 
   const [goodPlace, setGoodPlace] = useState([]);
   const [currentCategory, setCurrentCategory] = useState("coffee");
+  const [suggestedGoodPlace, setSuggestedGoodPlace] = useState([])
   
-  const updatePlaceBasedOnTime = () => {
+  const updatePlaceBasedOnTime = async () => {
     const currentHour = new Date().getHours();
-  
+    
     if (currentHour >= 3 && currentHour < 10) {
       setCurrentCategory("coffee");
     } else if (currentHour >= 10 && currentHour < 17) {
       setCurrentCategory("lunch");
     } else {
       setCurrentCategory("dinner");
+    }
+    try {
+      const response = await API.getSuggestedPlaces();
+      setSuggestedGoodPlace(response.data)
+    } catch (error) {
+      console.log(error)
     }
   };
   
@@ -297,7 +304,16 @@ useEffect(()=>{
   const [notificationsPermission, setNotificationsPermission] = useState(false);
   const [mapsPermission, setMapsPermission] = useState(false);
   const [messageSent, setMessageSent] = useState(false)
-  const { isSelecting } = useContext(LoadingEffectsContext)
+  const { isSelecting, setMapLocation } = useContext(LoadingEffectsContext)
+
+  const handleSelectedPlacesToNavigate = (lat, long) =>{
+    console.log(lat, long)
+    setMapLocation({
+      lat: lat,
+      long: long
+    })
+    router.push('/Map')
+  }
 
   return (
     <View className="flex-1 bg-white">
@@ -401,9 +417,10 @@ useEffect(()=>{
             contentContainerStyle={{ alignItems: "center" }}
           >
             {popularPlaces.map((places, index) => (
-              <View
+              <Pressable
                 key={index}
                 className="mr-2 "
+                onPress={()=>handleSelectedPlacesToNavigate(places.location.lat, places.location.lng)}
               >
                 <View className="rounded-xl overflow-hidden w-48 h-36">
                 <Image source={{uri: `${places.image_url}`}} className="w-full h-full " />
@@ -439,7 +456,7 @@ ${
                     />
                   </View>
                 </View>
-              </View>
+              </Pressable>
             ))}
           </ScrollView>
           {/* <ScrollView
@@ -500,9 +517,10 @@ ${
             contentContainerStyle={{ alignItems: "center" }}
           >
             {recommendedPlaces.map((places, index) => (
-              <View
+              <Pressable
                 key={index}
                 className="mr-2 "
+                onPress={()=>handleSelectedPlacesToNavigate(places.location.lat, places.location.lng)}
               >
                 <View className="rounded-xl overflow-hidden w-48 h-36">
                 <Image source={{uri: `${places.image_url}`}} className="w-full h-full " />
@@ -538,7 +556,7 @@ ${
                     />
                   </View>
                 </View>
-              </View>
+              </Pressable>
             ))}
           </ScrollView>
           {/* <ScrollView
@@ -634,7 +652,7 @@ ${
         <View className="flex-row items-center gap-4 flex-1 relative">
           <Image source={goodPlace[0].image} className="h-26" />
           <View>
-            <Text
+            <Text onPress={()=> console.log(goodPlace)}
               style={{ fontFamily: "PoppinsBold" }}
               className="text-lg break-words text-secondary"
             >
@@ -655,14 +673,15 @@ ${
             contentContainerStyle={{ alignItems: "center" }}
             className="mt-2"
           >
-            {goodPlace[0].places.map((places, index) => (
-              <View
+            {suggestedGoodPlace?.map((places, index) => (
+              <Pressable
                 key={index}
                 className="mr-2 "
+                onPress={()=>handleSelectedPlacesToNavigate(places.location.lat, places.location.lng)}
               >
                 <View className="rounded-xl overflow-hidden w-48 h-36">
                 {/* <Image source={{uri: `${places.image_url}`}} className="w-full h-full " /> */}
-                <Image source={places.image} className="w-full h-full " />
+                <Image source={{uri: places.image_url}} className="w-full h-full " />
                 </View>
                 <View className=" flex pl-2">
                 <Text
@@ -678,7 +697,7 @@ ${
                       style={{ fontFamily: "PoppinsMedium" }}
                       className="text-sm text-gray-400"
                     >
-                    {places.km}km
+                    {places.kilometers}km
                     </Text>
                     <View className="h-2 w-2 bg-gray-300 rounded-full "></View>
                     <View
@@ -695,55 +714,73 @@ ${
                     />
                   </View>
                 </View>
-              </View>
+              </Pressable>
             ))}
           </ScrollView>
       </View>
     )}
 
           <View className=" flex-1 mb-20">
-            <Text style={{ fontFamily: "PoppinsThin" }} className="text-xl">
-              Events Near You
+            <Text style={{ fontFamily: "PoppinsMedium" }} className="text-xl">
+             Today in your Area
             </Text>
             <View className="flex-1">
-              <View className="rounded-3xl p-2 mt-4 bg-white shadow-lg shadow-gray-700">
-                <View className="flex-row justify-around gap-3 items-center bg-transparent rounded-md p-2">
+              <View className="rounded-3xl flex-row gap-2 p-2 mt-4 bg-white shadow-lg shadow-gray-700">
+ 
                   <Image
                     source={require("../../assets/tabs/n1.png")}
-                    style={{ borderRadius: 16, height: 128 }}
+          
+                    style={{ borderRadius: 16, height: "90%" }}
                   />
                   <View style={{ flex: 1 }}>
                     <Text
-                      style={{ fontFamily: "PoppinsMedium", fontSize: 12 }}
+                      style={{ fontFamily: "PoppinsMedium", fontSize: 16 }}
                       className="text-secondary"
                     >
-                      1st May - Sat - 2:00 PM
+                      1st January
                     </Text>
-                    <Text style={{ fontFamily: "PoppinsMedium", fontSize: 16 }}>
+                    <Text style={{ fontFamily: "PoppinsBold", fontSize: 18 }}>
                       Networking & Sharing Club
                     </Text>
-                  </View>
-                </View>
-              </View>
-              <View className="rounded-3xl p-2 mt-4 bg-white shadow-lg shadow-gray-700">
-                <View className="flex-row justify-around gap-3 items-center bg-transparent rounded-md p-2">
-                  <Image
-                    source={require("../../assets/tabs/n2.png")}
-                    style={{ borderRadius: 16, height: 128 }}
-                  />
-                  <View style={{ flex: 1 }}>
                     <Text
-                      style={{ fontFamily: "PoppinsMedium", fontSize: 12 }}
-                      className="text-secondary"
+                      style={{ fontFamily: "PoppinsThin", fontSize: 14 }}
+                      className=""
                     >
-                      24th June- Sun -1:00 PM
-                    </Text>
-                    <Text style={{ fontFamily: "PoppinsMedium", fontSize: 16 }}>
-                      Mobile Legends Championship
+                     The first day of the year, a time for family
+gatherings and celebrations, marking
+the start of the new calendar year.
                     </Text>
                   </View>
                 </View>
-              </View>
+
+                <View className="rounded-3xl flex-row gap-2 p-2 mt-4 bg-white shadow-lg shadow-gray-700">
+ 
+ <Image
+   source={require("../../assets/tabs/n1.png")}
+
+   style={{ borderRadius: 16, height: "90%" }}
+ />
+ <View style={{ flex: 1 }}>
+   <Text
+     style={{ fontFamily: "PoppinsMedium", fontSize: 16 }}
+     className="text-secondary"
+   >
+     1st January
+   </Text>
+   <Text style={{ fontFamily: "PoppinsBold", fontSize: 18 }}>
+     Networking & Sharing Club
+   </Text>
+   <Text
+     style={{ fontFamily: "PoppinsThin", fontSize: 14 }}
+     className=""
+   >
+    The first day of the year, a time for family
+gatherings and celebrations, marking
+the start of the new calendar year.
+   </Text>
+ </View>
+</View>
+    
             </View>
 
             <View className="flex-1 justify-center items-center mt-10">
@@ -751,7 +788,7 @@ ${
                 className="text-lg text-secondary"
                 style={{ fontFamily: "PoppinsBold" }}
               >
-                Community Picks: Tips & Reviews
+                Quick Review
               </Text>
               <View className="flex-1 w-full">
                 <TextInput

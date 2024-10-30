@@ -1,14 +1,16 @@
-import { View, Text, SafeAreaView, TouchableOpacity, ScrollView, Image } from 'react-native'
+import { View, Text, SafeAreaView, TouchableOpacity, ScrollView, Image, Pressable } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { AuthenticatedContext } from '../../context/Authenticateduser';
 import { API } from '../../components/Protected/Api';
 import { useRouter } from 'expo-router';
+import { LoadingEffectsContext } from '../../context/Loadingeffect';
 
 const Poppular = () => {
     const { currentUser } = useContext(AuthenticatedContext)
     const [popularPlaces, setPopularPlaces] = useState([])
     const router = useRouter();
+    const { setMapLocation } = useContext(LoadingEffectsContext)
   
     const handleGetPopularPlaces = async () => {
         try {
@@ -18,6 +20,15 @@ const Poppular = () => {
         } catch (error) {
           console.log(error)
         }
+      }
+
+      const handleSelectedPlacesToNavigate = (lat, long) =>{
+        console.log(lat, long)
+        setMapLocation({
+          lat: lat,
+          long: long
+        })
+        router.push('/Map')
       }
 
       useEffect(()=>{
@@ -40,7 +51,9 @@ const Poppular = () => {
           {Array.from({ length: Math.ceil(popularPlaces.length / 2) }, (_, rowIndex) => (
             <View key={rowIndex} className="flex-row justify-between mb-4">
               {popularPlaces.slice(rowIndex * 2, rowIndex * 2 + 2).map((place, index) => (
-                <View key={index} className="w-1/2 p-2">
+                <Pressable key={index}
+                onPress={()=>handleSelectedPlacesToNavigate(place.location.lat, place.location.lng)}
+                className="w-1/2 p-2">
                   <View className="rounded-xl overflow-hidden h-28">
                     <Image source={{ uri: place.image_url }} className="w-full h-full" />
                   </View>
@@ -71,7 +84,7 @@ const Poppular = () => {
                       />
                     </View>
                   </View>
-                </View>
+                </Pressable>
               ))}
             </View>
           ))}

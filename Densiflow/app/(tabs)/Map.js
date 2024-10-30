@@ -1,5 +1,5 @@
 import { View, Text, Image, Pressable, TextInput, ScrollView, Modal } from "react-native";
-import React, { useRef, useState, useContext } from "react";
+import React, { useRef, useState, useContext, useEffect } from "react";
 import Image1 from "../../assets/tabs/img1.png";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import Entypo from "@expo/vector-icons/Entypo";
@@ -27,6 +27,27 @@ const Map = () => {
   const [placeFocus, setPlacesFocus] = useState("")
   const [placesTypes, setPlacesTypes] = useState([])
   const { isSelecting } = useContext(LoadingEffectsContext)
+
+  const {mapLocation} = useContext(LoadingEffectsContext)
+
+  const newMapLat = parseFloat(mapLocation.lat)
+  const newMapLong = parseFloat(mapLocation.long)
+
+
+  useEffect(() => {
+    if (mapLocation.lat && mapLocation.long) {
+      // If mapLocation is set, animate to it
+      mapRef.current.animateToRegion({
+        latitude: newMapLat,
+        longitude: newMapLong,
+        latitudeDelta: 0.002,
+        longitudeDelta: 0.002,
+      }, 1000);
+    } else {
+      // If mapLocation is not set, run handleCurrentUserLocation
+      handleCurrentUserLocation();
+    }
+  }, [mapLocation]);
 
   const typeOfPlaces = [
     { value: "amusement_park", name: "Amusement Park" },
@@ -319,6 +340,20 @@ const placesResult = [
           </View>
         </Marker>
       ))}
+
+
+       {/* SELECTED PLACES Markers */}
+
+    {mapLocation.lat === "" && mapLocation.long === "" ? '' : 
+       <Marker  onPress={() => handleMarkerPress("Place Title")} coordinate={{ latitude: newMapLat, longitude: newMapLong }}>
+       <View className="flex-1 justify-center items-center"><Text className="text-secondary text-xl">SEL</Text></View>
+       <View className="relative w-12 h-12 border-4 shadow-2xl shadow-gray-500 border-blue-500 rounded-full overflow-hidden">
+         <Image 
+           source={{ uri: imageProfile }} // Replace with your image URL
+           className="w-12 h-12" // Image size
+         />
+       </View>
+     </Marker>}
 
         </MapView>
 

@@ -41,6 +41,17 @@ class PlacesController < ApplicationController
       end
   end
 
+  def search_places
+    if current_user
+      query = params[:query]
+      google_service = Googleapi.new(nil)
+      places = google_service.fetch_places(query)
+      render json: places
+    else
+      render json: { error: 'User must be logged in' }, status: :unauthorized
+      end
+  end
+
 
   def suggested_places
     if current_user

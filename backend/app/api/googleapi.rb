@@ -70,7 +70,6 @@ class Googleapi
     all_places
   end
   
-  
 
   def popular_places(lat, long)
     establishment_types = ["restaurant", "cafe"]
@@ -306,9 +305,72 @@ class Googleapi
     
     formatted_places
   end
+
+
+  def fetch_places(query)
+    return [] if query.blank?
   
+    api_url = "https://maps.googleapis.com/maps/api/place/autocomplete/json?input=#{query}&key=#{@api_key}"
+    uri = URI(api_url)
+  
+    begin
+      # Perform the HTTP GET request
+      response = Net::HTTP.get(uri)
+      # Parse the JSON response
+      places = JSON.parse(response)
+  
+      formatted_places = places["predictions"].map do |place|
+        {
+          name: place["description"],
+          place_id: place["place_id"]
+        }
+      end
+      
+      formatted_places
+    rescue StandardError => e
+      # Log the error and return an empty array or handle it as needed
+      puts "Error fetching places: #{e.message}"
+      []
+    end
+  end
 
 
+  def place_information(lat, long, place_id)
+    return [] if place_id.blank?
+  
+    api_url = "https://maps.googleapis.com/maps/api/place/details/json?place_id=#{place_id}&key=#{@api_key}"
+    uri = URI(api_url)
+  
+    begin
+      # Perform the HTTP GET request
+      response = Net::HTTP.get(uri)
+      # Parse the JSON response
+      places = JSON.parse(response)
+  
+      formatted_places = places["result"].map do |place|
+
+        place_location = place.dig("geometry", "location")
+        place_lat = place_location["lat"]
+        place_lng = place_location["lng"]
+        distance = haversine_distance(lat, long, place_lat, place_lng)
+
+        {
+          location: place.dig("geometry", "location"),
+          name: place["name"],
+          place_id: place_id,
+           kilometers: distance.round(2)
+        }
+      end
+      
+      formatted_places
+    rescue StandardError => e
+      # Log the error and return an empty array or handle it as needed
+      puts "Error fetching places: #{e.message}"
+      []
+    end
+  end
+  
+  
   private 
 
   def haversine_distance(lat1, lon1, lat2, lon2)

@@ -53,6 +53,8 @@ Rails.application.routes.draw do
     #SUGGESTED_PLACE
     get "places/suggested", to: 'places#suggested_places'
 
+    get "places/search/:query", to: 'places#search_places'
+
 
     post "sampleplaces/types", to: 'places#sampleplaces_types'
 

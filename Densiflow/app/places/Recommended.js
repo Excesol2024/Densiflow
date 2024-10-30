@@ -1,14 +1,15 @@
-import { View, Text, SafeAreaView, TouchableOpacity, ScrollView, Image } from 'react-native'
+import { View, Text, SafeAreaView, TouchableOpacity, ScrollView, Image, Pressable } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { API } from '../../components/Protected/Api';
 import { useRouter } from 'expo-router';
+import { LoadingEffectsContext } from '../../context/Loadingeffect';
 
 const Recommended = () => {
  
     const [recommendedPlaces, setRecommendedPlaces] = useState([])
     const router = useRouter();
-  
+    const { setMapLocation } = useContext(LoadingEffectsContext)
     const handleGetRecommendedPlaces = async () => {
         try {
           const response = await API.getRecommededPlaces();
@@ -18,6 +19,16 @@ const Recommended = () => {
           console.log(error)
         }
       }
+
+      const handleSelectedPlacesToNavigate = (lat, long) =>{
+        console.log(lat, long)
+        setMapLocation({
+          lat: lat,
+          long: long
+        })
+        router.push('/Map')
+      }
+
 
       useEffect(()=>{
         handleGetRecommendedPlaces();
@@ -39,7 +50,7 @@ const Recommended = () => {
           {Array.from({ length: Math.ceil(recommendedPlaces.length / 2) }, (_, rowIndex) => (
             <View key={rowIndex} className="flex-row justify-between mb-4">
               {recommendedPlaces.slice(rowIndex * 2, rowIndex * 2 + 2).map((place, index) => (
-                <View key={index} className="w-1/2 p-2">
+                <Pressable  onPress={()=>handleSelectedPlacesToNavigate(place.location.lat, place.location.lng)} key={index} className="w-1/2 p-2">
                   <View className="rounded-xl overflow-hidden h-28">
                     <Image source={{ uri: place.image_url }} className="w-full h-full" />
                   </View>
@@ -70,7 +81,7 @@ const Recommended = () => {
                       />
                     </View>
                   </View>
-                </View>
+                </Pressable>
               ))}
             </View>
           ))}
