@@ -37,4 +37,5 @@ export const Places = {
     getRecommededPlaces: "/places/recommended",
     placeTypes: "/places/types",
     suggestedPlaces: "/places/suggested",
+    searchPlaces: "/places/search",
 }

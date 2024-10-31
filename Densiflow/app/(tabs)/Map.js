@@ -1,4 +1,4 @@
-import { View, Text, Image, Pressable, TextInput, ScrollView, Modal } from "react-native";
+import { View, Text, Image, Pressable, TextInput, ScrollView, Modal, ActivityIndicator } from "react-native";
 import React, { useRef, useState, useContext, useEffect } from "react";
 import Image1 from "../../assets/tabs/img1.png";
 import AntDesign from "@expo/vector-icons/AntDesign";
@@ -13,7 +13,7 @@ import Plus from '../../components/svg/map/Plus'
 import Minus from '../../components/svg/map/Minus'
 import Mapviews from '../../components/svg/map/Mapview'
 import Locate from '../../components/svg/map/Locate'
-import MapView, { Marker } from 'react-native-maps';
+import MapView, { Marker, Polygon } from 'react-native-maps';
 import axios from 'axios';
 import { AuthenticatedContext } from "../../context/Authenticateduser"
 import { API } from "../../components/Protected/Api";
@@ -28,21 +28,50 @@ const Map = () => {
   const [placesTypes, setPlacesTypes] = useState([])
   const { isSelecting } = useContext(LoadingEffectsContext)
 
-  const {mapLocation} = useContext(LoadingEffectsContext)
+  const {mapLocation, setMapLocation} = useContext(LoadingEffectsContext)
 
   const newMapLat = parseFloat(mapLocation.lat)
   const newMapLong = parseFloat(mapLocation.long)
 
+  // Check if newMapLat and newMapLong are valid numbers
+  const isValidLocation = !isNaN(newMapLat) && !isNaN(newMapLong);
+
+  // Define boundary coordinates based on newMapLat and newMapLong if valid
+  const cityBoundaryCoordinates = isValidLocation ? [
+    { latitude: newMapLat + 0.01, longitude: newMapLong + 0.01 },
+    { latitude: newMapLat + 0.01, longitude: newMapLong - 0.01 },
+    { latitude: newMapLat - 0.01, longitude: newMapLong - 0.01 },
+    { latitude: newMapLat - 0.01, longitude: newMapLong + 0.01 },
+    { latitude: newMapLat + 0.01, longitude: newMapLong + 0.01 }, // Close the loop
+  ] : [];
+
+  const plainMapStyle = [
+    {
+      featureType: 'poi', // Hides POI (points of interest) icons
+      elementType: 'labels.icon',
+      stylers: [{ visibility: 'off' }],
+    },
+    {
+      featureType: 'transit.station', // Hides transit icons
+      elementType: 'labels.icon',
+      stylers: [{ visibility: 'off' }],
+    },
+    {
+      featureType: 'road', // Optionally, hide road icons
+      elementType: 'labels.icon',
+      stylers: [{ visibility: 'off' }],
+    },
+  ];
+  
 
   useEffect(() => {
-    if (mapLocation.lat && mapLocation.long) {
-      // If mapLocation is set, animate to it
+    if (isValidLocation && mapRef.current) {
       mapRef.current.animateToRegion({
         latitude: newMapLat,
         longitude: newMapLong,
-        latitudeDelta: 0.002,
-        longitudeDelta: 0.002,
-      }, 1000);
+        latitudeDelta: 0.05,
+        longitudeDelta: 0.05,
+      }, 1000); // 1 second animation
     } else {
       // If mapLocation is not set, run handleCurrentUserLocation
       handleCurrentUserLocation();
@@ -285,8 +314,8 @@ const placesResult = [
       mapRef.current.animateToRegion({
         latitude: lat,
         longitude: long,
-        latitudeDelta: 0.002, // Adjust for more zoom
-        longitudeDelta: 0.002, // Adjust for more zoom
+        latitudeDelta: 0.001, // Adjust for more zoom
+        longitudeDelta: 0.001, // Adjust for more zoom
       }, 1000);
     };
 
@@ -299,6 +328,51 @@ const placesResult = [
       }, 1000);
     };
 
+    const [searchResults, setSearchResults] = useState([])
+    const [isSearching, setIsSearching] = useState(false)
+    const [searchText, setSearchText] = useState("");
+
+    useEffect(() => {
+      if (searchText === "") {
+        setSearchResults([]);
+        setIsSearching(false)
+        return;
+      } 
+    
+      const timeoutId = setTimeout(() => {
+        setIsSearching(true)
+        setPlacesTypes([])
+        setPlacesFocus("")
+        handleSearchPlaces();
+      }, 100);
+    
+      return () => clearTimeout(timeoutId); 
+    }, [searchText]);
+  
+    const handleSearchPlaces = async () => {
+      try {
+        const response = await API.getSearchedPlaces({ query: searchText });
+        setSearchResults(response.data)
+        if(response.data){
+          setIsSearching(false)
+        }
+      } catch (error) {
+        console.log(error)
+      }
+    }
+  
+    const handleSelectedSearchedPlaceToNavigate = (lat, long) =>{
+      console.log(lat, long)
+      setIsSearching(false)
+      setSearchResults([])
+      setSearchText("")
+      setMapLocation({
+        lat: lat,
+        long: long
+      })
+    }
+
+
   return (
     <View className="flex-1 ">
         {/** GOOGLE MAP */}
@@ -307,10 +381,18 @@ const placesResult = [
           initialRegion={region} 
           onRegionChangeComplete={setRegion}
           mapType={mapType}
+          customMapStyle={plainMapStyle}
           onPress={handleMapPress}
         className="flex-1">
 
-
+{cityBoundaryCoordinates.length > 0 && (
+          <Polygon
+            coordinates={cityBoundaryCoordinates}
+            strokeColor="#FF6347" // Boundary line color
+            fillColor="rgba(255, 99, 71, 0.3)" // Boundary fill color
+            strokeWidth={2}
+          />
+        )}
 
 <Marker  onPress={() => handleMarkerPress("Place Title")} coordinate={{ latitude: initialRegion.latitude, longitude: initialRegion.longitude }}>
           <View className="flex-1 justify-center items-center"><Text className="text-secondary text-xl">YOU</Text></View>
@@ -383,44 +465,10 @@ const placesResult = [
         </Modal>
       )}
 
-      <View className="flex-1 absolute mt-10">
-      <View className="flex-2 p-5 ">
-     <View className="rounded-full bg-white shadow-lg shadow-gray-900">
-      <View className="flex-row items-center bg-transparent rounded-full p-1">
-              <AntDesign
-                name="search1"
-                size={27}
-                color="gray"
-                paddingLeft={5}
-              
-              />
-              <TextInput
-                style={{ fontFamily: "PoppinsThin" }}
-                className="flex-1 pl-2 py-1 text-gray-50 text-sm"
-                placeholderTextColor="gray"
-                placeholder="Green Park Cafe"
-          
-              />
-            </View>
-      </View>
+      <View className="flex-1 w-full absolute mt-10">
+      <View className="flex-1 p-5 ">
 
-      <View className="flex-row  justify-center mt-4">
-  <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-  {typeOfPlaces.map((place, index)=>(
-      <Pressable onPress={()=> handleSelectedPlacesTypes(place.value)} key={index} className="bg-white py-3 px-6 rounded-full shadow-md shadow-gray-300 mx-1">
-      <Text style={{ fontFamily: "PoppinsMedium" }} className={place.value === placeFocus ? 'text-secondary text-sm' : `text-gray-500 text-sm`}>
-        {place.name}
-      </Text>
-    </Pressable>
-  ))}
-  </ScrollView>
-      </View>
-
-     
-
-     </View>
-     <View className="flex-1  w-full">
-        <View className="right-1 absolute">
+      <View className="right-1 top-32 absolute" style={{zIndex: 1}}>
         <Pressable onPress={handleZoomIn} className="bg-white w-10 flex justify-center items-center h-9 p-2 rounded-t-lg ">
           <Plus/>
         </Pressable>
@@ -434,8 +482,80 @@ const placesResult = [
           <Locate/>
         </Pressable>
    
-        </View>
+    
       </View>
+      
+      <View className="flex-1 relative">
+      <View className=" rounded-full bg-white shadow-lg shadow-gray-900">
+      <View className="flex-row items-center bg-transparent rounded-full p-1">
+              <AntDesign
+                name="search1"
+                size={27}
+                color="gray"
+                paddingLeft={5}
+              
+              />
+              <TextInput
+                style={{ fontFamily: "PoppinsThin" }}
+                className="flex-1 pl-2 py-1 text-black text-sm"
+                placeholderTextColor="gray"
+                placeholder="Where are you going to?"
+                onChangeText={setSearchText}
+                value={searchText}              />
+            </View>
+      </View>
+
+  
+
+      {isSearching ? (
+  <View className="bg-white h-16 rounded-md mt-1 flex-1 justify-center items-center">
+    <ActivityIndicator size="large" />
+  </View>
+) : (
+  searchResults.length > 0 ? (
+    <View className="h-40 w-full top-12 z-40 rounded-md absolute">
+      <ScrollView>
+        {searchResults.map((place, index) => (
+          <Pressable onPress={()=> handleSelectedSearchedPlaceToNavigate(place.location.lat, place.location.lng)} key={index} className="flex-row rounded-md bg-white p-2 h-14 items-center">
+            <AntDesign
+              name="search1"
+              size={27}
+              color="gray"
+              paddingLeft={5}
+            />
+            <Text style={{ fontFamily: "PoppinsMedium" }} className="pl-1">
+              {place.name}
+            </Text>
+          </Pressable>
+        ))}
+      </ScrollView>
+    </View>
+  ) : ''
+)}
+          
+          
+
+      
+    
+      </View>
+
+     {isSearching? '' :  <View className="flex-row  justify-center mt-2">
+  <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+  {typeOfPlaces.map((place, index)=>(
+      <Pressable onPress={()=> handleSelectedPlacesTypes(place.value)} key={index} className="bg-white py-3 px-6 rounded-full shadow-md shadow-gray-300 mx-1">
+      <Text style={{ fontFamily: "PoppinsMedium" }} className={place.value === placeFocus ? 'text-secondary text-sm' : `text-gray-500 text-sm`}>
+        {place.name}
+      </Text>
+    </Pressable>
+  ))}
+  </ScrollView>
+      </View>}
+
+     
+
+     </View>
+ 
+        
       </View>
 
       

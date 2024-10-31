@@ -8,6 +8,7 @@ import {
   SafeAreaView,
   Pressable,
   Alert,
+  ActivityIndicator,
 } from "react-native";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import Entypo from "@expo/vector-icons/Entypo";
@@ -30,6 +31,7 @@ import MessageSent from "../../components/modal/androidpopup/MessageSent";
 import { AuthenticatedContext } from "../../context/Authenticateduser";
 import { LoadingEffectsContext } from "../../context/Loadingeffect";
 import { router } from "expo-router";
+import { err } from "react-native-svg";
 
 
 
@@ -305,9 +307,50 @@ useEffect(()=>{
   const [mapsPermission, setMapsPermission] = useState(false);
   const [messageSent, setMessageSent] = useState(false)
   const { isSelecting, setMapLocation } = useContext(LoadingEffectsContext)
+  const [searchResults, setSearchResults] = useState([])
+  const [isSearching, setIsSearching] = useState(false)
 
   const handleSelectedPlacesToNavigate = (lat, long) =>{
     console.log(lat, long)
+    setMapLocation({
+      lat: lat,
+      long: long
+    })
+    router.push('/Map')
+  }
+
+  useEffect(() => {
+    if (searchText === "") {
+      setSearchResults([]);
+      setIsSearching(false)
+      return;
+    } 
+  
+    const timeoutId = setTimeout(() => {
+      setIsSearching(true)
+      handleSearchPlaces();
+    }, 100);
+  
+    return () => clearTimeout(timeoutId); 
+  }, [searchText]);
+
+  const handleSearchPlaces = async () => {
+    try {
+      const response = await API.getSearchedPlaces({ query: searchText });
+      setSearchResults(response.data)
+      if(response.data){
+        setIsSearching(false)
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  const handleSelectedSearchedPlaceToNavigate = (lat, long) =>{
+    console.log(lat, long)
+    setIsSearching(false)
+    setSearchResults([])
+    setSearchText("")
     setMapLocation({
       lat: lat,
       long: long
@@ -347,8 +390,8 @@ useEffect(()=>{
                     </Text>
             </View>
           </View>
-
-          <View
+<View>
+<View
             className="rounded-full shadow-lg shadow-gray-900 bg-white"
           >
             <View className="flex-row items-center bg-transparent rounded-full p-2">
@@ -357,18 +400,48 @@ useEffect(()=>{
                 size={27}
                 color="gray"
                 paddingLeft={5}
-                onPress={getCurrentUserWeather}
+                onPress={()=> setSearchText(null)}
               />
               <TextInput
                 style={{ fontFamily: "PoppinsThin" }}
-                className="flex-1 pl-2 py-1 text-gray-50 text-sm"
+                className="flex-1 pl-2 py-1 text-black text-sm"
                 placeholderTextColor="gray"
                 placeholder="Where are you going to?"
                 value={searchText}
-                onChangeText={setSearchText}
+                onChangeText={setSearchText} 
               />
             </View>
           </View>
+
+          <View className="mt-1 absolute z-40 h-44 bottom-[-185] w-full">
+     <View className=" h-full w-full rounded-md absolute">
+      <ScrollView>
+     {isSearching ? <View className="bg-white"><ActivityIndicator size={"large"} /></View> : searchResults.length > 0 ? 
+     (searchResults.map((place, index)=> (
+      <Pressable onPress={()=> handleSelectedSearchedPlaceToNavigate(place.location.lat, place.location.lng)} key={index} className="flex-row bg-white p-2 border-b-2 h-16 border-gray-300 items-center">
+      <AntDesign
+              name="search1"
+              size={27}
+              color="gray"
+              paddingLeft={5}
+            
+            />
+        <Text style={{fontFamily: "PoppinsMedium"}} className="pl-1">{place.name}</Text>
+
+        
+
+        </Pressable>
+     ))) : ''}
+
+       
+  
+      </ScrollView>
+          
+      </View>
+     </View>
+</View>
+
+        
         </View>
       </View>
 
@@ -804,7 +877,6 @@ the start of the new calendar year.
                   className="border-2 border-secondary rounded-lg mt-2"
                   placeholderTextColor="gray"
                   placeholder="“Share your tips or reviews about the spot!”"
-                  onChangeText={setSearchText}
                 />
                <Text className="absolute right-3 bottom-2"> <NextSvg /></Text>
               </View>

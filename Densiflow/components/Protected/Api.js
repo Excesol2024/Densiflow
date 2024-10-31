@@ -57,4 +57,5 @@ export const API = {
   getRecommededPlaces: ()=> apiHelper(Places.getRecommededPlaces, "GET"),
   getPlacesTypes: (body)=> apiHelper(Places.placeTypes, "POST", body),
   getSuggestedPlaces: ()=> apiHelper(Places.suggestedPlaces, "GET"),
+  getSearchedPlaces: (params)=> apiHelper(Places.searchPlaces, "GET", undefined, params),
 };
