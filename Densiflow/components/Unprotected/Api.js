@@ -2,7 +2,7 @@ import axios from "axios"
 import { Authentication} from "../../constant/Endpoint"
 import { SERVER_URL } from '@env'
 
-  const newServeUrl = "http://192.168.0.202:3000"
+  const newServeUrl = "https://densiflow.onrender.com"
   
 const apiHelper = async (endpoint, method, body, params)=>{
   
