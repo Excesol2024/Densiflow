@@ -20,7 +20,7 @@ export const LoadingEffectsProvider = ({children}) => {
         long: ""
     })
 
-
+  
     useEffect(()=>{
     console.log("MAP LOCATIONS", mapLocation)
     },[])

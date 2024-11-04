@@ -4,6 +4,7 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 import { API } from '../../components/Protected/Api';
 import { useRouter } from 'expo-router';
 import { LoadingEffectsContext } from '../../context/Loadingeffect';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Recommended = () => {
  
@@ -33,6 +34,43 @@ const Recommended = () => {
       useEffect(()=>{
         handleGetRecommendedPlaces();
       },[])
+
+      const handleRecentVisited = async (name, address, km, lat, long) => {
+        try {
+          // Retrieve the current list of recent visits from AsyncStorage
+          const existingVisits = await AsyncStorage.getItem('recentVisited');
+          let visits = existingVisits ? JSON.parse(existingVisits) : [];
+      
+          // Create a new visit object
+          const newVisit = { name, address, km, lat, long };
+      
+          // Check if the visit is already in the list
+          const isDuplicate = visits.some(
+            (visit) => visit.name === newVisit.name && visit.address === newVisit.address
+          );
+      
+          // If it's a duplicate, do not add it to the list
+          if (isDuplicate) {
+            console.log('Visit already exists in recent visits');
+            return;
+          }
+      
+          // Add the new visit to the beginning of the list if it's not a duplicate
+          visits.unshift(newVisit);
+      
+          // Limit the list to 4 items
+          if (visits.length > 4) {
+            visits.pop(); // Remove the last (oldest) visit
+          }
+      
+          // Save the updated list back to AsyncStorage
+          await AsyncStorage.setItem('recentVisited', JSON.stringify(visits));
+          console.log('Recent visit saved successfully');
+          getRecentVisited();
+        } catch (error) {
+          console.error('Failed to save recent visit:', error);
+        }
+      };
 
   return (
     <SafeAreaView className="flex-1 bg-white">

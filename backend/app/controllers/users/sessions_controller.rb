@@ -3,16 +3,22 @@
 class Users::SessionsController < Devise::SessionsController
   # before_action :configure_sign_in_params, only: [:create]
 
-  def create
-    user = User.find_by(email: params[:user][:email])
-    if user && user.valid_password?(params[:user][:password])
-      sign_in(user)
-      user.update(expo_token: params[:expo_token], firebase_token: params[:firebase_token])  
-      render json: { status: :ok, message: 'Login successful', user: user }
-    else
-      render json: { status: 'error', message: 'Login Failed', errors: ['Invalid email or password'] }, status: :unprocessable_entity
-    end
+ def create
+  user = User.find_by(email: params[:user][:email])
+  
+  if user.nil?
+    # User not found case
+    render json: { status: 'error', message: 'User not found', errors: ['Invalid email or password'] }, status: :not_found
+  elsif user.valid_password?(params[:user][:password])
+    # User found and password valid
+    sign_in(user)
+    user.update(expo_token: params[:expo_token], firebase_token: params[:firebase_token])  
+    render json: { status: :ok, message: 'Login successful', user: user }
+  else
+    # User found but password invalid
+    render json: { status: 'error', message: 'Login Failed', errors: ['Invalid email or password'] }, status: :unprocessable_entity
   end
+end
   
   # DELETE /users/sign_out
   def destroy

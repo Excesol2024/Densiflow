@@ -11,27 +11,17 @@ import {
   ActivityIndicator,
 } from "react-native";
 import AntDesign from "@expo/vector-icons/AntDesign";
-import Entypo from "@expo/vector-icons/Entypo";
-import Image1 from "../../assets/tabs/img1.png";
 import { LinearGradient } from "expo-linear-gradient";
 import NextSvg from "../../components/svg/next";
 import * as Location from 'expo-location';
 import { API } from "../../components/Protected/Api";
-import Moon from "../../components/svg/weather/night/Moon"
-import MoonLight from "../../components/svg/weather/night/Moonlight"
-import Mooncloud from "../../components/svg/weather/night/Mooncloud"
 import Notif from "../../components/svg/Notif"
-import Sun from "../../components/svg/weather/day/Sun"
-import Light from "../../components/svg/weather/day/Light"
-import Rain from "../../components/svg/weather/day/Rain"
-import LocationPermission from "../../components/modal/androidpopup/LocationPermission";
-import Notifications from "../../components/modal/androidpopup/Notifications";
-import Maps from "../../components/modal/androidpopup/Maps";
-import MessageSent from "../../components/modal/androidpopup/MessageSent";
+
 import { AuthenticatedContext } from "../../context/Authenticateduser";
 import { LoadingEffectsContext } from "../../context/Loadingeffect";
 import { router } from "expo-router";
-import { err } from "react-native-svg";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 
 
 
@@ -43,6 +33,7 @@ const Home =  () => {
   const [celcius, setCelcius] = useState('')
   const [weatherStatus, setWeatherStatus] = useState('')
   const {   handleLoggedInUser, setSubscribed } = useContext(AuthenticatedContext);
+  
   const getCurrentDate = () => {
     const today = new Date();
     const options = { weekday: 'long', month: 'long', day: '2-digit' };
@@ -112,9 +103,7 @@ const Home =  () => {
         };
         const response = await API.getCurrentUserWeather(body)
         setWeatherStatus(response.data.weather[0].main)
-
         handleLoggedInUser();
-
         const tempKelvin = response.data.main.temp;
         const tempCelsius = Math.round(tempKelvin - 273.15);
         setCelcius(tempCelsius);
@@ -131,41 +120,23 @@ useEffect(()=>{
   setSubscribed(true)
  getUserCurrentLocation();
  getCurrentDate();
- handleLoggedInUser();
- handleGetPopularPlaces();
- handleGetRecommendedPlaces();
+},[])
+
+useEffect(()=>{
+  handleGetPopularPlaces();
+  handleGetRecommendedPlaces();
+updatePlaceBasedOnTime();
 },[])
 
 useEffect(()=>{
   getCurrentUserWeather();
-},[userCity, userSubregion])
+  handleDayOrNight();
+},[])
 
 
 
 
-  const recentPlaces = [
-    {
-      name: "Mall of Asia",
-      address: "Antaro Mart, BSD City Tanggerang",
-      distance: "1.7",
-    },
-
-    {
-      name: "Starbucks Cafe",
-      address: "Antaro Mart, BSD City Tanggerang",
-      distance: "1.6",
-    },
-    {
-      name: "Manila Museum",
-      address: "Antaro Mart, BSD City Tanggerang",
-      distance: "1.4",
-    },
-    {
-      name: "Sky Library",
-      address: "Antaro Mart, BSD City Tanggerang",
-      distance: "1.3",
-    },
-  ];
+ 
 
   const goodPlaces = {
     coffee: [
@@ -290,10 +261,7 @@ useEffect(()=>{
       console.log(error)
     }
   };
-  
-  useEffect(() => {
-    updatePlaceBasedOnTime();
-  }, []);
+
   
   useEffect(() => {
     setGoodPlace(goodPlaces[currentCategory]);
@@ -310,13 +278,15 @@ useEffect(()=>{
   const [searchResults, setSearchResults] = useState([])
   const [isSearching, setIsSearching] = useState(false)
 
-  const handleSelectedPlacesToNavigate = (lat, long) =>{
-    console.log(lat, long)
+  const handleSelectedPlacesToNavigate = (place) =>{
+    console.log("SELECTD PLACE", place.kilometers)
+    handleRecentVisited(place.name, place.vicinity, place.kilometers,  place.location.lat,  place.location.lng)
     setMapLocation({
-      lat: lat,
-      long: long
+      lat: place.location.lat,
+      long: place.location.lng
     })
     router.push('/Map')
+   
   }
 
   useEffect(() => {
@@ -346,20 +316,75 @@ useEffect(()=>{
     }
   }
 
-  const handleSelectedSearchedPlaceToNavigate = (lat, long) =>{
-    console.log(lat, long)
-    setIsSearching(false)
-    setSearchResults([])
-    setSearchText("")
-    setMapLocation({
-      lat: lat,
-      long: long
-    })
-    router.push('/Map')
+  const handleSelectedSearchedPlaceToNavigate = (place) =>{
+    console.log("SELECTD PLACE", place.kilometers)
+    handleRecentVisited(place.name, place.vicinity, place.kilometers,  place.location.lat,  place.location.lng)
+   setMapLocation({
+     lat: place.location.lat,
+     long: place.location.lng
+   })
+   router.push('/Map')
   }
 
+
+  const handleRecentVisited = async (name, address, km, lat, long) => {
+    try {
+      // Retrieve the current list of recent visits from AsyncStorage
+      const existingVisits = await AsyncStorage.getItem('recentVisited');
+      let visits = existingVisits ? JSON.parse(existingVisits) : [];
+  
+      // Create a new visit object
+      const newVisit = { name, address, km, lat, long };
+  
+      // Check if the visit is already in the list
+      const isDuplicate = visits.some(
+        (visit) => visit.name === newVisit.name && visit.address === newVisit.address
+      );
+  
+      // If it's a duplicate, do not add it to the list
+      if (isDuplicate) {
+        console.log('Visit already exists in recent visits');
+        return;
+      }
+  
+      // Add the new visit to the beginning of the list if it's not a duplicate
+      visits.unshift(newVisit);
+  
+      // Limit the list to 4 items
+      if (visits.length > 4) {
+        visits.pop(); // Remove the last (oldest) visit
+      }
+  
+      // Save the updated list back to AsyncStorage
+      await AsyncStorage.setItem('recentVisited', JSON.stringify(visits));
+      console.log('Recent visit saved successfully');
+      getRecentVisited();
+    } catch (error) {
+      console.error('Failed to save recent visit:', error);
+    }
+  };
+
+  const [recentVisited, setRecentVisited] = useState([])
+
+  const getRecentVisited = async () => {
+    try {
+      const recentVisited = await AsyncStorage.getItem('recentVisited');
+      if (recentVisited) {
+        const visits = JSON.parse(recentVisited);
+        console.log("RECENT VISITED", visits)
+        setRecentVisited(visits)
+      }
+    } catch (error) {
+      console.error('Failed to retrieve recent visits:', error);
+    }
+  };
+
+  useEffect(()=>{
+    getRecentVisited();
+  },[])
+
   return (
-    <View className="flex-1 bg-white">
+    <SafeAreaView className="flex-1 bg-white">
       {/* <LocationPermission visible={locationsPermission} />
       <Notifications visible={notificationsPermission}/>
       <Maps visible={mapsPermission}/>
@@ -368,9 +393,10 @@ useEffect(()=>{
      {isSelecting ?  <Image source={require('../../assets/blur.png')} className="absolute z-20"/> : ''}
 
       <View className="">
-        <View className=" w-full p-3 mt-14">
+        <View className=" w-full pl-4 pr-4 mt-14">
 
-          <View className="flex-row items-center gap-2 mb-5">
+       <View className="flex-row justify-between mb-2">
+       <View className="flex-row items-center gap-2 mb-5">
             <Notif/>
             <View className="flex">
               <View className="flex-row  gap-2">
@@ -390,6 +416,16 @@ useEffect(()=>{
                     </Text>
             </View>
           </View>
+          <View className="bg-gray-200 shadow-xl shadow-gray-700 h-full w-16 justify-center items-center rounded-lg absolute right-3 top-[-10] p-2">
+              {isPM ? ( weatherStatus === "Rain" ?  <Image source={require('../../assets/weather/rain.png')} className="w-10 h-8"/> : 
+              weatherStatus === "Clouds" ?  <Image source={require('../../assets/weather/moonlight.png')} className="w-10 h-8"/> : 
+              weatherStatus === "Thunderstorm" ?  <Image source={require('../../assets/weather/thunder.png')} className="w-10 h-8"/> :  <Image source={require('../../assets/weather/cloudy.png')} className="w-10 h-8"/>  ) : 
+              (weatherStatus === "Rain" ?  <Image source={require('../../assets/weather/rainyday.png')} className="w-10 h-8"/> : 
+              weatherStatus === "Clouds" ?  <Image source={require('../../assets/weather/cloudy.png')} className="w-10 h-8"/> : 
+              weatherStatus === "Thunderstorm" ?  <Image source={require('../../assets/weather/thunder.png')} className="w-10 h-8"/> :  <Image source={require('../../assets/weather/sunny.png')} className="w-10 h-8"/>  ) }
+            <Text style={{fontFamily: "PoppinsBold"}}>{celcius}°</Text>
+          </View>
+       </View>
 <View>
 <View
             className="rounded-full shadow-lg shadow-gray-900 bg-white"
@@ -418,7 +454,7 @@ useEffect(()=>{
       <ScrollView>
      {isSearching ? <View className="bg-white"><ActivityIndicator size={"large"} /></View> : searchResults.length > 0 ? 
      (searchResults.map((place, index)=> (
-      <Pressable onPress={()=> handleSelectedSearchedPlaceToNavigate(place.location.lat, place.location.lng)} key={index} className="flex-row bg-white p-2 border-b-2 h-16 border-gray-300 items-center">
+      <Pressable onPress={()=> handleSelectedSearchedPlaceToNavigate(place)} key={index} className="flex-row bg-white p-2 border-b-2 h-16 border-gray-300 items-center">
       <AntDesign
               name="search1"
               size={27}
@@ -493,7 +529,7 @@ useEffect(()=>{
               <Pressable
                 key={index}
                 className="mr-2 "
-                onPress={()=>handleSelectedPlacesToNavigate(places.location.lat, places.location.lng)}
+                onPress={()=>handleSelectedPlacesToNavigate(places)}
               >
                 <View className="rounded-xl overflow-hidden w-48 h-36">
                 <Image source={{uri: `${places.image_url}`}} className="w-full h-full " />
@@ -532,49 +568,6 @@ ${
               </Pressable>
             ))}
           </ScrollView>
-          {/* <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{ alignItems: "center" }}
-            className="mt-2"
-          >
-            {popularPlaces2.map((places, index) => (
-              <View
-                key={index}
-                className="mr-2 rounded-3xl w-52 overflow-hidden"
-              >
-                <Image source={places.image} className="w-full h-32 " />
-                <View className="bg-secondary flex flex-row justify-evenly py-2 rounded-b-2xl">
-                  <Text
-                    style={{ fontFamily: "PoppinsThin" }}
-                    className="text-sm text-white"
-                  >
-                    {places.name}
-                  </Text>
-                  <View className="flex flex-row items-center">
-                    <Text
-                      style={{ fontFamily: "PoppinsThin" }}
-                      className="text-sm text-white"
-                    >
-                      {places.km}
-                    </Text>
-                    <View
-                      className={`w-3 h-3 rounded-full
-${
-  places.busyness === "red"
-    ? "bg-red-500"
-    : places.busyness === "yellow"
-    ? "bg-yellow-300"
-    : places.busyness === "green"
-    ? "bg-green-500"
-    : ""
-} ml-1`}
-                    />
-                  </View>
-                </View>
-              </View>
-            ))}
-          </ScrollView> */}
         </View>
 
 
@@ -593,7 +586,7 @@ ${
               <Pressable
                 key={index}
                 className="mr-2 "
-                onPress={()=>handleSelectedPlacesToNavigate(places.location.lat, places.location.lng)}
+                onPress={()=>handleSelectedPlacesToNavigate(places)}
               >
                 <View className="rounded-xl overflow-hidden w-48 h-36">
                 <Image source={{uri: `${places.image_url}`}} className="w-full h-full " />
@@ -632,70 +625,28 @@ ${
               </Pressable>
             ))}
           </ScrollView>
-          {/* <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{ alignItems: "center" }}
-            className="mt-2"
-          >
-            {popularPlaces2.map((places, index) => (
-              <View
-                key={index}
-                className="mr-2 rounded-3xl w-52 overflow-hidden"
-              >
-                <Image source={places.image} className="w-full h-32 " />
-                <View className="bg-secondary flex flex-row justify-evenly py-2 rounded-b-2xl">
-                  <Text
-                    style={{ fontFamily: "PoppinsThin" }}
-                    className="text-sm text-white"
-                  >
-                    {places.name}
-                  </Text>
-                  <View className="flex flex-row items-center">
-                    <Text
-                      style={{ fontFamily: "PoppinsThin" }}
-                      className="text-sm text-white"
-                    >
-                      {places.km}
-                    </Text>
-                    <View
-                      className={`w-3 h-3 rounded-full
-${
-  places.busyness === "red"
-    ? "bg-red-500"
-    : places.busyness === "yellow"
-    ? "bg-yellow-300"
-    : places.busyness === "green"
-    ? "bg-green-500"
-    : ""
-} ml-1`}
-                    />
-                  </View>
-                </View>
-              </View>
-            ))}
-          </ScrollView> */}
         </View> 
    
 
-          <View className="flex-1 w-full mt-5 ">
+          <View className="flex-1 w-full mt-5 mb-5 ">
             <Text style={{ fontFamily: "PoppinsThin" }} className="text-xl">
-              Recents Searches
+              Recents Visited
             </Text>
-
+            
             <View className="">
-              {recentPlaces.map((recent, index) => (
+             {recentVisited.length > 0 ? 
+              (recentVisited.map((recent, index) => (
                 <View
                   key={index}
-                  className="flex flex-row mt-2 w-full justify-center gap-3 py-3"
+                  className="flex flex-row mt-2 w-full justify-center"
                 >
                   <View className=" rounded-full justify-center">
-                    <Image
+                  <Image
                       source={require("../../assets/tabs/Location.png")}
                       className="h-10 w-10"
                     />
                   </View>
-                  <View className="w-56">
+                  <View className="w-56 mt-2 ml-2 mr-2">
                     <Text
                       style={{ fontFamily: "PoppinsBold" }}
                       className="text-md"
@@ -710,13 +661,14 @@ ${
                     </Text>
                   </View>
                   <Text
-                    style={{ fontFamily: "PoppinsBold" }}
-                    className="text-md"
+                    style={{ fontFamily: "PoppinsThin" }}
+                    className="text-md text-gray-400"
                   >
-                    {recent.distance}
+                    {recent.km} km
                   </Text>
                 </View>
-              ))}
+              ))) : <Text  style={{ fontFamily: "PoppinsThin" }}
+              className="text-lg mt-3 mb-10 text-gray-400 text-center" >No recent Visited Places</Text> }
             </View>
           </View>
 
@@ -750,7 +702,7 @@ ${
               <Pressable
                 key={index}
                 className="mr-2 "
-                onPress={()=>handleSelectedPlacesToNavigate(places.location.lat, places.location.lng)}
+                onPress={()=>handleSelectedPlacesToNavigate(places)}
               >
                 <View className="rounded-xl overflow-hidden w-48 h-36">
                 {/* <Image source={{uri: `${places.image_url}`}} className="w-full h-full " /> */}
@@ -936,7 +888,7 @@ the start of the new calendar year.
           </View>
         </ScrollView>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 

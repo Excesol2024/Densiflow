@@ -23,10 +23,8 @@ export const AuthenticatedProvider = ({ children }) => {
   const handleLoggedInUser = async () => {
     const token = await AsyncStorage.getItem('Authorization');
     console.log("TOKEN", token);
-    console.log("CURRENT USER ssss")
     const dataresponse = await API.getCurrentUser();
     setCurrentUser(dataresponse.data)
-    console.log("CURRENT USER", dataresponse.data)
       setIsloggedIn({
         authUser: true
       })
@@ -44,7 +42,7 @@ export const AuthenticatedProvider = ({ children }) => {
 
   const handleLogoutUser = async () => {
     await AsyncStorage.removeItem('Authorization');
-    
+    await AsyncStorage.removeItem('recentVisited')
       setIsloggedIn({
         authUser: false,
       });

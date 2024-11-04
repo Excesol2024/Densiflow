@@ -7,6 +7,7 @@ import {
   Pressable,
   ScrollView,
   Keyboard,
+  SafeAreaView,
 } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import { useRouter } from "expo-router";
@@ -45,6 +46,10 @@ export default function Login() {
   const { setIsloggedIn } = useContext(AuthenticatedContext);
   const [isToggle, setIsToggle] = useState(true);
   const { setEffectLoading } = useContext(LoadingEffectsContext)
+  const [errors, setErrors] = useState({
+    email: "",
+    password: ""
+  })
 
   useEffect(() => {
     GoogleSignin.configure({
@@ -224,6 +229,8 @@ async function registerForPushNotificationsAsync() {
     }
   };
 
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
   const handleLogin = async () => {
     setEffectLoading(true);
     const body = {
@@ -235,15 +242,24 @@ async function registerForPushNotificationsAsync() {
       firebase_token: firebaseToken
     };
 
+    let newErrors = {}; 
+
     if (email === "") {
-      Alert.alert("Email must not be empty");
-      setEffectLoading(false);
-      return;
-    } else if (password === "") {
-      Alert.alert("Password must not be empty");
+      newErrors.email = "Email should not be empty.";
+    } else if (!emailRegex.test(email)) {
+      newErrors.email = "Please enter a valid email address.";
+    }
+    
+    if (password === "") {
+     newErrors.password = "Password should not be empty.";
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
       setEffectLoading(false);
       return;
     }
+
     try {
       const response = await API.loginUser(body);
       console.log(response.data);
@@ -261,11 +277,20 @@ async function registerForPushNotificationsAsync() {
         }, 1000);
       } else {
         setEffectLoading(false);
-        Alert.alert("Invalid Username or Password");
+        setErrors({email: "The email address you entered is incorrect.", 
+                   password: "The password you entered is incorrect."
+        })
       }
     } catch (error) {
-      console.log(error);
-      Alert.alert("Invalid Username or Password");
+      console.log(error.message);
+      if(error.message === "User not found"){
+        setErrors({email: "No account found with this email address.", 
+  })
+      } else{
+        setErrors({email: "The email address you entered is incorrect.", 
+          password: "The password you entered is incorrect."
+  })
+      }
       setEffectLoading(false);
     }
   };
@@ -294,40 +319,71 @@ async function registerForPushNotificationsAsync() {
     };
   }, []);
 
+  const handleInputChange = (field, value) => {
+    // Update the specific field's value
+    if (field === "email") {
+      setEmail(value);
+    } else if (field === "password") {
+      setPassword(value);
+    }
+  
+    // Clear the error for the specific field
+    if (errors[field]) {
+      setErrors((prevErrors) => ({ ...prevErrors, [field]: "" }));
+    }
+  };
+
   return (
-    <ScrollView contentContainerStyle={{ flex: 1, height: 50 }}>
-      <View className="flex-1 justify-center p-4 bg-white">
-        <View className="flex-1 justify-end">
+  <SafeAreaView className="flex-1  justify-center bg-white">
+      <ScrollView contentContainerStyle={{ flex: 1, height: 50 }}>
+  <View className="flex-1 justify-center p-4">
+        <View className="">
           <Text
             style={{ fontFamily: "PoppinsMedium" }}
             className="text-2xl mb-4 text-start "
           >
             Sign In
           </Text>
-          <View className="flex-row items-center border border-gray-300 rounded-lg p-3 mb-4">
-            <Email className=" text-gray-400" />
-            <TextInput
-              placeholder="example@gmail.com"
-              placeholderTextColor={"#747688"}
-              className="ml-3 flex-1"
-              style={{ fontFamily: "PoppinsMedium" }}
-              value={email}
-              onChangeText={setEmail}
-            />
-          </View>
-          <View className="flex-row items-center border border-gray-300 rounded-lg p-3 mb-4">
-            <Lock className=" text-gray-400 ml-1" />
-            <TextInput
-              placeholder="Your Password"
-              placeholderTextColor={"#747688"}
-              className="ml-3 flex-1"
-              style={{ fontFamily: "PoppinsMedium" }}
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-            />
-            <Eye />
-          </View>
+          <View className="mb-4">
+     <View className={`flex-row items-center border rounded-lg p-3 ${errors.email ? 'border-red-500' : 'border-gray-300'}`}>
+    <Email className="text-gray-400" />
+    <TextInput
+      placeholder="example@gmail.com"
+      placeholderTextColor="#747688"
+      className="ml-3 flex-1"
+      style={{ fontFamily: "PoppinsMedium" }}
+      value={email}
+      onChangeText={(text) => handleInputChange("email", text)}
+    />
+  </View>
+  {errors.email && (
+    <Text style={{ fontFamily: "PoppinsMedium" }} className="text-sm text-start text-red-500 mt-0.5">
+      {errors.email}
+    </Text>
+  )}
+</View>
+
+<View className="mb-4">
+<View className={`flex-row items-center border rounded-lg p-3 ${errors.password ? 'border-red-500' : 'border-gray-300'}`}>
+  <Lock className="text-gray-400 ml-1" />
+  <TextInput
+    placeholder="Your Password"
+    placeholderTextColor="#747688"
+    className="ml-3 flex-1"
+    style={{ fontFamily: "PoppinsMedium" }}
+    value={password}
+    onChangeText={(text) => handleInputChange("password", text)}
+    secureTextEntry
+  />
+  <Eye />
+</View>
+{errors.password && (
+  <Text style={{ fontFamily: "PoppinsMedium" }} className="text-sm text-start text-red-500 mt-0.5">
+    {errors.password}
+  </Text>
+)}
+</View>
+
           <View className="flex-row justify-between">
             <View className="flex-row">
               <Toggle
@@ -377,7 +433,7 @@ async function registerForPushNotificationsAsync() {
         {isKeyboardVisible ? (
           ""
         ) : (
-          <View className="flex-2 mt-5 mb-4">
+          <View className="">
             <Text
               style={{ fontFamily: "PoppinsMedium" }}
               className="text-center text-lg text-gray-400 mt-5"
@@ -427,6 +483,7 @@ async function registerForPushNotificationsAsync() {
         )}
       </View>
     </ScrollView>
+  </SafeAreaView>
   );
 };
 

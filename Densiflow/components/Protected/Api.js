@@ -3,7 +3,7 @@ import {paymentIntent, CurrentUser, Authentication, Weather, Feedbacks, Notifica
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SERVER_URL } from '@env'
 
-const newServeUrl = "https://densiflow.onrender.com"
+const newServeUrl = "http://192.168.233.241:3000"
 
 const apiHelper = async (endpoint, method, body = {}, params = {}) => {
 

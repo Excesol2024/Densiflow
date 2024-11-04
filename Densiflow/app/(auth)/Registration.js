@@ -24,11 +24,18 @@ const Registration = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [otp, setOtp] = useState(''); // State for OTP input
+  const [otp, setOtp] = useState(['', '', '', '']);
   const router = useRouter();
   const [timer, setTimer] = useState(60); // Timer starting at 60 seconds
   const [isTimerActive, setIsTimerActive] = useState(true);
   const { setEffectLoading } = useContext(LoadingEffectsContext)
+  const [errors, setErrors] = useState({
+    name: "",
+    email: "",
+    password: "",
+    confirm_password: ""
+  })
+  const [otpError, setOtpError] = useState("");
 
   useEffect(()=>{
     GoogleSignin.configure({
@@ -125,34 +132,71 @@ const Registration = () => {
    
   }
 
+  const handleInputChange = (field, value) => {
+    // Update the specific field's value
+    if (field === "email") {
+      setEmail(value);
+    } else if (field === "password") {
+      setPassword(value);
+    }
+    else if (field === "name") {
+      setName(value);
+    }
+    else if (field === "confirm_password") {
+      setConfirmPassword(value);
+    }
+  
+    // Clear the error for the specific field
+    if (errors[field]) {
+      setErrors((prevErrors) => ({ ...prevErrors, [field]: "" }));
+    }
+  };
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const passwordComplexityRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
   const handleRegister = async () => {
 
     setEffectLoading(true)
-    
-    if (password !== confirmPassword) {
-      Alert.alert('Error', 'Passwords do not match');
-      setEffectLoading(false)
-      return;
-    }
 
-    if (password === "" || confirmPassword === "") {
-      Alert.alert('Error', 'Password must not be empty');
-      setEffectLoading(false)
-      return;
-    }
+    let newErrors = {}; // Collect all errors here
 
+    // Email validation
     if (email === "") {
-      Alert.alert('Error', 'Email must not be empty');
-      setEffectLoading(false)
-      return;
+      newErrors.email = "Email should not be empty.";
+    } else if (!emailRegex.test(email)) {
+      newErrors.email = "Please enter a valid email address.";
     }
-
+  
+    // Password validations
+    if (password === "") {
+      newErrors.password = "Password should not be empty.";
+    } else if (password.length < 8) {
+      newErrors.password = "Password must be at least 8 characters long.";
+    } else if (!passwordComplexityRegex.test(password)) {
+      newErrors.password = "Password must include at least one uppercase letter, one number, and one special character.";
+    }
+  
+    // Confirm password validation
+    if (confirmPassword === "") {
+      newErrors.confirm_password = "Confirm password should not be empty.";
+    } else if (password !== confirmPassword) {
+      newErrors.confirm_password = "Passwords do not match.";
+    }
+  
+    // Name validation
     if (name === "") {
-      Alert.alert('Error', 'Name must not be empty');
-      setEffectLoading(false)
+      newErrors.name = "Name should not be empty.";
+    }
+  
+  
+    // If there are errors, set them and stop the submission
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      setEffectLoading(false);
       return;
     }
-
+ 
     const body = {
         pending: {
           name: name,
@@ -165,7 +209,6 @@ const Registration = () => {
      const response = await API.initialRegister(body)
      if(response.data){
       setEffectLoading(false)
-      Alert.alert('Success', 'Registration successful. Please check your email for OTP.');
       setTimer(60)
       setIsTimerActive(true); 
       setTimeout(() => {
@@ -173,7 +216,10 @@ const Registration = () => {
       }, 1000);
      }
     } catch (error) {
-      console.log(error)
+      console.log(error.error)
+      if(error.error === "Email already taken"){
+        setErrors({email: "This email address is already registered."})
+      }
       setEffectLoading(false)
     }
   
@@ -187,20 +233,19 @@ const Registration = () => {
   }
 
   const handleVerifyOtp = async () => {
-    // Handle OTP verification logic here
-    // Alert.alert('OTP Verification', 'OTP verified successfully');
-    // setIsModalVisible(false); // Close the modal after verification
+
+    const otpString = otp.join('');
+
     setEffectLoading(true)
     const body = {
         email: email,
-        otp: otp
+        otp: otpString
     }
     try {
       const response = await API.register(body)
       console.log("FINAL REGISTER", response.data.status)
       if(response.data.status === "success"){
         setEffectLoading(false)
-          Alert.alert('OTP Verification', response.data.message);
           setIsModalVisible(false);
           setTimeout(() => {
             router.push('/')
@@ -208,7 +253,7 @@ const Registration = () => {
       }
     } catch (error) {
       console.log("ERROR",error)
-      Alert.alert('OTP Verification', error.error);
+      setOtpError("The verification code is invalid or expired.");
       setEffectLoading(false)
     }
   
@@ -228,7 +273,6 @@ const Registration = () => {
      const response = await API.initialRegister(body)
      if(response.data){
       setEffectLoading(false)
-      Alert.alert('Success', 'New Otp sent to your email');
       setTimeout(() => {
         setIsModalVisible(true);
         setTimer(60); 
@@ -283,10 +327,10 @@ const Registration = () => {
   }, []);
 
   return (
-   <SafeAreaView className="flex-1 bg-white">
+   <SafeAreaView className="flex-1 justify-center bg-white">
       {isModalVisible ? <Otp email={email} 
    otp={otp} setOtp={setOtp}
-   handleVerifyOtp={handleVerifyOtp} handleCancelOtp={handleCancelOtp} timer={timer} isTimerActive={isTimerActive} handleResendCode={handleResendCode} /> : 
+   handleVerifyOtp={handleVerifyOtp} handleCancelOtp={handleCancelOtp} timer={timer} isTimerActive={isTimerActive} handleResendCode={handleResendCode} otpError={otpError} setOtpError={setOtpError} /> : 
     <View className="flex-1 justify-center p-4">
       <View className="mt-6 flex-row items-center">
         <TouchableOpacity onPress={() => router.push("/Login")}>
@@ -295,54 +339,68 @@ const Registration = () => {
       </View>
 
       
-    <View className="flex-1 justify-end ">
+    <View className="flex-1 justify-center ">
     <Text style={{ fontFamily: 'PoppinsMedium' }} className="text-2xl mb-6 text-start">Sign Up</Text>
 
-    <View className="flex-row items-center border border-gray-300 rounded-lg p-3 mb-3">
+  <View className="mb-3">
+  <View className={`flex-row items-center border rounded-lg p-3 ${errors.name ? 'border-red-500' : 'border-gray-300'}`}>
         <User className=" text-gray-400" />
         <TextInput
           placeholder="Full name"
           className="ml-3 flex-1"
           style={{ fontFamily: "PoppinsMedium" }}
           value={name}
-          onChangeText={setName}
+          onChangeText={(text) => handleInputChange("name", text)}
         />
       </View>
-      <View className="flex-row items-center border border-gray-300 rounded-lg p-3 mb-3">
+     {errors.name &&  <Text  style={{ fontFamily: "PoppinsMedium" }} className="mt-0.5 text-red-500">{errors.name}</Text>}
+  </View>
+
+   <View className="mb-3">
+   <View className={`flex-row items-center border rounded-lg p-3 ${errors.email ? 'border-red-500' : 'border-gray-300'}`}>
         <Email className=" text-gray-400" />
         <TextInput
           placeholder="example@gmail.com"
           className="ml-3 flex-1"
           style={{ fontFamily: "PoppinsMedium" }}
           value={email}
-          onChangeText={setEmail}
+          onChangeText={(text) => handleInputChange("email", text)}
         />
       </View>
+      {errors.email &&  <Text  style={{ fontFamily: "PoppinsMedium" }} className="mt-0.5 text-red-500">{errors.email}</Text>}
+   </View>
 
-      <View className="flex-row items-center border border-gray-300 rounded-lg p-3 mb-3">
+    <View className="mb-3">
+    <View className={`flex-row items-center border rounded-lg p-3 ${errors.password ? 'border-red-500' : 'border-gray-300'}`}>
       <Lock className=" text-gray-400 ml-1" />
         <TextInput
           placeholder="Your Password"
           className="ml-3 flex-1"
           style={{ fontFamily: "PoppinsMedium" }}
           value={password}
-          onChangeText={setPassword}
+          onChangeText={(text) => handleInputChange("password", text)}
         />
          <Eye />
       </View>
+      {errors.password &&  <Text  style={{ fontFamily: "PoppinsMedium" }} className="mt-0.5 text-red-500">{errors.password}</Text>}
+    </View>
 
-      <View className="flex-row items-center border border-gray-300 rounded-lg p-3 mb-3">
+    <View className="mb-3">
+    <View className={`flex-row items-center border rounded-lg p-3 ${errors.confirm_password ? 'border-red-500' : 'border-gray-300'}`}>
         <Lock className=" text-gray-400 ml-1" />
         <TextInput
           placeholder="Confirm Password"
           className="ml-3 flex-1"
           style={{ fontFamily: "PoppinsMedium" }}
           value={confirmPassword}
-          onChangeText={setConfirmPassword}
+          onChangeText={(text) => handleInputChange("confirm_password", text)}
           secureTextEntry
         />
         <Eye />
       </View>
+      {errors.confirm_password &&  <Text  style={{ fontFamily: "PoppinsMedium" }} className="mt-0.5 text-red-500">{errors.confirm_password}</Text>}
+
+    </View>
       <View className=" ml-8 mr-8 mt-4">
     <TouchableOpacity
         className="bg-secondary p-3.5 rounded-xl shadow-2xl shadow-primary"
@@ -356,10 +414,10 @@ const Registration = () => {
         </View>
       </TouchableOpacity>
     </View>
-    </View>
 
-      {isKeyboardVisible ? '' : 
-      <View className="flex-3 mt-2">
+    
+    {isKeyboardVisible ? '' : 
+      <View className="">
       <Text
               style={{ fontFamily: "PoppinsMedium" }}
               className="text-center text-lg text-gray-400 mt-5"
@@ -397,6 +455,8 @@ const Registration = () => {
            </View>
       </View>
       }
+    </View>
+
 
     </View>
    }

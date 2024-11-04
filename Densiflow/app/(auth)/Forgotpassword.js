@@ -14,14 +14,17 @@ const Forgotpassword = () => {
     const [email, setEmail] = useState('')
     const [isVerifyOtp, setIsVerifyOtp] = useState(false);
     const [isVerifyPassword, setIsVerifyPassword] = useState(false)
-
+    const [emailErrors, setEmailErrors] = useState("")
+    
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
-    const [otp, setOtp] = useState(''); // State for OTP input
+    const [otp, setOtp] = useState(['', '', '', '']);
     const router = useRouter();
     const [timer, setTimer] = useState(60); // Timer starting at 60 seconds
     const [isTimerActive, setIsTimerActive] = useState(true);
     const { setEffectLoading } = useContext(LoadingEffectsContext)
+    const [otpError, setOtpError] = useState("");
+
 
     useEffect(() => {
       if (!isTimerActive || timer <= 0) return;
@@ -40,10 +43,29 @@ const Forgotpassword = () => {
       return () => clearInterval(interval);
     }, [isTimerActive, timer]);
 
+    const handleInputChange = (field, value) => {
+      // Update the specific field's value
+      if (field === "email") {
+        setEmail(value);
+      }
+    
+      // Clear the error for the specific field
+      if (emailErrors) {
+        setEmailErrors("");
+      }
+    };
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
     const handleSendOtp = async () =>{
       setEffectLoading(true);
       if(email === ""){
-        Alert.alert("Email should not be empty")
+        setEmailErrors("Email should not be empty")
+        setEffectLoading(false);
+        return
+      } else if (!emailRegex.test(email)) {
+        setEmailErrors("Please enter a valid email address.");
+        setEffectLoading(false);
         return
       }
 
@@ -54,7 +76,6 @@ const Forgotpassword = () => {
       try {
         const response = await API.sendOtp(body)
         if(response.data.status === "success"){
-          Alert.alert("Otp sent successfully")
           setEffectLoading(false);
           setTimeout(() => {
             setIsVerifyOtp(true);
@@ -62,13 +83,13 @@ const Forgotpassword = () => {
             setIsTimerActive(true); 
           }, 1000);
         }else if(response.data.status === "error"){
-          Alert.alert("User not found");
+          setEmailErrors("User not found")
           setEffectLoading(false);
           return
         }
       } catch (error) {
         console.log(error)
-        Alert.alert("User not found");
+        setEmailErrors("User not found")
         setEffectLoading(false);
       }
     }
@@ -82,7 +103,6 @@ const Forgotpassword = () => {
       try {
         const response = await API.sendOtp(body)
         if(response.data.status === "success"){
-          Alert.alert("New Otp sent successfully")
           setEffectLoading(false);
           setTimeout(() => {
             setTimer(60); 
@@ -100,17 +120,18 @@ const Forgotpassword = () => {
     }
 
     const handleValidateOtp = async () =>{
+      const otpString = otp.join('');
+
     setEffectLoading(true)
       const body = {
         email: email,
-        otp: otp
+        otp: otpString
       }
       console.log(body)
       try {
         const response = await API.validateOtp(body);
         if(response.data.status === "success"){
           setEffectLoading(false)
-            Alert.alert('OTP Verification', response.data.message);
             setEffectLoading(false)
             setTimeout(() => {
              setIsVerifyOtp(false);
@@ -119,7 +140,7 @@ const Forgotpassword = () => {
         }
       } catch (error) {
         console.log("ERROR",error)
-        Alert.alert('Invalid OTP', error.error);
+         setOtpError("The verification code is invalid or expired.");
         setEffectLoading(false)
       }
     }
@@ -160,7 +181,7 @@ const Forgotpassword = () => {
     <>
     {isVerifyOtp ? <>
     <Passwordotp email={email} otp={otp} setOtp={setOtp} isTimerActive={isTimerActive} 
-    timer={timer} handleResendOtp={handleResendOtp} handleVerifyOtp={handleValidateOtp}/>
+    timer={timer} handleResendOtp={handleResendOtp} handleVerifyOtp={handleValidateOtp} otpError={otpError} setOtpError={setOtpError}/>
     </> : isVerifyPassword ? <>
       <ResetPassword password={password} setPassword={setPassword} confirmationPassword={confirmPassword}
        setConfirmationPassword={setConfirmPassword} handleResetPassword={handleResetPassword}/>
@@ -174,7 +195,7 @@ const Forgotpassword = () => {
      <View className="flex-1 justify-start mt-9">
      <Text style={{ fontFamily: 'PoppinsMedium' }} className="text-3xl mb-3">Reset Password</Text>
      <Text style={{ fontFamily: 'PoppinsMedium' }} className="mb-4">Please enter your email address to request a password reset</Text>
-     <View className="flex-row items-center border border-gray-300 rounded-lg p-3 mb-4">
+     <View className={`flex-row items-center border rounded-lg p-3 ${emailErrors ? "border-red-500" : "border-gray-300"}`}>
         <Email className=" text-gray-400" />
         <TextInput
           placeholder="example@gmail.com"
@@ -182,9 +203,10 @@ const Forgotpassword = () => {
           className="ml-3 flex-1"
           style={{ fontFamily: "PoppinsMedium" }}
           value={email}
-          onChangeText={setEmail}
+          onChangeText={(text)=>handleInputChange("email", text)}
         />
       </View>
+      {emailErrors && <Text style={{ fontFamily: 'PoppinsMedium' }} className="mb-4 text-red-500 mt-0.5 ml-0.5">{emailErrors}</Text>}
       <View className=" ml-8 mr-8 mt-4">
     <TouchableOpacity
         className="bg-secondary p-3.5 rounded-xl shadow-2xl shadow-primary"
