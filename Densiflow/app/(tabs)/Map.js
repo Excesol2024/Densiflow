@@ -395,12 +395,10 @@ const placesResult = [
         )}
 
 <Marker  onPress={() => handleMarkerPress("Place Title")} coordinate={{ latitude: initialRegion.latitude, longitude: initialRegion.longitude }}>
-          <View className="flex-1 justify-center items-center"><Text className="text-secondary text-xl">YOU</Text></View>
-          <View className="relative w-12 h-12 border-4 shadow-2xl shadow-gray-500 border-blue-500 rounded-full overflow-hidden">
-            <Image 
-              source={{ uri: imageProfile }} // Replace with your image URL
-              className="w-12 h-12" // Image size
-            />
+          <View className="relative w-40 h-40  flex-2 justify-center items-center shadow-2xl s rounded-full overflow-hidden">
+         {currentUser?.user.gender === "Male" ?  <Image source={require("../../assets/location/male.png")} className="w-20 h-20"/> : 
+          <Image source={require("../../assets/location/female.png")} className="w-20 h-20"/>
+         }
           </View>
         </Marker>
 

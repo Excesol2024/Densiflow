@@ -16,7 +16,8 @@ export const Authentication = {
 
 export const CurrentUser = {
     getSignedUser: "/me",
-    uploadProfilePicture: "/user/update_photo"
+    uploadProfilePicture: "/user/update_photo",
+    updateUserGender: "/user/gender"
 }
 
 export const Weather = {

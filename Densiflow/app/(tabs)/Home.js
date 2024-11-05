@@ -9,6 +9,7 @@ import {
   Pressable,
   Alert,
   ActivityIndicator,
+  Modal,
 } from "react-native";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { LinearGradient } from "expo-linear-gradient";
@@ -32,7 +33,7 @@ const Home =  () => {
   const [dateToday, setDateToday] = useState('')
   const [celcius, setCelcius] = useState('')
   const [weatherStatus, setWeatherStatus] = useState('')
-  const {   handleLoggedInUser, setSubscribed } = useContext(AuthenticatedContext);
+  const {   handleLoggedInUser, setSubscribed, currentUser } = useContext(AuthenticatedContext);
   
   const getCurrentDate = () => {
     const today = new Date();
@@ -115,9 +116,16 @@ const Home =  () => {
     }
   };
 
+  const handleIsSelectingGender = () =>{
+    if (currentUser?.user.gender === "male") {
+      setIsSelectingGender(true)
+    } else {
+      console.log("FEMALE")
+    }
+  }
 
 useEffect(()=>{
-  setSubscribed(true)
+  handleIsSelectingGender();
  getUserCurrentLocation();
  getCurrentDate();
 },[])
@@ -274,7 +282,7 @@ useEffect(()=>{
   const [notificationsPermission, setNotificationsPermission] = useState(false);
   const [mapsPermission, setMapsPermission] = useState(false);
   const [messageSent, setMessageSent] = useState(false)
-  const { isSelecting, setMapLocation } = useContext(LoadingEffectsContext)
+  const { setMapLocation, setIsSelectingGender } = useContext(LoadingEffectsContext)
   const [searchResults, setSearchResults] = useState([])
   const [isSearching, setIsSearching] = useState(false)
 
@@ -390,7 +398,9 @@ useEffect(()=>{
       <Maps visible={mapsPermission}/>
       <MessageSent visible={messageSent}/> */}
 
-     {isSelecting ?  <Image source={require('../../assets/blur.png')} className="absolute z-20"/> : ''}
+
+
+
 
       <View className="">
         <View className=" w-full pl-4 pr-4 mt-14">
@@ -453,7 +463,7 @@ useEffect(()=>{
      <View className=" h-full w-full rounded-md absolute">
       <ScrollView>
      {isSearching ? <View className="bg-white"><ActivityIndicator size={"large"} /></View> : searchResults.length > 0 ? 
-     (searchResults.map((place, index)=> (
+     (searchResults?.map((place, index)=> (
       <Pressable onPress={()=> handleSelectedSearchedPlaceToNavigate(place)} key={index} className="flex-row bg-white p-2 border-b-2 h-16 border-gray-300 items-center">
       <AntDesign
               name="search1"
@@ -525,7 +535,7 @@ useEffect(()=>{
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={{ alignItems: "center" }}
           >
-            {popularPlaces.map((places, index) => (
+            {popularPlaces?.map((places, index) => (
               <Pressable
                 key={index}
                 className="mr-2 "
@@ -582,7 +592,7 @@ ${
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={{ alignItems: "center" }}
           >
-            {recommendedPlaces.map((places, index) => (
+            {recommendedPlaces?.map((places, index) => (
               <Pressable
                 key={index}
                 className="mr-2 "
@@ -635,7 +645,7 @@ ${
             
             <View className="">
              {recentVisited.length > 0 ? 
-              (recentVisited.map((recent, index) => (
+              (recentVisited?.map((recent, index) => (
                 <View
                   key={index}
                   className="flex flex-row mt-2 w-full justify-center"

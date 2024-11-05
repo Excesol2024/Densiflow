@@ -104,6 +104,20 @@ class UsersController < ApplicationController
       render json: @users # Render the users as JSON
     end
 
+    def update_gender
+      gender = params[:gender]
+      if current_user
+        if current_user.update(gender: gender)
+          render json: {status: "success", message: "successfully updated gender" }, status: :ok
+        else
+          render json: { status: 'error', message: 'Failed to update gender', errors: current_user.errors.full_messages }, status: :unprocessable_entity
+        end
+
+      else
+        render json: { status: 'error', message: 'User not authenticated' }, status: :unauthorized
+      end
+    end
+
 
 
     private

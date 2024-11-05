@@ -58,6 +58,12 @@ Rails.application.routes.draw do
 
     post "sampleplaces/types", to: 'places#sampleplaces_types'
 
+    #UPDATE USER GENDER
+    post 'user/gender', to: 'users#update_gender'
+
+    #CREATE SAVED PLACES
+    post 'user/places', to: 'savedplaces#create'
+
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 

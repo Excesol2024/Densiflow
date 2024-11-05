@@ -15,11 +15,14 @@ export const LoadingEffectsProvider = ({children}) => {
     const [effectLoading, setEffectLoading] = useState(false)
     const [isSelecting, setIsSelecting] = useState(false)
 
+    const [isSelectingGender, setIsSelectingGender] = useState(false)
+
     const [mapLocation, setMapLocation] = useState({
         lat: "",
         long: ""
     })
 
+    
   
     useEffect(()=>{
     console.log("MAP LOCATIONS", mapLocation)
@@ -32,7 +35,8 @@ export const LoadingEffectsProvider = ({children}) => {
             isSelecting,
             setIsSelecting,
             mapLocation,
-            setMapLocation
+            setMapLocation,
+            isSelectingGender, setIsSelectingGender
         }}>
             {children}
         </LoadingEffectsContext.Provider>

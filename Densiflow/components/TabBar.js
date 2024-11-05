@@ -1,12 +1,16 @@
-import { View, Text, TouchableOpacity, Image, TextInput, Pressable } from 'react-native';
-import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, Image, TextInput, Pressable, KeyboardAvoidingView, Modal } from 'react-native';
+import React, { useState, useContext } from 'react';
 import MapSvg from './svg/map';
 import HomeSvg from './svg/home';
 import WorldSvg from './svg/world';
 import NotifSvg from './svg/notification';
 import ProfileSvg from './svg/profile';
+import { LoadingEffectsContext } from "../context/Loadingeffect";
+import { API } from './Protected/Api';
 
 const TabBar = ({ state, descriptors, navigation }) => {
+
+  const { isSelectingGender, setIsSelectingGender } = useContext(LoadingEffectsContext)
 
     const icons = {
       Home: (props) => <HomeSvg {...props} />,
@@ -24,24 +28,50 @@ const TabBar = ({ state, descriptors, navigation }) => {
     const handleSelectAm = () =>{
       setIsAM(true)
     }
+
+    const handleUpdateGender = async (gender) =>{
+      const body = {
+         gender: gender
+      }
+      try {
+        const reponse = await API.updateUserGender(body);
+        if(reponse.data.status === "success"){
+          setIsSelectingGender(false)
+        }
+      } catch (error) {
+        console.log(error)
+      }
+    }
   
 
   return (
     <View style={{ flexDirection: 'row', backgroundColor: 'white', position: 'absolute', bottom: 0, width: '100%', 
     padding: 2, alignItems: 'center', alignContent: 'center' }}>
-       <View className="absolute h-56 w-screen bg-gray-50 right-0 bottom-0 rounded-t-3xl hidden " style={{zIndex: 2}}>
+      
+   <Modal
+    animationType="slide" // or 'fade' or 'none'
+    transparent={true} // Makes the background semi-transparent
+    visible={isSelectingGender}
+
+   >
+      <View className="flex-1 justify-center items-center" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)',}}>
+      <View className="absolute h-56 w-screen bg-gray-50 right-0 bottom-0 rounded-t-3xl  " style={{zIndex: 2}}>
           <Text style={{fontFamily: 'PoppinsMedium'}} className="text-center mt-4 text-2xl">Select a Gender</Text>
           <View className="flex-row justify-center mt-5">
-            <View className="pr-14">
+            <Pressable onPress={()=> {handleUpdateGender("Female")}} className="pr-14">
               <Image source={require('../assets/fm.png')}/>
               <Text style={{fontFamily: 'PoppinsMedium'}} className={`text-center mt-2 text-lg`}>Female</Text>
-            </View>
-            <View>
+            </Pressable>
+            <Pressable onPress={()=> {handleUpdateGender("Male")}}>
               <Image source={require('../assets/m.png')}/>
               <Text style={{fontFamily: 'PoppinsMedium'}} className="text-center mt-2 text-lg">Male</Text>
-            </View>
+            </Pressable>
           </View>
        </View>
+</View>
+   </Modal>
+
+
        <View className="absolute h-56 w-screen bg-gray-50 right-0 bottom-0 rounded-t-3xl hidden" style={{zIndex: 2}}>
           <Text style={{fontFamily: 'PoppinsMedium'}} className="text-center mt-4 text-2xl">Map Type</Text>
           <View className="flex-row justify-center gap-6 mt-1">
