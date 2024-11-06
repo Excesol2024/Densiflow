@@ -11,12 +11,13 @@ const Success = () => {
       <View className="flex-2">
         <View className="flex-2 items-center">
           <LottieView 
-          source={require("../../assets/animation/shesh.json")}
+          source={require("../../assets/animation/ann.json")}
           autoPlay
           loop
           className="w-full h-36"
           />
 
+       
    
         </View>
         <Text style={{ fontFamily: 'PoppinsMedium' }} className="text-3xl mb-3 mt-3 text-center">Password Changed</Text>

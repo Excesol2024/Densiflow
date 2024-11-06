@@ -7,10 +7,11 @@ import NotifSvg from './svg/notification';
 import ProfileSvg from './svg/profile';
 import { LoadingEffectsContext } from "../context/Loadingeffect";
 import { API } from './Protected/Api';
+import Searchplace from '../app/search/Searchplace';
 
 const TabBar = ({ state, descriptors, navigation }) => {
 
-  const { isSelectingGender, setIsSelectingGender } = useContext(LoadingEffectsContext)
+  const { isSelectingGender, setIsSelectingGender, handleMapSelections, isSelectingMap , selectedMap, isSearching } = useContext(LoadingEffectsContext)
 
     const icons = {
       Home: (props) => <HomeSvg {...props} />,
@@ -47,7 +48,9 @@ const TabBar = ({ state, descriptors, navigation }) => {
   return (
     <View style={{ flexDirection: 'row', backgroundColor: 'white', position: 'absolute', bottom: 0, width: '100%', 
     padding: 2, alignItems: 'center', alignContent: 'center' }}>
-      
+
+  {isSearching ? <Searchplace/> : ''}
+  
    <Modal
     animationType="slide" // or 'fade' or 'none'
     transparent={true} // Makes the background semi-transparent
@@ -71,24 +74,31 @@ const TabBar = ({ state, descriptors, navigation }) => {
 </View>
    </Modal>
 
-
-       <View className="absolute h-56 w-screen bg-gray-50 right-0 bottom-0 rounded-t-3xl hidden" style={{zIndex: 2}}>
+     <Modal
+      animationType="slide" // or 'fade' or 'none'
+      transparent={true} // Makes the background semi-transparent
+      visible={isSelectingMap}
+     >
+      <View className="flex-1 justify-center items-center" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)',}}>
+      <View className="absolute h-56 w-screen bg-gray-50 right-0 bottom-0 rounded-t-3xl " style={{zIndex: 2}}>
           <Text style={{fontFamily: 'PoppinsMedium'}} className="text-center mt-4 text-2xl">Map Type</Text>
           <View className="flex-row justify-center gap-6 mt-1">
             <View>
-              <View className="rounded-2xl overflow-hidden border-4 border-secondary"><Image source={require('../assets/map/1.png')}/></View>
+              <Pressable onPress={()=> handleMapSelections("standard")} className={`rounded-2xl overflow-hidden border-4 ${selectedMap === "standard" ? 'border-secondary' : 'border-white'}`}><Image source={require('../assets/map/1.png')}/></Pressable>
               <Text style={{fontFamily: 'PoppinsMedium'}} className="text-center mt-2 text-lg text-gray-600">Default</Text>
             </View>
             <View>
-              <View className="rounded-2xl overflow-hidden  border-white border-4"><Image source={require('../assets/map/2.png')}/></View>
+              <Pressable onPress={()=> handleMapSelections("satellite")} className={`rounded-2xl overflow-hidden border-4 ${selectedMap === "satellite" ? 'border-secondary' : 'border-white'}`}><Image source={require('../assets/map/2.png')}/></Pressable>
               <Text style={{fontFamily: 'PoppinsMedium'}} className="text-center mt-2 text-lg text-gray-600">Satelite</Text>
             </View>
             <View>
-              <View className="rounded-2xl overflow-hidden  border-white border-4"><Image source={require('../assets/map/3.png')}/></View>
+              <Pressable onPress={()=> handleMapSelections("terrain")} className={`rounded-2xl overflow-hidden border-4 ${selectedMap === "terrain" ? 'border-secondary' : 'border-white'}`}><Image source={require('../assets/map/3.png')}/></Pressable>
               <Text style={{fontFamily: 'PoppinsMedium'}} className="text-center mt-2 text-lg text-gray-600">Terrain</Text>
             </View>
           </View>
        </View>
+      </View>
+     </Modal>
 
        <View className="absolute h-72 w-screen bg-gray-50 right-0 bottom-0 rounded-t-3xl hidden" style={{zIndex: 2}}>
        <View className="flex-1 mb-2 p-10">

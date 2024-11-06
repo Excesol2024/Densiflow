@@ -430,7 +430,8 @@ class Googleapi
   
         result = place_details["result"]
         {
-          name: place["description"],
+          name: place.dig("structured_formatting", "main_text"),
+          subname: place["description"],
           place_id: place["place_id"],
           location: result.dig("geometry", "location")
         }

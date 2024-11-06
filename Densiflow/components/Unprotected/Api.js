@@ -2,7 +2,7 @@ import axios from "axios"
 import { Authentication} from "../../constant/Endpoint"
 import { SERVER_URL } from '@env'
 
-  const newServeUrl = "http://192.168.233.241:3000"
+  const newServeUrl = "http://192.168.0.200:3000"
   
 const apiHelper = async (endpoint, method, body, params)=>{
   

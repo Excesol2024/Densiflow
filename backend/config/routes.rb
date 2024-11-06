@@ -42,16 +42,16 @@ Rails.application.routes.draw do
 
 
     #RECOMMENDED_PLACES
-    get "places/recommended", to: 'places#recommended'
+    # get "places/recommended", to: 'places#recommended'
 
-    #POPULAR_PLACE
-    get "places/popular", to: 'places#popular'
+    # #POPULAR_PLACE
+    # get "places/popular", to: 'places#popular'
 
     #PLACES_TYPES
     post "places/types", to: 'places#places_types'
 
     #SUGGESTED_PLACE
-    get "places/suggested", to: 'places#suggested_places'
+    # get "places/suggested", to: 'places#suggested_places'
 
     get "places/search", to: 'places#search_places'
 

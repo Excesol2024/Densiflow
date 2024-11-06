@@ -4,7 +4,8 @@ import FontLoader from '../components/Fontloader';
 import { SafeAreaView } from 'react-native';
 import Subscribed from './subscriptions/Subscribed';
 import Lodingscreen from '../components/Modal';
-import { LoadingEffectsProvider } from '../context/Loadingeffect';
+import {  LoadingEffectsProvider } from '../context/Loadingeffect';
+import { useContext } from 'react';
 
 const StackLayout = () => {
   return (
@@ -22,11 +23,15 @@ const StackLayout = () => {
 };
 
 const RootLayout = () => {
+
+
+
   return <AuthenticatedProvider>
  <LoadingEffectsProvider>
  <FontLoader>
     <SafeAreaView style={{ flex: 1 }}>
       {/* <Subscribed/> */}
+ 
       <Lodingscreen/>
           <StackLayout />
         </SafeAreaView>

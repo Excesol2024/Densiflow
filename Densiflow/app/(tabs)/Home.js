@@ -282,9 +282,11 @@ useEffect(()=>{
   const [notificationsPermission, setNotificationsPermission] = useState(false);
   const [mapsPermission, setMapsPermission] = useState(false);
   const [messageSent, setMessageSent] = useState(false)
-  const { setMapLocation, setIsSelectingGender } = useContext(LoadingEffectsContext)
-  const [searchResults, setSearchResults] = useState([])
-  const [isSearching, setIsSearching] = useState(false)
+  const { setMapLocation, setIsSelectingGender, setIsSearching } = useContext(LoadingEffectsContext)
+ 
+  const handleSearchFocus = () =>{
+    setIsSearching(true)
+  }
 
   const handleSelectedPlacesToNavigate = (place) =>{
     console.log("SELECTD PLACE", place.kilometers)
@@ -297,32 +299,9 @@ useEffect(()=>{
    
   }
 
-  useEffect(() => {
-    if (searchText === "") {
-      setSearchResults([]);
-      setIsSearching(false)
-      return;
-    } 
-  
-    const timeoutId = setTimeout(() => {
-      setIsSearching(true)
-      handleSearchPlaces();
-    }, 100);
-  
-    return () => clearTimeout(timeoutId); 
-  }, [searchText]);
 
-  const handleSearchPlaces = async () => {
-    try {
-      const response = await API.getSearchedPlaces({ query: searchText });
-      setSearchResults(response.data)
-      if(response.data){
-        setIsSearching(false)
-      }
-    } catch (error) {
-      console.log(error)
-    }
-  }
+
+
 
   const handleSelectedSearchedPlaceToNavigate = (place) =>{
     console.log("SELECTD PLACE", place.kilometers)
@@ -437,7 +416,7 @@ useEffect(()=>{
           </View>
        </View>
 <View>
-<View
+<View onPress={()=> console.log("PRESSED")}
             className="rounded-full shadow-lg shadow-gray-900 bg-white"
           >
             <View className="flex-row items-center bg-transparent rounded-full p-2">
@@ -446,45 +425,17 @@ useEffect(()=>{
                 size={27}
                 color="gray"
                 paddingLeft={5}
-                onPress={()=> setSearchText(null)}
               />
               <TextInput
                 style={{ fontFamily: "PoppinsThin" }}
                 className="flex-1 pl-2 py-1 text-black text-sm"
                 placeholderTextColor="gray"
                 placeholder="Where are you going to?"
-                value={searchText}
-                onChangeText={setSearchText} 
+                onFocus={() => handleSearchFocus()}
               />
             </View>
           </View>
 
-          <View className="mt-1 absolute z-40 h-44 bottom-[-185] w-full">
-     <View className=" h-full w-full rounded-md absolute">
-      <ScrollView>
-     {isSearching ? <View className="bg-white"><ActivityIndicator size={"large"} /></View> : searchResults.length > 0 ? 
-     (searchResults?.map((place, index)=> (
-      <Pressable onPress={()=> handleSelectedSearchedPlaceToNavigate(place)} key={index} className="flex-row bg-white p-2 border-b-2 h-16 border-gray-300 items-center">
-      <AntDesign
-              name="search1"
-              size={27}
-              color="gray"
-              paddingLeft={5}
-            
-            />
-        <Text style={{fontFamily: "PoppinsMedium"}} className="pl-1">{place.name}</Text>
-
-        
-
-        </Pressable>
-     ))) : ''}
-
-       
-  
-      </ScrollView>
-          
-      </View>
-     </View>
 </View>
 
         
