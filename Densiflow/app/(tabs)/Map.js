@@ -344,6 +344,38 @@ const placesResult = [
     }
   };
 
+  const [isClicked, setIsClicked] = useState(false)
+  const [selectedPlaceTypes, setSelectedPlaceTypes] = useState([])
+
+  const handleClickedSelectedPlacesTypes = (placesDetails) => {
+    console.log(placesDetails)
+    setSelectedPlaceTypes(placesDetails)
+    setIsClicked(true)
+  }
+
+  const handleSavedPlaces = async () => {
+    const body = {
+      savedplace: {
+        name: selectedPlaceTypes.name,
+        address: selectedPlaceTypes.vicinity,
+        lat: selectedPlaceTypes.location.lat,
+        long: selectedPlaceTypes.location.lng,
+        crowd_status: selectedPlaceTypes.crowd_status,
+        image_url: selectedPlaceTypes.image_url,
+        placesID: selectedPlaceTypes.place_id
+      }
+    }
+
+    console.log(body)
+
+    try {
+      const response = await API.savedPlace(body)
+      console.log(response.data)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
   return (
     <View className="flex-1 ">
     {/** GOOGLE MAP */}
@@ -378,10 +410,11 @@ const placesResult = [
    {placesTypes.map((place, index) => (
     <Marker
       key={index}
+      onPress={()=> handleClickedSelectedPlacesTypes(place)}
       coordinate={{latitude: place.location.lat, longitude: place.location.lng}}
     >
       <View>
-      <View className="flex-1 justify-center items-center"><Text className="text-secondary text-xl">YOU</Text></View>
+      <View className="flex-1 justify-center items-center"></View>
       <View className="relative w-14 h-14  shadow-2xl shadow-gray-500 ">
         <Image 
           source={{ uri: place.icon }} // Replace with your image URL
@@ -393,7 +426,7 @@ const placesResult = [
   ))}
 
 
-   {/* SELECTED PLACES Markers */}
+   
 
 
 
@@ -490,7 +523,7 @@ const placesResult = [
   
 {/* SELECTED PLACES TYPES*/}
 
-<View className="flex-1 absolute w-full p-2 bottom-20 z-50 ">
+{isClicked ? '' : <View className="flex-1 absolute w-full p-2 bottom-20 z-50 ">
  <ScrollView horizontal className="flex-1 gap-2">
  {placesTypes.map((place, index)=>(
   <Pressable onPress={ ()=> handleGetPlacesTpyeLocation(place.location.lat, place.location.lng)} key={index} className="flex p-3 bg-white   items-center round rounded-2xl"  >
@@ -517,75 +550,49 @@ const placesResult = [
  ))}
 
  </ScrollView>
-   </View>
+   </View>}
   
-<View className="flex-1 absolute w-full z-50 p-3 hidden" style={{bottom: `30%` }}>
-<View className="flex flex-row p-4 bg-white shadow-2xl shadow-gray-700 rounded-2xl">
-     <View className="flex-1 mb-2">
-      <Text style={{fontFamily: 'PoppinsMedium'}} className="text-md text-secondary text-center mb-5">
-      Set alerts to get notified when your favorite spots reach your preferred crowd level
-      </Text>
 
-
-
-     <View className="flex-1 justify-center items-center">
-   <View className="">
-   <View className="flex-row gap-2">
-      
-      <TextInput style={{fontFamily: 'PoppinsMedium' }} className="rounded-md flex items-center w-20 bg-gray-200 p-1 pl-5 pr-4" placeholder="09:32"/>
-
-        <View className="flex-row items-center rounded-md bg-gray-200 p-1.5 ">
-          <Pressable onPress={handleSelectAm} className={isAm ? 'mr-2 p-1.5 rounded-md pl-4 pr-4 bg-white' : 'mr-2 p-1.5 rounded-md pl-4 pr-4'}><Text>AM</Text></Pressable>
-          <Pressable onPress={handleSelectPm} className={!isAm ? 'mr-2 p-1.5 rounded-md pl-4 pr-4 bg-white' : 'mr-2 p-1.5 rounded-md pl-4 pr-4'}><Text>PM</Text></Pressable>
-        </View>
-
-      </View>
-  
-   </View>
-     </View>
-     <View className="flex-row justify-center mt-4">
-      <Pressable className="bg-secondary p-1.5 pl-14 pr-14 rounded-md">
-      <Text className="text-white" style={{fontFamily: 'PoppinsMedium' }}>Set</Text>
-      </Pressable>
-     </View>
-     </View>
-    </View>
-</View>
-
-
-   <View className="flex-1 absolute w-full p-2 bottom-24 z-50 hidden">
+  {isClicked ?  <View className="flex-1 absolute w-full p-2 bottom-24 z-50 ">
    <View className="flex flex-row p-3 bg-white shadow-2xl shadow-gray-700 rounded-2xl">
-      <View className="absolute right-3 top-3">
+      <Pressable onPress={()=> handleSavedPlaces()} className="absolute right-3 top-3">
       <Bookmark/>
-      </View>
+      </Pressable>
       <View className="absolute right-3 bottom-16">
       <Alert/>
       </View>
       <View> 
-        <Image source={Image1} className="w-28 h-24 rounded-xl" />
+        <Image source={{uri: selectedPlaceTypes.image_url}} className="w-28 h-24 rounded-xl" />
       </View>
 
       <View className="ml-2">
         <Text  style={{ fontFamily: "PoppinsBold", fontSize: 16 }} className="w-40"
          numberOfLines={1} // Limit to 1 line
          ellipsizeMode="tail" // Add ellipsis if the text overflows
-        >Green Park Cafe reen Park Cafe</Text>
+        >{selectedPlaceTypes.name}</Text>
         <Text style={{ fontFamily: "PoppinsThin" }} className="mb-1 text-sm w-40"
            numberOfLines={1} // Limit to 1 line
            ellipsizeMode="tail" // Add ellipsis if the text overflows
-        >Antaro Mart, Metro Manila</Text>
+        >{selectedPlaceTypes.vicinity}</Text>
         <View className="flex flex-row gap-1 items-center">
           <Kilometer/>
-          <Text style={{ fontFamily: "PoppinsBold" }} className="text-secondary mt-1">3.6 Kilometer</Text>
+          <Text style={{ fontFamily: "PoppinsBold" }} className="text-secondary mt-1">{selectedPlaceTypes.kilometers} Kilometer</Text>
         </View>
 
-        <View className="flex flex-row gap-1 items-center">
+        {selectedPlaceTypes.crowd_status === "low" ?    <View className="flex flex-row gap-1 items-center">
           <FontAwesome name="dot-circle-o" size={14} color="#68D391" />
-          <Text style={{ fontFamily: "PoppinsBold" }} className="text-green-400 mt-1">Not Crowded (25%)</Text>
-        </View>
+          <Text style={{ fontFamily: "PoppinsBold" }} className="text-green-400 mt-1">Not Crowded (5-15)</Text>
+        </View> : selectedPlaceTypes === "medium" ?    <View className="flex flex-row gap-1 items-center">
+          <FontAwesome name="dot-circle-o" size={14} color="#F59E0B" />
+          <Text style={{ fontFamily: "PoppinsBold" }} className="text-yellow-400 mt-1">Moderately Busy (16-30)</Text>
+        </View> : selectedPlaceTypes.crowd_status === "high" ?   <View className="flex flex-row gap-1 items-center">
+          <FontAwesome name="dot-circle-o" size={14} color="#EF4444" />
+          <Text style={{ fontFamily: "PoppinsBold" }} className="text-red-400 mt-1">Very Crowded (31+)</Text>
+        </View> : '' }
+     
       </View>
     </View>
-   </View>
+   </View> : ''}
   
 </View>
   );

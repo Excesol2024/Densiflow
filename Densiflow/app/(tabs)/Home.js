@@ -131,8 +131,8 @@ useEffect(()=>{
 },[])
 
 useEffect(()=>{
-  handleGetPopularPlaces();
-  handleGetRecommendedPlaces();
+  // handleGetPopularPlaces();
+  // handleGetRecommendedPlaces();
 updatePlaceBasedOnTime();
 },[])
 
@@ -416,7 +416,7 @@ useEffect(()=>{
           </View>
        </View>
 <View>
-<View onPress={()=> console.log("PRESSED")}
+<View 
             className="rounded-full shadow-lg shadow-gray-900 bg-white"
           >
             <View className="flex-row items-center bg-transparent rounded-full p-2">
