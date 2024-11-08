@@ -22,7 +22,7 @@ import { LoadingEffectsContext } from "../../context/Loadingeffect";
 const Map = () => {
   const mapRef = useRef(null);
   const { currentUser } = useContext(AuthenticatedContext)
-  const imageProfile = `${currentUser.user.photo_url}`
+  const imageProfile = `${currentUser?.user.photo_url}`
   const [isAm, setIsAM] = useState(true)
   const [placeFocus, setPlacesFocus] = useState("")
   const [placesTypes, setPlacesTypes] = useState([])
@@ -395,16 +395,7 @@ const placesResult = [
 
    {/* SELECTED PLACES Markers */}
 
-{mapLocation.lat === "" && mapLocation.long === "" ? '' : 
-   <Marker  onPress={() => handleMarkerPress("Place Title")} coordinate={{ latitude: newMapLat, longitude: newMapLong }}>
-   <View className="flex-1 justify-center items-center"><Text className="text-secondary text-xl">SEL</Text></View>
-   <View className="relative w-12 h-12 border-4 shadow-2xl shadow-gray-500 border-blue-500 rounded-full overflow-hidden">
-     <Image 
-       source={{ uri: imageProfile }} // Replace with your image URL
-       className="w-12 h-12" // Image size
-     />
-   </View>
- </Marker>}
+
 
     </MapView>
 

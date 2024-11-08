@@ -41,11 +41,11 @@ Rails.application.routes.draw do
     post "user/feedbacks", to: 'feedbacks#create'
 
 
-    #RECOMMENDED_PLACES
-    # get "places/recommended", to: 'places#recommended'
+    # RECOMMENDED_PLACES
+    get "places/recommended", to: 'places#recommended'
 
-    # #POPULAR_PLACE
-    # get "places/popular", to: 'places#popular'
+    #POPULAR_PLACE
+    get "places/popular", to: 'places#popular'
 
     #PLACES_TYPES
     post "places/types", to: 'places#places_types'

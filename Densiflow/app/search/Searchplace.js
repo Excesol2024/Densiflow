@@ -69,8 +69,11 @@ const Searchplace = () => {
   }
 
   return (
-   <Modal>
-     <View className="flex-1">
+   <Modal  
+    animationType="slide" // or 'fade' or 'none'
+    transparent={true} // Makes the background semi-transparent
+   >
+     <View className="flex-1 bg-white">
    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
    <View className="flex-1  p-5">
         <View className="rounded-full border border-gray-400 bg-white">
