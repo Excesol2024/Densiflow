@@ -61,4 +61,5 @@ export const API = {
   updateUserGender: (body)=> apiHelper(CurrentUser.updateUserGender, "POST", body),
   savedPlace: (body)=> apiHelper(Places.savedPlaces, "POST", body),
   getSavedPlaces: ()=> apiHelper(Places.getSavedPlaces, "GET"),
+  FindPlaces: (params)=> apiHelper(Places.findPlace, "GET", undefined, params),
 };

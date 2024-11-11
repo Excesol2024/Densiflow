@@ -41,4 +41,5 @@ export const Places = {
     searchPlaces: "/places/search",
     savedPlaces: "/user/places",
     getSavedPlaces: "/user/places",
+    findPlace: "/places/find"
 }

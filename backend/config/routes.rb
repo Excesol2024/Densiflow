@@ -54,6 +54,7 @@ Rails.application.routes.draw do
     # get "places/suggested", to: 'places#suggested_places'
 
     get "places/search", to: 'places#search_places'
+    get "places/find", to: 'savedplaces#find_place'
 
 
     post "sampleplaces/types", to: 'places#sampleplaces_types'
@@ -63,6 +64,7 @@ Rails.application.routes.draw do
 
     #CREATE SAVED PLACES
     post 'user/places', to: 'savedplaces#create'
+    get 'user/places', to: 'savedplaces#user_savedplaces'
 
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html

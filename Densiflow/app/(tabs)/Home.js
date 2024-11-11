@@ -629,7 +629,7 @@ ${
                   </Text>
                 </View>
               ))) : <Text  style={{ fontFamily: "PoppinsThin" }}
-              className="text-lg mt-3 mb-10 text-gray-400 text-center" >No recent Visited Places</Text> }
+              className="text-lg mt-3 mb-10 text-gray-400 text-center" >You haven't visited any spots yet. Start exploring!</Text> }
             </View>
           </View>
 
@@ -710,6 +710,11 @@ ${
             <Text style={{ fontFamily: "PoppinsMedium" }} className="text-xl">
              Today in your Area
             </Text>
+
+            <Text style={{ fontFamily: "PoppinsMedium" }} className="text-lg text-center mt-4 text-gray-400 hidden">
+            No events today, but your area has so much to offer! Try exploring some popular spots.
+            </Text>
+
             <View className="flex-1">
               <View className="rounded-3xl flex-row gap-2 p-2 mt-4 bg-white shadow-lg shadow-gray-700">
  

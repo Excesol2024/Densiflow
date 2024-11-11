@@ -8,6 +8,7 @@ import Fontisto from '@expo/vector-icons/Fontisto';
 import Checkbox from 'expo-checkbox';
 import Kilometer from "../../components/svg/Kilometer";
 import Bookmark from "../../components/svg/Bookmark";
+import Bookmarks from "../../components/svg/Bookmarks";
 import Alert from "../../components/svg/Alert";
 import Plus from '../../components/svg/map/Plus'
 import Minus from '../../components/svg/map/Minus'
@@ -124,7 +125,8 @@ const Map = () => {
 const handleSelectedPlacesTypes = async(placeName) =>{
 
   setPlacesFocus(placeName)
-
+  setIsAlreadySaved(false)
+  setIsClicked(false)
   const body = {
      establishment_type: placeName
   }
@@ -156,14 +158,6 @@ const placesResult = [
 ]
 
   
-  const handleSelectPm = () =>{
-    setIsAM(false)
-  }
-
-  const handleSelectAm = () =>{
-    setIsAM(true)
-  }
-
 
   const [region, setRegion] = useState({
     latitude: 8.1130595, // Example latitude
@@ -172,15 +166,6 @@ const placesResult = [
     longitudeDelta: 0.005, // Initial zoom level
   });
 
-  const [mapType, setMapType] = useState('standard');
-
-  const handleAddNotifications = async () => {
-    try {
-      
-    } catch (error) {
-      console.log(error)
-    }
-  }
 
   const handleZoomIn = () => {
     const newLatitudeDelta = region.latitudeDelta / 2;
@@ -318,7 +303,7 @@ const placesResult = [
     };
 
 
-    const { setIsSearching, isSearching } = useContext(LoadingEffectsContext)
+    const { setIsSearching, isSearching, setIsSaved } = useContext(LoadingEffectsContext)
 
     const handleSearchFocus = () =>{
       setIsSearching(true)
@@ -346,12 +331,27 @@ const placesResult = [
 
   const [isClicked, setIsClicked] = useState(false)
   const [selectedPlaceTypes, setSelectedPlaceTypes] = useState([])
+  const [isAlreadySaved, setIsAlreadySaved] = useState(false)
 
-  const handleClickedSelectedPlacesTypes = (placesDetails) => {
-    console.log(placesDetails)
-    setSelectedPlaceTypes(placesDetails)
-    setIsClicked(true)
+  const handleClickedSelectedPlacesTypes = async (placesDetails) => {
+    console.log(placesDetails.place_id)
+    try {
+      const response = await API.FindPlaces({ query: placesDetails.place_id})
+      console.log(response.data.status)
+      if(response.data.status === "success"){
+        setIsAlreadySaved(true)
+        setSelectedPlaceTypes(placesDetails)
+        setIsClicked(true)
+      } else if(response.data.status === "error"){
+        setSelectedPlaceTypes(placesDetails)
+        setIsClicked(true)
+      }
+    } catch (error) {
+      console.log(error)
+    }
   }
+
+
 
   const handleSavedPlaces = async () => {
     const body = {
@@ -367,10 +367,14 @@ const placesResult = [
     }
 
     console.log(body)
+    setIsSaved(selectedPlaceTypes.place_id)
 
     try {
       const response = await API.savedPlace(body)
       console.log(response.data)
+      if(response.data){
+        setIsAlreadySaved(true)
+      }
     } catch (error) {
       console.log(error)
     }
@@ -555,9 +559,13 @@ const placesResult = [
 
   {isClicked ?  <View className="flex-1 absolute w-full p-2 bottom-24 z-50 ">
    <View className="flex flex-row p-3 bg-white shadow-2xl shadow-gray-700 rounded-2xl">
-      <Pressable onPress={()=> handleSavedPlaces()} className="absolute right-3 top-3">
-      <Bookmark/>
-      </Pressable>
+      {isAlreadySaved ?  <Pressable className="absolute right-3.5 top-3">
+       <Bookmark/>
+       </Pressable> : 
+       <Pressable onPress={()=> handleSavedPlaces()} className="absolute right-3.5 top-3">
+       <Bookmarks/>
+       </Pressable>
+      }
       <View className="absolute right-3 bottom-16">
       <Alert/>
       </View>

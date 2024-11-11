@@ -27,6 +27,7 @@ export const LoadingEffectsProvider = ({children}) => {
     const [isSelectingMap, setIsSelectingMap] = useState(false)
     const [selectedMap, setSelectedMap] = useState("")
     const [isSearching, setIsSearching] = useState(false)
+    const [isSaved, setIsSaved] = useState("");
 
     const [mapLocation, setMapLocation] = useState({
         lat: "",
@@ -74,6 +75,8 @@ export const LoadingEffectsProvider = ({children}) => {
         }
     };
 
+    
+
     return(
         <LoadingEffectsContext.Provider value={{
             effectLoading,
@@ -86,7 +89,8 @@ export const LoadingEffectsProvider = ({children}) => {
             isSelectingGender, setIsSelectingGender ,
             isSelectingMap, setIsSelectingMap, 
             selectedMap,
-            isSearching, setIsSearching
+            isSearching, setIsSearching,
+            isSaved, setIsSaved
         }}>
             {children}
         </LoadingEffectsContext.Provider>

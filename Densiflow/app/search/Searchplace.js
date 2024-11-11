@@ -9,6 +9,7 @@ import {
   Keyboard,
   Modal,
   Pressable,
+  ActivityIndicator ,
 } from "react-native";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import AntDesign from "@expo/vector-icons/AntDesign";
@@ -68,6 +69,8 @@ const Searchplace = () => {
     setIsTyping(false)
   }
 
+  const isLoading = !searchResults || searchResults.length === 0;
+
   return (
    <Modal  
     animationType="slide" // or 'fade' or 'none'
@@ -91,7 +94,7 @@ const Searchplace = () => {
           </View>
         </View>
 
-        <View className="mt-4 h-44 ml-2">
+        <View className="mt-4 flex-1 ml-2">
       
         {!isTyping ?  <View className="">
             <Text
@@ -112,22 +115,36 @@ const Searchplace = () => {
                 Ocean Park
               </Text>
             </View>
-          </View> :     <ScrollView>
-           {searchResults?.map((place, index)=>(
-             <View key={index} className="flex-row gap-2 items-center mb-2">
-             <Notif/>
-             <View>
-                 <Text className="" style={{fontFamily: "PoppinsBold"}}>{place.name}</Text>
-                 <Text className="w-60" numberOfLines={1} ellipsizeMode="tail" style={{fontFamily: "PoppinsThin"}}>{place.subname}</Text>
-             </View>
-         </View>
-           ))}
-     
-            </ScrollView> }
+          </View> :      <ScrollView>
+      {isLoading ? (
+        <View className="flex-1 items-center justify-center mt-1">
+          <ActivityIndicator size="large" color="#007AFF" />
+          <Text style={{ fontFamily: "PoppinsThin" }}>No search results found</Text>
+        </View>
+      ) : (
+        searchResults.map((place, index) => (
+          <View key={index} className="flex-row gap-2 items-center mb-2">
+            <Notif />
+            <View>
+              <Text className="" style={{ fontFamily: "PoppinsBold" }}>{place.name}</Text>
+              <Text
+                className="w-60"
+                numberOfLines={1}
+                ellipsizeMode="tail"
+                style={{ fontFamily: "PoppinsThin" }}
+              >
+                {place.subname}
+              </Text>
+            </View>
+          </View>
+        ))
+      )}
+    </ScrollView> }
          
         </View>
 
-        <View className=" flex-1 justify-center ml-2">
+        {isTyping ? '' : 
+          <View className=" flex-1 justify-center ml-2">
           <Text className="text-lg mb-2" style={{ fontFamily: "PoppinsBold" }}>
             Find Nearby
           </Text>
@@ -209,7 +226,8 @@ const Searchplace = () => {
               </Text>
             </View>
           </View>
-        </View>
+        </View>}
+      
       </View>
    </TouchableWithoutFeedback>
     </View>
