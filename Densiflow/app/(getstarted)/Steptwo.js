@@ -47,8 +47,8 @@ const Steptwo = () => {
         <View className="h-3 w-3 bg-white rounded-full"></View>
       </View>
 
-      <Pressable onPress={()=>{router.replace('/(getstarted)/Stepthree')}} className="bg-primary p-2 mt-5 pl-10 pr-10 rounded-xl">
-        <Text style={{ fontFamily: 'PoppinsMedium' }} className="text-white text-md">Next</Text>
+      <Pressable onPress={handleGetStarted} className="bg-primary p-2 mt-5 pl-10 pr-10 rounded-xl">
+        <Text style={{ fontFamily: 'PoppinsMedium' }} className="text-white text-md">Get started</Text>
       </Pressable>
 
       <Text onPress={handleGetStarted}  style={{ fontFamily: 'PoppinsMedium' }} className="text-white text-md mt-4">Sign In</Text>

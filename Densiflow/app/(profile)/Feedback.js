@@ -18,6 +18,19 @@ const Feedback = () => {
     })
    const { setEffectLoading } = useContext(LoadingEffectsContext)
     const [isVisible, setIsVisible] = useState(false)
+    const [errors, setErrors] = useState({
+      name: "",
+      email: "",
+      message: ""
+    })
+
+    const handleInputChange = (field, value) => {
+      // Update user data
+      setUser(prevUser => ({ ...prevUser, [field]: value }));
+  
+      // Clear error for the specific field when user types
+      setErrors(prevErrors => ({ ...prevErrors, [field]: "" }));
+    };
 
     const handleShareFeedbacks = async () => {
       setEffectLoading(true)
@@ -25,6 +38,26 @@ const Feedback = () => {
         name: user.name,
         email: user.email,
         message: user.message
+      }
+
+      let newErrors = {}; 
+
+      if(user.name === ""){
+        newErrors.name = "Name should not be empty.";
+      }
+
+      if(user.email === ""){
+        newErrors.email = "Email should not be empty.";
+      }
+
+      if(user.message === ""){
+        newErrors.message = "Message should not be empty.";
+      }
+
+      if(Object.keys(newErrors).length > 0){
+        setErrors(newErrors);
+        setEffectLoading(false);
+        return;
       }
 
       try {
@@ -69,28 +102,48 @@ const Feedback = () => {
         >
           Send Feedback
         </Text>
-
-        <View className="flex-row items-center border border-gray-300 rounded-lg p-3 mb-3">
+<View className="mb-3">
+<View className={`flex-row items-center border rounded-lg p-3 ${errors.name ? 'border-red-500' : 'border-gray-300'}`}>
           <User className=" text-gray-400" />
           <TextInput
             placeholder="Your Name"
             className="ml-3 flex-1"
             value={user.name}
-            onChangeText={(text) => setUser({ ...user, name: text })}
+            onChangeText={(text) => handleInputChange("name", text)}
             style={{ fontFamily: "PoppinsMedium" }}
           />
         </View>
-        <View className="flex-row items-center border border-gray-300 rounded-lg p-3 mb-3">
+        {errors.name && (
+    <Text style={{ fontFamily: "PoppinsMedium" }} className="text-sm text-start text-red-500 mt-0.5">
+      {errors.name}
+    </Text>
+  )}
+</View>
+
+        <View className="mb-2">
+        <View className={`flex-row items-center border rounded-lg p-3 ${errors.email ? 'border-red-500' : 'border-gray-300'}`}>
           <Email className=" text-gray-400" />
           <TextInput
             placeholder="Your Email"
             className="ml-3 flex-1"
             style={{ fontFamily: "PoppinsMedium" }}
             value={user.email}
-            onChangeText={(text) => setUser({ ...user, email: text })}
+            onChangeText={(text) => handleInputChange("email", text)}
           />
         </View>
+        {errors.email && (
+    <Text style={{ fontFamily: "PoppinsMedium" }} className="text-sm text-start text-red-500 mt-0.5">
+      {errors.email}
+    </Text>
+  )}
+        </View>
 
+        <Text
+          style={{ fontFamily: "PoppinsMedium" }}
+          className="text-lg text-center text-secondary m"
+        >
+          ISSUE, QUESTIONS OR SUGGESTION
+        </Text>
         <TextInput
           style={{
             fontFamily: "PoppinsThin",
@@ -102,10 +155,10 @@ const Feedback = () => {
             height: 250, // Adjust height as needed
           }}
           className="border-gray-300 border-2 rounded-lg mt-2"
-          placeholderTextColor="gray"
-          placeholder="Message"
+          placeholderTextColor={`${errors.message ? "red" : 'gray'}`}
+          placeholder={`${errors.message ? `${errors.message}` : 'Message'}`}
           value={user.message}
-          onChangeText={(text) => setUser({ ...user, message: text })}
+          onChangeText={(text) => handleInputChange("message", text)}
         />
 
         <View className=" ml-8 mr-8 mt-4">

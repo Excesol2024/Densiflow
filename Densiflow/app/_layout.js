@@ -6,6 +6,7 @@ import Subscribed from './subscriptions/Subscribed';
 import Lodingscreen from '../components/Modal';
 import {  LoadingEffectsProvider } from '../context/Loadingeffect';
 import { useContext } from 'react';
+import Error from '../components/Error';
 
 const StackLayout = () => {
   return (
@@ -31,7 +32,7 @@ const RootLayout = () => {
  <FontLoader>
     <SafeAreaView style={{ flex: 1 }}>
       {/* <Subscribed/> */}
- 
+      <Error/>
       <Lodingscreen/>
           <StackLayout />
         </SafeAreaView>
