@@ -1,16 +1,18 @@
-import { View, Text, Image, ScrollView, TextInput } from "react-native";
-import React, { useEffect, useState, useContext } from "react";
+import { View, Text, Image, ScrollView, TextInput, Pressable, Animated } from "react-native";
+import React, { useEffect, useState, useContext, useRef } from "react";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import LocationSvg from "../../components/svg/location";
 import MiniSvg from "../../components/svg/mini";
 import { API } from "../../components/Protected/Api";
 import { LoadingEffectsContext } from "../../context/Loadingeffect";
+import { GestureHandlerRootView, Swipeable } from "react-native-gesture-handler";
 
 const Saved = () => {
   const [savedPlaces, setSavedPlaces] = useState([]);
   const [filteredPlaces, setFilteredPlaces] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const { isSaved } = useContext(LoadingEffectsContext);
+  const scrollViewRef = useRef(null);
 
   // Fetch saved places from the API
   const fetchSavedPlaces = async () => {
@@ -22,7 +24,6 @@ const Saved = () => {
         const dateB = new Date(b.created_at);
         return dateB - dateA; // Sort in descending order of created_at
       });
-
       setSavedPlaces(sortedFiltered);
       setFilteredPlaces(sortedFiltered); // Initialize filteredPlaces with all places
     } catch (error) {
@@ -47,11 +48,41 @@ const Saved = () => {
 
   useEffect(() => {
     fetchSavedPlaces();
-    console.log("PLACES REFRESHED", isSaved);
   }, [isSaved]);
 
+  const deletePlace = async (placeID, id) => {
+    console.log(placeID)
+    const arr = [...filteredPlaces];
+    const index = arr.findIndex(item => item.id === id);
+    arr.splice(index, 1); // Remove the item from the array
+    setFilteredPlaces(arr)
+    try {
+      const response = await API.deletePlace({query: placeID})
+      console.log(response.data)
+      if(response.data){
+        fetchSavedPlaces();
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  };
+
+
+ 
+
+  const RightSwipe = (placeID, id) => {
+
+    return (
+      <Pressable onPress={()=> deletePlace(placeID, id)} className="flex-row  justify-end items-center bg-red-500 shadow-lg shadow-gray-900 mb-3 p-3">
+      <AntDesign name="delete" size={24} color="white" />
+      <Text style={{ fontFamily: "PoppinsBold" }} className="text-white ml-2">Delete</Text>
+    </Pressable>
+    );
+  };
+
   return (
-    <View className="flex-1 bg-white">
+      <GestureHandlerRootView className="flex-1">
+           <View className="flex-1 bg-white">
       <View className="flex-row top-11 gap-3 items-center p-3">
         <AntDesign name="arrowleft" size={30} color="black" />
         <Text style={{ fontFamily: "PoppinsBold" }} className="text-xl">
@@ -80,7 +111,7 @@ const Saved = () => {
             </View>
           </View>
 
-          <ScrollView className="flex-1">
+          <ScrollView  className="flex-1">
             {filteredPlaces.length === 0 ? (
               <View className="flex-1 items-center justify-center p-4">
                 <Text
@@ -91,22 +122,25 @@ const Saved = () => {
                 </Text>
               </View>
             ) : (
-              filteredPlaces.map((places, index) => (
-                <View
-                  key={index}
-                  className="flex-row items-center p-3 mb-3 bg-white shadow-lg rounded-2xl shadow-gray-950 relative"
-                >
+              filteredPlaces.map((places) => (
+                <Swipeable 
+                animationOptions={true}
+                friction={1}
+                key={places.id}
+                overshootRight={false}
+                renderRightActions={()=> RightSwipe(places.placesID, places.id)}>
+            
+                <View className="flex-row items-center p-3 mb-3  bg-white shadow-lg  shadow-gray-950 relative">
                   <View
-                    className={`w-3 h-3 absolute rounded-full top-3 right-3
-${
-  places.crowd_status === "high"
-    ? "bg-red-500"
-    : places.crowd_status === "medium"
-    ? "bg-yellow-300"
-    : places.crowd_status === "low"
-    ? "bg-green-500"
-    : ""
-} ml-1`}
+                    className={`w-3 h-3 absolute rounded-full top-3 right-3 ${
+                      places.crowd_status === "high"
+                        ? "bg-red-500"
+                        : places.crowd_status === "medium"
+                        ? "bg-yellow-300"
+                        : places.crowd_status === "low"
+                        ? "bg-green-500"
+                        : ""
+                    } ml-1`}
                   ></View>
                   <Image
                     source={{ uri: places.image_url }}
@@ -114,20 +148,24 @@ ${
                   />
                   <View className="flex-1 pl-2">
                     <Text
+                    numberOfLines={2}
                       style={{ fontFamily: "PoppinsBold" }}
                       className="text-lg pl-1"
                     >
                       {places.name}
                     </Text>
-
+      
                     <View className="flex-row gap-1">
                       <MiniSvg />
-                      <Text style={{ fontFamily: "PoppinsThin", fontSize: 12 }}>
+                      <Text numberOfLines={1} style={{ fontFamily: "PoppinsThin", fontSize: 12 }}>
                         {places.address}
                       </Text>
                     </View>
                   </View>
                 </View>
+         
+            
+              </Swipeable>
               ))
             )}
           </ScrollView>
@@ -154,6 +192,7 @@ ${
         </View>
       )}
     </View>
+      </GestureHandlerRootView>
   );
 };
 

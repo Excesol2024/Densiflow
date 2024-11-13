@@ -21,6 +21,24 @@ class SavedplacesController < ApplicationController
   end
 
 
+  def delete_saved_place
+    place_id = params[:query] 
+    if current_user
+      # Find the saved place by placesID and ensure it belongs to the current user
+      saved_place = current_user.savedplaces.find_by(placesID: place_id)
+      
+      if saved_place
+        saved_place.destroy
+        render json: { status: "success", message: "Place successfully deleted" }, status: :ok
+      else
+        render json: { status: "error", message: "Place not found" }, status: :not_found
+      end
+    else
+      render json: { status: 'error', message: 'User not authenticated' }, status: :unauthorized
+    end
+  end
+
+
   def find_place
     place_id = params[:query]
   

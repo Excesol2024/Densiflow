@@ -65,6 +65,7 @@ Rails.application.routes.draw do
     #CREATE SAVED PLACES
     post 'user/places', to: 'savedplaces#create'
     get 'user/places', to: 'savedplaces#user_savedplaces'
+    delete 'user/savedplaces', to: 'savedplaces#delete_saved_place'
 
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html

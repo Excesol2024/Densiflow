@@ -3,7 +3,7 @@ import {paymentIntent, CurrentUser, Authentication, Weather, Feedbacks, Notifica
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SERVER_URL } from '@env'
 
-const newServeUrl = "http://192.168.0.114:3000"
+const newServeUrl = "http://192.168.0.200:3000"
 
 const apiHelper = async (endpoint, method, body = {}, params = {}) => {
 
@@ -33,7 +33,7 @@ const apiHelper = async (endpoint, method, body = {}, params = {}) => {
       url: `${newServeUrl}${url}`,
       headers: headers,
       data: body,   // Send data if there's a request body (POST, PUT)
-      params: method === 'GET' ? params : {}, // Attach params only for GET requests
+      params: method === 'GET' || 'DELETE' ? params : {}, // Attach params only for GET requests
     });
     return response;
     
@@ -62,4 +62,5 @@ export const API = {
   savedPlace: (body)=> apiHelper(Places.savedPlaces, "POST", body),
   getSavedPlaces: ()=> apiHelper(Places.getSavedPlaces, "GET"),
   FindPlaces: (params)=> apiHelper(Places.findPlace, "GET", undefined, params),
+  deletePlace: (params)=> apiHelper(Places.deleteSavedPlace, "DELETE", undefined, params),
 };
