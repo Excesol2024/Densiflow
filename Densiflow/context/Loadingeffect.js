@@ -29,6 +29,8 @@ export const LoadingEffectsProvider = ({children}) => {
     const [isSearching, setIsSearching] = useState(false)
     const [isSaved, setIsSaved] = useState("");
 
+    const [nearbyPlaceTypes, setNearbyPlaceTypes] = useState("")
+
     const [mapLocation, setMapLocation] = useState({
         lat: "",
         long: ""
@@ -90,7 +92,8 @@ export const LoadingEffectsProvider = ({children}) => {
             isSelectingMap, setIsSelectingMap, 
             selectedMap,
             isSearching, setIsSearching,
-            isSaved, setIsSaved
+            isSaved, setIsSaved,
+            nearbyPlaceTypes, setNearbyPlaceTypes
         }}>
             {children}
         </LoadingEffectsContext.Provider>

@@ -18,6 +18,7 @@ import Notif from "../../components/svg/Notif";
 import Back from "../../components/svg/Back";
 import { API } from "../../components/Protected/Api";
 import { LoadingEffectsContext } from "../../context/Loadingeffect";
+import { useRouter } from "expo-router";
 
 const Searchplace = () => {
   const inputRef = useRef(null);
@@ -26,12 +27,31 @@ const Searchplace = () => {
       inputRef.current.focus();
     }
   }, []);
+  const router = useRouter()
 
   const [isTyping, setIsTyping] = useState(false)
   const [searchText, setSearchText] = useState("");
   const [searchResults, setSearchResults] = useState([])
 
-  const {setIsSearching} = useContext(LoadingEffectsContext)
+  const {setIsSearching, setNearbyPlaceTypes} = useContext(LoadingEffectsContext)
+
+  const placesTypes = [
+    { value: "cafe", name: "Coffee shops" },
+    { value: "restaurant", name: "Restaurants" },
+    { value: "shopping_mall", name: "Shopping Malls" },
+  ]
+
+  const placesTypes2 = [
+    { value: "pharmacy", name: "Pharmacies" },
+    { value: "hotel", name: "Hotels" },
+    { value: "store", name: "Stores" },
+  ]
+
+  const placesTypes3 = [
+    { value: "gas", name: "Gas Stations" },
+    { value: "bakery", name: "Bakery" },
+    { value: "park", name: "Parks" },
+  ]
 
   useEffect(() => {
     if (searchText === "") {
@@ -70,6 +90,14 @@ const Searchplace = () => {
   }
 
   const isLoading = !searchResults || searchResults.length === 0;
+
+  const handleSelectedNearbyPlaceTypes = (placeName) => {
+    console.log(placeName)
+    setNearbyPlaceTypes(placeName)
+    router.push('/Map')
+    setIsSearching(false)
+    setIsTyping(false)
+  }
 
   return (
    <Modal  
@@ -149,82 +177,40 @@ const Searchplace = () => {
             Find Nearby
           </Text>
           <View className="flex-row gap-1 items-center">
-            <View className="bg-secondary flex-1 justify-center p-1.5 items-center rounded-full">
+            {placesTypes.map((item, index)=> (
+              <Pressable key={index} onPress={()=> handleSelectedNearbyPlaceTypes(item.value)} className="bg-secondary flex-1 justify-center p-1.5 items-center rounded-full">
               <Text
                 className="text-xs text-white"
                 style={{ fontFamily: "PoppinsThin" }}
               >
-                Coffee shops
+                {item.name}
               </Text>
-            </View>
-            <View className="bg-secondary flex-1 justify-center p-1.5 items-center rounded-full">
-              <Text
-                className="text-xs text-white"
-                style={{ fontFamily: "PoppinsThin" }}
-              >
-                Restaurants
-              </Text>
-            </View>
-            <View className="bg-secondary flex-1 justify-center p-1.5 items-center rounded-full">
-              <Text
-                className="text-xs text-white"
-                style={{ fontFamily: "PoppinsThin" }}
-              >
-                Shopping Malls
-              </Text>
-            </View>
+            </Pressable>
+            ) )}
           </View>
           <View className="flex-row gap-1 mt-1.5 items-center">
-            <View className="bg-secondary flex-1 justify-center p-1.5 items-center rounded-full">
+          {placesTypes2.map((item, index)=> (
+              <Pressable key={index} onPress={()=> handleSelectedNearbyPlaceTypes(item.value)} className="bg-secondary flex-1 justify-center p-1.5 items-center rounded-full">
               <Text
                 className="text-xs text-white"
                 style={{ fontFamily: "PoppinsThin" }}
               >
-                Pharmacies
+                {item.name}
               </Text>
-            </View>
-            <View className="bg-secondary flex-1 justify-center p-1.5 items-center rounded-full">
-              <Text
-                className="text-xs text-white"
-                style={{ fontFamily: "PoppinsThin" }}
-              >
-                Hotels
-              </Text>
-            </View>
-            <View className="bg-secondary flex-1 justify-center p-1.5 items-center rounded-full">
-              <Text
-                className="text-xs text-white"
-                style={{ fontFamily: "PoppinsThin" }}
-              >
-                Stores
-              </Text>
-            </View>
+            </Pressable>
+            ) )}
           </View>
           <View className="flex-row gap-1 mt-1.5 items-center">
-            <View className="bg-secondary flex-1 justify-center p-1.5 items-center rounded-full">
+          {placesTypes3.map((item, index)=> (
+              <Pressable key={index} onPress={()=> handleSelectedNearbyPlaceTypes(item.value)} className="bg-secondary flex-1 justify-center p-1.5 items-center rounded-full">
               <Text
                 className="text-xs text-white"
                 style={{ fontFamily: "PoppinsThin" }}
               >
-                Gas Stations
+                {item.name}
               </Text>
-            </View>
-            <View className="bg-secondary flex-1 justify-center p-1.5 items-center rounded-full">
-              <Text
-                className="text-xs text-white"
-                style={{ fontFamily: "PoppinsThin" }}
-              >
-                Bakery
-              </Text>
-            </View>
-            <View className="bg-secondary flex-1 justify-center p-1.5 items-center rounded-full">
-              <Text
-                className="text-xs text-white"
-                style={{ fontFamily: "PoppinsThin" }}
-              >
-                Parks
-              </Text>
-            </View>
+            </Pressable>
+            ) )}
           </View>
         </View>}
       

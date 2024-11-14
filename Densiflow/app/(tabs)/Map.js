@@ -27,9 +27,10 @@ const Map = () => {
   const [isAm, setIsAM] = useState(true)
   const [placeFocus, setPlacesFocus] = useState("")
   const [placesTypes, setPlacesTypes] = useState([])
-  const { isSelecting } = useContext(LoadingEffectsContext)
 
-  const {mapLocation, setMapLocation, setIsSelectingMap, selectedMap} = useContext(LoadingEffectsContext)
+  const {isSelecting, mapLocation, setMapLocation, setIsSelectingMap, selectedMap,
+    setIsSearching, isSearching, setIsSaved, nearbyPlaceTypes, setNearbyPlaceTypes 
+  } = useContext(LoadingEffectsContext)
 
   const newMapLat = parseFloat(mapLocation.lat)
   const newMapLong = parseFloat(mapLocation.long)
@@ -140,24 +141,35 @@ const handleSelectedPlacesTypes = async(placeName) =>{
   }
 }
 
-const placesResult = [
-  {
-    location: {
-      lat: 8.11792,
-      lng: 122.666031
-  },
-    icon: "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/bank-71.png",
-  }, 
-  {
-    location: {
-      lat: 8.1193222,
-      lng: 122.6824758
-  },
-    icon: "https://maps.gstatic.com/mapfiles/place_api/icons/v1/png_71/bank-71.png",
-  }, 
-]
+const handleNearbyPlaceTypes = async() =>{
 
-  
+  setPlacesFocus(nearbyPlaceTypes)
+  setIsAlreadySaved(false)
+  setIsClicked(false)
+  const body = {
+     establishment_type: nearbyPlaceTypes
+  }
+
+  try {
+    const response = await API.getPlacesTypes(body);
+    setPlacesTypes(response.data);
+    handleZoomOutPlacesTpyeLocation();
+    setNearbyPlaceTypes("")
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+useEffect(() => {
+    if(nearbyPlaceTypes){
+      handleNearbyPlaceTypes();
+      console.log("NEARBY TYPES IS", nearbyPlaceTypes);
+    } else {
+      console.log("NEARBY TYPES IS EMPTY");
+    }
+}, [nearbyPlaceTypes]);
+
+
 
   const [region, setRegion] = useState({
     latitude: 8.1130595, // Example latitude
@@ -301,9 +313,6 @@ const placesResult = [
         longitudeDelta: 0.052, // Adjust for more zoom
       }, 1000);
     };
-
-
-    const { setIsSearching, isSearching, setIsSaved } = useContext(LoadingEffectsContext)
 
     const handleSearchFocus = () =>{
       setIsSearching(true)
