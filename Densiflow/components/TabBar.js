@@ -1,17 +1,37 @@
 import { View, Text, TouchableOpacity, Image, TextInput, Pressable, KeyboardAvoidingView, Modal } from 'react-native';
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import MapSvg from './svg/map';
 import HomeSvg from './svg/home';
 import WorldSvg from './svg/world';
+import Close from './svg/Close';
 import NotifSvg from './svg/notification';
 import ProfileSvg from './svg/profile';
 import { LoadingEffectsContext } from "../context/Loadingeffect";
 import { API } from './Protected/Api';
 import Searchplace from '../app/search/Searchplace';
+import LottieView from "lottie-react-native"
 
 const TabBar = ({ state, descriptors, navigation }) => {
 
-  const { isSelectingGender, setIsSelectingGender, handleMapSelections, isSelectingMap , selectedMap, isSearching } = useContext(LoadingEffectsContext)
+  const { isSelectingGender, setIsSelectingGender, handleMapSelections, isSelectingMap , selectedMap, isSearching,
+    isSettingNotif, setIsSettingNotif, placeDetails
+  } = useContext(LoadingEffectsContext)
+
+  const [isSuccess, setIsSuccess] = useState(false)
+
+  const currentDate = new Date();
+  let hours = currentDate.getHours();
+  let minutes = currentDate.getMinutes();
+  
+  // Ensure minutes are always two digits
+  minutes = minutes < 10 ? '0' + minutes : minutes;
+  
+  // Convert to 12-hour format
+  const formattedHours = hours % 12 || 12;  // Converts 0 to 12 for 12 AM
+  const currentTime = `${formattedHours}:${minutes}`;
+  const formattedDate = currentDate.toLocaleDateString('en-CA')
+
+
 
     const icons = {
       Home: (props) => <HomeSvg {...props} />,
@@ -22,6 +42,8 @@ const TabBar = ({ state, descriptors, navigation }) => {
     }
 
     const [isAm, setIsAM] = useState(true)
+    const [time, setTime] = useState("")
+
     const handleSelectPm = () =>{
       setIsAM(false)
     }
@@ -43,6 +65,45 @@ const TabBar = ({ state, descriptors, navigation }) => {
         console.log(error)
       }
     }
+
+    const handleSetNotification = async() =>{
+      const [hour, minute] = time.split(":"); 
+      const adjustedHour = isAm ? hour : `${parseInt(hour) + 12}`; // Add 12 for PM
+      const scheduledTime = `${formattedDate}T${isAm ? `0${time}:00` : `${adjustedHour}:${minute}:00`}`;
+     
+
+      const body = {
+        notification: {
+          lat: placeDetails.location.lat,
+          long: placeDetails.location.lng,
+          name: placeDetails.name,
+          scheduled_time: scheduledTime,  
+          placesID: placeDetails.place_id
+        }
+      }
+      try {
+        const response = await API.addPlaceToNotify(body)
+        if(response.data){
+          console.log(response.data.status)
+          setIsSuccess(true)
+          setIsSettingNotif(false)
+          setTimeout(() => {
+            setIsSuccess(false)
+          }, 3000);
+        }
+      } catch (error) {
+        console.log(error)
+      }
+    }
+
+    useEffect(()=> {
+      const hour = currentDate.getHours();
+      if (hour >= 12) {
+        setIsAM(false)
+      } else {
+        setIsAM(true)
+      }
+    },[])
   
 
   return (
@@ -100,7 +161,16 @@ const TabBar = ({ state, descriptors, navigation }) => {
       </View>
      </Modal>
 
-       <View className="absolute h-72 w-screen bg-gray-50 right-0 bottom-0 rounded-t-3xl hidden" style={{zIndex: 2}}>
+       <Modal 
+        animationType="slide" // or 'fade' or 'none'
+        transparent={true} // Makes the background semi-transparent
+        visible={isSettingNotif}
+       >
+        <View className="flex-1 justify-center items-center" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)',}}>
+        <View className="absolute h-72 w-screen bg-gray-50 right-0 bottom-0 rounded-t-3xl " style={{zIndex: 2}}>
+          <Pressable onPress={()=> setIsSettingNotif(false)} className="absolute right-4 top-4"> 
+            <Close/>
+          </Pressable>
        <View className="flex-1 mb-2 p-10">
           <Text style={{fontFamily: 'PoppinsMedium'}} className="text-lg text-secondary text-center mb-5">
           Set alerts to get notified when your favorite spots reach your preferred crowd level
@@ -111,7 +181,10 @@ const TabBar = ({ state, descriptors, navigation }) => {
        <View className="">
        <View className="flex-row gap-2">
           
-          <TextInput style={{fontFamily: 'PoppinsMedium' }} className="rounded-md flex items-center w-20 bg-gray-200 p-1 pl-6 pr-4" placeholder="09:32"/>
+          <TextInput
+          value={time}
+          onChangeText={setTime}
+          style={{fontFamily: 'PoppinsMedium' }} className="rounded-md flex items-center w-20 bg-gray-200 p-1 pl-6 pr-4" placeholder={currentTime}/>
 
             <View className="flex-row items-center rounded-md bg-gray-200 p-0.5 ">
               <Pressable onPress={handleSelectAm} className={isAm ? 'mr-2 p-1.5 rounded-md pl-4 pr-4 bg-white shadow-2xl shadow-gray-400' : 'mr-2 p-1.5 rounded-md pl-4 pr-4'}><Text>AM</Text></Pressable>
@@ -123,12 +196,42 @@ const TabBar = ({ state, descriptors, navigation }) => {
        </View>
          </View>
          <View className="flex-row justify-center mt-7">
-          <Pressable className="bg-secondary p-2 shadow-2xl shadow-primary pl-14 pr-14 rounded-xl">
+          <Pressable onPress={()=> handleSetNotification()} className="bg-secondary p-2 shadow-2xl shadow-primary pl-14 pr-14 rounded-xl">
           <Text className="text-white text-lg" style={{fontFamily: 'PoppinsMedium' }}>Set</Text>
           </Pressable>
          </View>
          </View>
        </View>
+        </View>
+       </Modal>
+
+       <Modal 
+        animationType="slide" // or 'fade' or 'none'
+        transparent={true} // Makes the background semi-transparent
+        visible={isSuccess}
+       >
+        <View className="flex-1 justify-center items-center" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)',}}>
+        <View className="absolute h-72 w-screen bg-gray-50 right-0 bottom-0 rounded-t-3xl " style={{zIndex: 2}}>
+          <Pressable onPress={()=> setIsSuccess(false)} className="absolute right-4 top-4"> 
+            <Close/>
+          </Pressable>
+       <View className="flex-1 mb-2 p-10">
+          <Text style={{fontFamily: 'PoppinsMedium'}} className="text-lg text-secondary text-center mb-5">
+          We'll keep an eye on <Text className="text-red-500">{placeDetails.name}</Text> {" "}
+for you at <Text className="text-red-500">{isAm ? `${time}AM`: `${time}PM`}</Text>. We'll notify you when it's time!
+          </Text>
+
+          <LottieView 
+          source={require("../assets/animation/bell.json")}
+          autoPlay
+          loop
+          className="w-full h-36"
+          />
+
+         </View>
+       </View>
+        </View>
+       </Modal>
 
 
       {state.routes.map((route, index) => {

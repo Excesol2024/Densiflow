@@ -29,6 +29,9 @@ export const LoadingEffectsProvider = ({children}) => {
     const [isSearching, setIsSearching] = useState(false)
     const [isSaved, setIsSaved] = useState("");
 
+    const [isSettingNotif, setIsSettingNotif] = useState(false)
+    const [placeDetails, setPlaceDetails] = useState([])
+
     const [nearbyPlaceTypes, setNearbyPlaceTypes] = useState("")
 
     const [mapLocation, setMapLocation] = useState({
@@ -77,6 +80,12 @@ export const LoadingEffectsProvider = ({children}) => {
         }
     };
 
+    const handleSelectedPlaceToNotif = (place) => {
+        setIsSettingNotif(true)
+        setPlaceDetails(place)
+        console.log("SELECTED PLACE TO NOTIF", place)
+    }
+
     
 
     return(
@@ -93,7 +102,10 @@ export const LoadingEffectsProvider = ({children}) => {
             selectedMap,
             isSearching, setIsSearching,
             isSaved, setIsSaved,
-            nearbyPlaceTypes, setNearbyPlaceTypes
+            nearbyPlaceTypes, setNearbyPlaceTypes,
+            isSettingNotif, setIsSettingNotif,
+            handleSelectedPlaceToNotif,
+            placeDetails, setPlaceDetails
         }}>
             {children}
         </LoadingEffectsContext.Provider>

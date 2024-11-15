@@ -29,7 +29,7 @@ const Map = () => {
   const [placesTypes, setPlacesTypes] = useState([])
 
   const {isSelecting, mapLocation, setMapLocation, setIsSelectingMap, selectedMap,
-    setIsSearching, isSearching, setIsSaved, nearbyPlaceTypes, setNearbyPlaceTypes 
+    setIsSearching, isSearching, setIsSaved, nearbyPlaceTypes, setNearbyPlaceTypes, handleSelectedPlaceToNotif
   } = useContext(LoadingEffectsContext)
 
   const newMapLat = parseFloat(mapLocation.lat)
@@ -389,6 +389,11 @@ useEffect(() => {
     }
   }
 
+  const handleSettingUpNotifications = (place) => {
+    setIsClicked(false)
+    handleSelectedPlaceToNotif(place)
+  }
+
   return (
     <View className="flex-1 ">
     {/** GOOGLE MAP */}
@@ -576,7 +581,9 @@ useEffect(() => {
        </Pressable>
       }
       <View className="absolute right-3 bottom-16">
+      <Pressable onPress={()=> handleSettingUpNotifications(selectedPlaceTypes)}> 
       <Alert/>
+         </Pressable>
       </View>
       <View> 
         <Image source={{uri: selectedPlaceTypes.image_url}} className="w-28 h-24 rounded-xl" />

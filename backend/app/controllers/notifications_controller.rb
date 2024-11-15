@@ -20,6 +20,23 @@ class NotificationsController < ApplicationController
     end
   end
 
+  def delete_notifications
+    notif_id = params[:id] 
+    if current_user
+      # Find the notification by ID and ensure it belongs to the current user
+      notification = current_user.notifications.find_by(id: notif_id)
+      
+      if notification
+        notification.destroy
+        render json: { status: "success", message: "Notification successfully deleted" }, status: :ok
+      else
+        render json: { status: "error", message: "Notification not found" }, status: :not_found
+      end
+    else
+      render json: { status: 'error', message: 'User not authenticated' }, status: :unauthorized
+    end
+  end
+
   def user_notifications
     @user_notifications = current_user.notifications
     
@@ -34,7 +51,7 @@ class NotificationsController < ApplicationController
   private
 
   def notification_params
-    params.require(:notification).permit(:lat, :long, :name, :scheduled_time)
+    params.require(:notification).permit(:lat, :long, :name, :scheduled_time, :placesID)
   end
 
 end

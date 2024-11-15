@@ -35,7 +35,7 @@ Rails.application.routes.draw do
     #USERS NOTIFICATIONS
     post "user/notify", to: 'notifications#create'
     get "user/all_notifications", to: "notifications#user_notifications"
-
+    delete "user/notifications", to: "notifications#delete_notifications"
 
     #FEEDBACKS
     post "user/feedbacks", to: 'feedbacks#create'
