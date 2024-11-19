@@ -34,8 +34,9 @@ const Searchplace = () => {
   const [searchText, setSearchText] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [recentSearches, setRecentSearches] = useState([]);
+  const [isNoResults, setIsNoResults] = useState(false)
 
-  const { setIsSearching, setNearbyPlaceTypes } = useContext(
+  const { setIsSearching, setNearbyPlaceTypes, setMapLocation } = useContext(
     LoadingEffectsContext
   );
 
@@ -61,9 +62,19 @@ const Searchplace = () => {
     if (searchText === "") {
       setSearchResults([]);
       setIsTyping(false);
+      setIsNoResults(false)
       return;
     }
   }, [searchText]);
+
+
+  const handleNavigateToMap = (place) => {
+    router.push('/Map')
+    setMapLocation(place)
+    setIsSearching(false);
+    setSearchResults([]);
+    setIsTyping(false);
+  }
 
   useEffect(() => {
     const loadRecentSearches = async () => {
@@ -97,8 +108,11 @@ const Searchplace = () => {
     setIsTyping(true);
     try {
       const response = await API.getSearchedPlaces({ query: searchText });
-      setSearchResults(response.data);
-      if (response.data) {
+      if(response.data.length <= 0){
+        setIsNoResults(true)
+        handleSearch()
+      } else {
+        setSearchResults(response.data);
         handleSearch();
       }
     } catch (error) {
@@ -196,14 +210,14 @@ const Searchplace = () => {
                 <ScrollView>
                   {isLoading ? (
                     <View className="flex-1 items-center justify-center mt-1">
-                      <ActivityIndicator size="large" color="#007AFF" />
-                      <Text style={{ fontFamily: "PoppinsThin" }}>
+                     {isNoResults ? <Text style={{ fontFamily: "PoppinsThin" }}>
                         No search results found
-                      </Text>
+                      </Text> :  <ActivityIndicator size="large" color="#007AFF" />}
                     </View>
                   ) : (
                     searchResults.map((place, index) => (
-                      <View
+                      <Pressable
+                      onPress={()=> handleNavigateToMap(place)}
                         key={index}
                         className="flex-row gap-2 items-center mb-2"
                       >
@@ -224,7 +238,7 @@ const Searchplace = () => {
                             {place.subname}
                           </Text>
                         </View>
-                      </View>
+                      </Pressable>
                     ))
                   )}
                 </ScrollView>

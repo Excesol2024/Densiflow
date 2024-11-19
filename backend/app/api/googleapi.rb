@@ -6,8 +6,8 @@ class Googleapi
     @api_key = api_key || Rails.application.credentials[:google_api]
   end
 
-  BANNER = "https://firebasestorage.googleapis.com/v0/b/exceproducts.appspot.com/o/1718299487862.png?alt=media&token=3fb7ff4a-79d5-45cf-8c45-176902de3fa0"
-  CUSTOM_IMAGE_URL = "https://firebasestorage.googleapis.com/v0/b/exceproducts.appspot.com/o/1718300080610.png?alt=media&token=564aeb7c-b894-4407-89c6-c4b55aab466d"
+  BANNER = "https://firebasestorage.googleapis.com/v0/b/densiflowapp.appspot.com/o/415277-PDUGAF-998.jpg?alt=media&token=0a9cf82f-80d2-4555-befa-aa8c65a960e9"
+  CUSTOM_IMAGE_URL = "https://firebasestorage.googleapis.com/v0/b/densiflowapp.appspot.com/o/2208.i203.051.S.m004.c13.restaurant%20bar%20cafe%20furniture%20interior%20cartoon.jpg?alt=media&token=96c0d3f3-bbb9-445f-a685-dd3f277cd414"
 
   def recommended_places(lat, long)
     establishment_types = ["cafe", "park", "hotels"]
@@ -57,6 +57,7 @@ class Googleapi
           details = JSON.parse(details_response)
   
           # Check if reviews are available and extract them
+         
           reviews = details.dig("result", "reviews") || []
           photos = details.dig("result", "photos") || []
           photo_count = photos.length
@@ -89,7 +90,7 @@ class Googleapi
           icon_background_color: place["icon_background_color"],
           icon_mask_base_uri: place["icon_mask_base_uri"],
           name: place["name"],
-          opening_hours: place["opening_hours"],
+          opening_hours: details.dig("result", "opening_hours"),
           image_url: photo_url,
           place_id: place["place_id"],
           rating: place["rating"],
@@ -98,7 +99,7 @@ class Googleapi
           vicinity: place["vicinity"],
           crowd_status: crowd_status,
           kilometers: distance.round(2),
-          reviews: reviews # Include reviews in the output
+          reviews: reviews
         }
       end.compact # Remove nil values
     end
@@ -191,7 +192,7 @@ class Googleapi
           icon_background_color: place["icon_background_color"],
           icon_mask_base_uri: place["icon_mask_base_uri"],
           name: place["name"],
-          opening_hours: place["opening_hours"],
+          opening_hours: details.dig("result", "opening_hours"),
           image_url: photo_url,
           place_id: place["place_id"],
           rating: place["rating"],
@@ -290,12 +291,13 @@ class Googleapi
         details_response = Net::HTTP.get(URI(details_url))
         details = JSON.parse(details_response)
         
+        types = details.dig("result", "types") || []
         photos = details.dig("result", "photos") || []
         photo_count = photos.length
         photo_url = CUSTOM_IMAGE_URL if photo_count <= 2
       end
     
-     
+      next unless types.include?(establishment_type)
 
       # Check if the latest review is within the last hour
       if latest_review_time
@@ -317,7 +319,7 @@ class Googleapi
         icon_background_color: place["icon_background_color"],
         icon_mask_base_uri: place["icon_mask_base_uri"],
         name: place["name"],
-        opening_hours: place["opening_hours"],
+        opening_hours: details.dig("result", "opening_hours"),
         image_url: photo_url, 
         place_id: place["place_id"],
         rating: place["rating"],
@@ -416,7 +418,7 @@ class Googleapi
         icon_background_color: place["icon_background_color"],
         icon_mask_base_uri: place["icon_mask_base_uri"],
         name: place["name"],
-        opening_hours: place["opening_hours"],
+        opening_hours: details.dig("result", "opening_hours"),
         image_url: photo_url,
         place_id: place["place_id"],
         rating: place["rating"],
@@ -452,27 +454,76 @@ class Googleapi
         details_response = Net::HTTP.get(place_uri)
         place_details = JSON.parse(details_response)
         result = place_details["result"]
-
-        photo_reference = result.dig("photos", 0, "photo_reference")
-        photo_url = photo_reference ? "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=#{photo_reference}&key=#{@api_key}" : BANNER
   
-     
+        photos = result["photos"] || []
+        photo_count = photos.length
+  
+        # Determine photo_url based on photo_count
+        if photo_count > 2
+          photo_reference = photos.first["photo_reference"]
+          photo_url = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=#{photo_reference}&key=#{@api_key}"
+        else
+          photo_url = CUSTOM_IMAGE_URL  # Use default image if photo count is <= 2
+        end
+  
+        # Extract type information and check for 'establishment'
+        types = result["types"] || []
+        is_establishment = types.include?("establishment")
+  
+        # Skip places that are not an establishment
+        next unless is_establishment
+  
+        # Extract reviews
+        reviews = result["reviews"] || []
+        reviews_count = reviews.size
+        recent_reviews = reviews.select do |review|
+          review_time_utc = review["time"]
+          review_time_philippines = review_time_utc + 8 * 60 * 60
+          # Consider review as recent if within the last 1 hour
+          (Time.now.to_i + 8 * 60 * 60 - review_time_philippines) <= 60 * 60
+        end
+  
+        # Determine crowd status based on user ratings and recent reviews
+        user_ratings_total = result["user_ratings_total"] || 0
+        crowd_status = case
+                       when user_ratings_total > 30 && recent_reviews.any?
+                         "high"
+                       when user_ratings_total.between?(15, 30) && recent_reviews.any?
+                         "medium"
+                       else
+                         "low"
+                       end
+  
+        # Return the place only if it is an establishment
         {
           name: place.dig("structured_formatting", "main_text"),
           image_url: photo_url,
           subname: place["description"],
           place_id: place["place_id"],
-          location: result.dig("geometry", "location")
+          location: result.dig("geometry", "location"),
+          types: types,
+          is_establishment: is_establishment,
+          crowd_status: crowd_status,
+          reviews_count: reviews_count,
+          recent_reviews: recent_reviews,
+          rating: result["rating"],
+          user_ratings_total: user_ratings_total,
+          photo_count: photo_count,
+          opening_hours: result["opening_hours"],
+          vicinity: result["vicinity"]
         }
       end
   
-      formatted_places
+      # Filter out nil results (places that are not establishments)
+      formatted_places.compact
+  
     rescue StandardError => e
       # Log the error and return an empty array or handle it as needed
       puts "Error fetching places: #{e.message}"
       []
     end
   end
+  
 
 
   def place_information(lat, long, place_id)

@@ -32,20 +32,20 @@ const Map = () => {
     setIsSearching, isSearching, setIsSaved, nearbyPlaceTypes, setNearbyPlaceTypes, handleSelectedPlaceToNotif
   } = useContext(LoadingEffectsContext)
 
-  const newMapLat = parseFloat(mapLocation.lat)
-  const newMapLong = parseFloat(mapLocation.long)
+  const newMapLat = parseFloat(mapLocation.location?.lat)
+  const newMapLong = parseFloat(mapLocation.location?.lng)
 
   // Check if newMapLat and newMapLong are valid numbers
   const isValidLocation = !isNaN(newMapLat) && !isNaN(newMapLong);
 
   // Define boundary coordinates based on newMapLat and newMapLong if valid
-  const cityBoundaryCoordinates = isValidLocation ? [
-    { latitude: newMapLat + 0.01, longitude: newMapLong + 0.01 },
-    { latitude: newMapLat + 0.01, longitude: newMapLong - 0.01 },
-    { latitude: newMapLat - 0.01, longitude: newMapLong - 0.01 },
-    { latitude: newMapLat - 0.01, longitude: newMapLong + 0.01 },
-    { latitude: newMapLat + 0.01, longitude: newMapLong + 0.01 }, // Close the loop
-  ] : [];
+  // const cityBoundaryCoordinates = isValidLocation ? [
+  //   { latitude: newMapLat + 0.01, longitude: newMapLong + 0.01 },
+  //   { latitude: newMapLat + 0.01, longitude: newMapLong - 0.01 },
+  //   { latitude: newMapLat - 0.01, longitude: newMapLong - 0.01 },
+  //   { latitude: newMapLat - 0.01, longitude: newMapLong + 0.01 },
+  //   { latitude: newMapLat + 0.01, longitude: newMapLong + 0.01 }, // Close the loop
+  // ] : [];
 
   const plainMapStyle = [
     {
@@ -67,13 +67,15 @@ const Map = () => {
   
 
   useEffect(() => {
-    if (isValidLocation && mapRef.current) {
+    if (isValidLocation) {
+      setIsClicked(true)
+      setSelectedPlaceTypes(mapLocation)
       mapRef.current.animateToRegion({
         latitude: newMapLat,
         longitude: newMapLong,
-        latitudeDelta: 0.05,
-        longitudeDelta: 0.05,
-      }, 1000); // 1 second animation
+        latitudeDelta: 0.002, // Adjust for more zoom
+      longitudeDelta: 0.002,
+      }, 2000); // 1 second animation
     } else {
       // If mapLocation is not set, run handleCurrentUserLocation
       handleCurrentUserLocation();
@@ -406,14 +408,9 @@ useEffect(() => {
       onPress={handleMapPress}
     className="flex-1">
 
-{cityBoundaryCoordinates.length > 0 && (
-      <Polygon
-        coordinates={cityBoundaryCoordinates}
-        strokeColor="#FF6347" // Boundary line color
-        fillColor="rgba(255, 99, 71, 0.3)" // Boundary fill color
-        strokeWidth={2}
-      />
-    )}
+{isValidLocation ? <Marker coordinate={{ latitude: newMapLat, longitude: newMapLong }}>
+  
+  </Marker> : ''}
 
 <Marker  onPress={() => handleMarkerPress("Place Title")} coordinate={{ latitude: initialRegion.latitude, longitude: initialRegion.longitude }}>
       <View className="relative w-40 h-40  flex-2 justify-center items-center shadow-2xl s rounded-full overflow-hidden">

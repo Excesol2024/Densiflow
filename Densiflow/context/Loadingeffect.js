@@ -34,10 +34,7 @@ export const LoadingEffectsProvider = ({children}) => {
 
     const [nearbyPlaceTypes, setNearbyPlaceTypes] = useState("")
 
-    const [mapLocation, setMapLocation] = useState({
-        lat: "",
-        long: ""
-    })
+    const [mapLocation, setMapLocation] = useState([])
 
     useEffect(()=> {
         handleSetMap();
