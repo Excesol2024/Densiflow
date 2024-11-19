@@ -30,7 +30,9 @@ export const Feedbacks = {
 }
 
 export const Notifications = {
-    addNotifications: "/user/notify"
+    addNotifications: "/user/notify",
+    userNotifications: "/user/all_notifications",
+    deleteNotifications: "/user/notifications"
 }
 
 export const Places = {

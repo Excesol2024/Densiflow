@@ -3,7 +3,7 @@ import {paymentIntent, CurrentUser, Authentication, Weather, Feedbacks, Notifica
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SERVER_URL } from '@env'
 
-const newServeUrl = "http://192.168.0.114:3000"
+const newServeUrl = "http://192.168.0.200:3000"
 
 const apiHelper = async (endpoint, method, body = {}, params = {}) => {
 
@@ -52,7 +52,11 @@ export const API = {
   getCurrentUserWeather: (body)=> apiHelper(Weather.getCurrentweather, "POST", body),
   shareFeedbacks: (body)=> apiHelper(Feedbacks.shareFeedbacks, "POST", body),
   uploadProfilePicture: (body)=> apiHelper(CurrentUser.uploadProfilePicture, "PUT", body),
+
   addPlaceToNotify: (body)=> apiHelper(Notifications.addNotifications, "POST", body),
+  userNotifications: ()=> apiHelper(Notifications.userNotifications, "GET"),
+  deleteNotifications: (params)=> apiHelper(Notifications.deleteNotifications, "DELETE", undefined, params),
+
   getPopularPlacess: ()=> apiHelper(Places.getPopularPlaces, "GET"),
   getRecommededPlaces: ()=> apiHelper(Places.getRecommededPlaces, "GET"),
   getPlacesTypes: (body)=> apiHelper(Places.placeTypes, "POST", body),

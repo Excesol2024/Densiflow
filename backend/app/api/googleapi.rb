@@ -6,10 +6,12 @@ class Googleapi
     @api_key = api_key || Rails.application.credentials[:google_api]
   end
 
+  BANNER = "https://firebasestorage.googleapis.com/v0/b/exceproducts.appspot.com/o/1718299487862.png?alt=media&token=3fb7ff4a-79d5-45cf-8c45-176902de3fa0"
+  CUSTOM_IMAGE_URL = "https://firebasestorage.googleapis.com/v0/b/exceproducts.appspot.com/o/1718300080610.png?alt=media&token=564aeb7c-b894-4407-89c6-c4b55aab466d"
 
   def recommended_places(lat, long)
     establishment_types = ["cafe", "park", "hotels"]
-    
+  
     # Get the current time in seconds since the epoch in UTC
     current_time_utc = Time.now.to_i
     # Adjust for the Philippines time zone (UTC+8)
@@ -37,7 +39,7 @@ class Googleapi
         distance = haversine_distance(lat, long, place_lat, place_lng)
   
         photo_reference = place.dig("photos", 0, "photo_reference")
-        photo_url = photo_reference ? "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=#{photo_reference}&key=#{@api_key}" : nil
+        photo_url = photo_reference ? "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=#{photo_reference}&key=#{@api_key}" : BANNER
         
         # Skip the place if there is no photo URL
         next if photo_url.nil?
@@ -46,7 +48,7 @@ class Googleapi
         next if user_ratings_total <= 0 # Skip places with no ratings
   
         # Initialize reviews to nil
-        reviews = nil
+        reviews = []
         
         # If the place ID is available, fetch detailed place info for reviews
         if place["place_id"]
@@ -55,7 +57,10 @@ class Googleapi
           details = JSON.parse(details_response)
   
           # Check if reviews are available and extract them
-          reviews = details.dig("result", "reviews") if details.dig("result", "reviews")
+          reviews = details.dig("result", "reviews") || []
+          photos = details.dig("result", "photos") || []
+          photo_count = photos.length
+          photo_url = CUSTOM_IMAGE_URL if photo_count <= 2
         end
   
         # Count recent reviews (e.g., within the last 1 hour in PH time)
@@ -136,7 +141,7 @@ class Googleapi
         distance = haversine_distance(lat, long, place_lat, place_lng)
         
         photo_reference = place.dig("photos", 0, "photo_reference")
-        photo_url = photo_reference ? "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=#{photo_reference}&key=#{@api_key}" : nil
+        photo_url = photo_reference ? "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=#{photo_reference}&key=#{@api_key}" : BANNER
         
         # Skip the place if there is no photo URL
         next if photo_url.nil?
@@ -154,7 +159,10 @@ class Googleapi
           details = JSON.parse(details_response)
           
           # Check if reviews are available and extract them
-          reviews = details.dig("result", "reviews") if details.dig("result", "reviews")
+          reviews = details.dig("result", "reviews") || []
+          photos = details.dig("result", "photos") || []
+          photo_count = photos.length
+          photo_url = CUSTOM_IMAGE_URL if photo_count <= 2
         end
   
         # Count recent reviews (e.g., within the last 1 hour in PH time)
@@ -268,7 +276,7 @@ class Googleapi
   
       # Construct the photo URL if a photo reference exists
       photo_reference = place.dig("photos", 0, "photo_reference")
-      photo_url = photo_reference ? "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=#{photo_reference}&key=#{@api_key}" : nil
+      photo_url = photo_reference ? "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=#{photo_reference}&key=#{@api_key}" : BANNER
   
       # Skip the place if there is no photo URL
       next if photo_url.nil?
@@ -276,7 +284,19 @@ class Googleapi
       user_ratings_total = place["user_ratings_total"] || 0
       latest_review_time = place["reviews"]&.dig(0, "time") # Assuming reviews are sorted with the latest first
       crowd_status = "low" # Default status
-  
+      
+      if place["place_id"]
+        details_url = "https://maps.googleapis.com/maps/api/place/details/json?place_id=#{place['place_id']}&key=#{@api_key}"
+        details_response = Net::HTTP.get(URI(details_url))
+        details = JSON.parse(details_response)
+        
+        photos = details.dig("result", "photos") || []
+        photo_count = photos.length
+        photo_url = CUSTOM_IMAGE_URL if photo_count <= 2
+      end
+    
+     
+
       # Check if the latest review is within the last hour
       if latest_review_time
         latest_review_timestamp = Time.at(latest_review_time)
@@ -305,7 +325,8 @@ class Googleapi
         user_ratings_total: user_ratings_total,
         vicinity: place["vicinity"],
         crowd_status: crowd_status,
-        kilometers: distance.round(2)
+        kilometers: distance.round(2),
+        count: photo_count
       }
     end.compact  # Removes any nil values from the array
     
@@ -345,7 +366,7 @@ class Googleapi
   
       # Construct the photo URL if a photo reference exists
       photo_reference = place.dig("photos", 0, "photo_reference")
-      photo_url = photo_reference ? "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=#{photo_reference}&key=#{@api_key}" : nil
+      photo_url = photo_reference ? "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=#{photo_reference}&key=#{@api_key}" : BANNER
   
       # Skip the place if there is no photo URL
       next if photo_url.nil?
@@ -363,7 +384,10 @@ class Googleapi
         details = JSON.parse(details_response)
   
         # Check if reviews are available and extract them
-        reviews = details.dig("result", "reviews") if details.dig("result", "reviews")
+        reviews = details.dig("result", "reviews") || []
+        photos = details.dig("result", "photos") || []
+        photo_count = photos.length
+        photo_url = CUSTOM_IMAGE_URL if photo_count <= 2
       end
   
       # Count recent reviews (e.g., within the last 1 hour in PH time)
@@ -427,10 +451,15 @@ class Googleapi
         place_uri = URI(place_url)
         details_response = Net::HTTP.get(place_uri)
         place_details = JSON.parse(details_response)
-  
         result = place_details["result"]
+
+        photo_reference = result.dig("photos", 0, "photo_reference")
+        photo_url = photo_reference ? "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=#{photo_reference}&key=#{@api_key}" : BANNER
+  
+     
         {
           name: place.dig("structured_formatting", "main_text"),
+          image_url: photo_url,
           subname: place["description"],
           place_id: place["place_id"],
           location: result.dig("geometry", "location")

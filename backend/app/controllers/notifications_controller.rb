@@ -41,7 +41,7 @@ class NotificationsController < ApplicationController
     @user_notifications = current_user.notifications
     
     if @user_notifications.any?
-      render json: { status: 'success', data: @product_carts }, status: :ok
+      render json: { status: 'success', data: @user_notifications }, status: :ok
     else
       render json: { status: 'error', message: 'No carts found' }, status: :ok
     end
