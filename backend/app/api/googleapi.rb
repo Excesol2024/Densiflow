@@ -1,5 +1,6 @@
 require 'net/http'
 require 'json'
+require 'date'
 
 class Googleapi
   def initialize(api_key)
@@ -558,6 +559,49 @@ class Googleapi
       # Log the error and return an empty array or handle it as needed
       puts "Error fetching places: #{e.message}"
       []
+    end
+  end
+  
+  def user_reviews(lat, long)
+    establishment_types = ["cafe", "restaurant"]
+  
+    establishment_types.flat_map do |establishment_type|
+      # Construct the API URL dynamically based on lat, long, and establishment type
+      api_url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=#{lat},#{long}&radius=2000&type=#{establishment_type}&key=#{@api_key}"
+      
+      # Perform the HTTP GET request
+      response = Net::HTTP.get(URI(api_url))
+      places = JSON.parse(response)["results"]
+      
+      places.flat_map do |place|
+        # Fetch place details if place ID exists
+        next unless place["place_id"]
+        
+        details_url = "https://maps.googleapis.com/maps/api/place/details/json?place_id=#{place['place_id']}&key=#{@api_key}"
+        details_response = Net::HTTP.get(URI(details_url))
+        details = JSON.parse(details_response)
+        
+        # Extract reviews and filter only 5-star ratings
+        reviews = details.dig("result", "reviews")&.select { |review| review["rating"] == 5 } || []
+        
+        # Format each review to include establishment details, excluding empty review_text
+        reviews.map do |review|
+          next if review["text"].nil? || review["text"].strip.empty?
+  
+          review_date = Time.at(review["time"]).to_date
+          formatted_date = review_date.strftime("%d %b") # Format: "20 Nov"
+  
+          {
+            name: place["name"],
+            place_id: place["place_id"],
+            location: place.dig("geometry", "location"),
+            reviewer_name: review["author_name"],
+            photo_url: review["profile_photo_url"],
+            review_text: review["text"],
+            date: formatted_date
+          }
+        end.compact # Remove nil values
+      end.compact # Remove nil values from places
     end
   end
   

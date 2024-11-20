@@ -29,6 +29,10 @@ export const Feedbacks = {
     shareFeedbacks: "/user/feedbacks"
 }
 
+export const Reviews = {
+    randomReviews: "/random/reviews"
+}
+
 export const Notifications = {
     addNotifications: "/user/notify",
     userNotifications: "/user/all_notifications",

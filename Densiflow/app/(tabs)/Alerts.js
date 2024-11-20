@@ -9,6 +9,8 @@ import Alert1 from "../../components/svg/Alert1";
 import Alert2 from "../../components/svg/Alert2";
 import Alert3 from "../../components/svg/Alert3";
 import { API } from "../../components/Protected/Api";
+import { formatDistanceToNow } from 'date-fns';
+
 import {
   GestureHandlerRootView,
   Swipeable,
@@ -164,7 +166,7 @@ const Alerts = () => {
                     style={{ fontFamily: "PoppinsThin" }}
                     className="absolute top-[-1] right-3 text-gray-400"
                   >
-                    20 minutes
+                   {formatDistanceToNow(new Date(notif.scheduled_time), { addSuffix: true })}
                   </Text>
                   {notif.crowd_status === "low" ? (
                     <GreenSvg />

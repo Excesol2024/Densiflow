@@ -143,93 +143,7 @@ useEffect(()=>{
 
 
 
-
  
-
-  const goodPlaces = {
-    coffee: [
-      {
-        title: "Quiet cafes for",
-        subtitle: "your morning coffee",
-        image: `${require("../../assets/tabs/cuate.png")}`,
-        places: [
-          // Changed from coffeePlace to coffeePlaces
-          {
-            name: "Forest Cafe",
-            image: `${require("../../assets/tabs/c1.png")}`,
-            km: "1.3",
-            crowd_status: "low",
-          },
-          {
-            name: "Green Coffee",
-            image: `${require("../../assets/tabs/c2.png")}`,
-            km: "5.3",
-            crowd_status: "high",
-          },
-          {
-            name: "Tartufo Ristorante",
-            image: `${require("../../assets/tabs/img1.png")}`,
-            km: "2.3",
-            crowd_status: "medium",
-          },
-        ],
-      },
-    ],
-    lunch: [
-      {
-        title: "Perfect lunch spots",
-        subtitle: "with moderate crowds",
-        image: `${require("../../assets/tabs/pana.png")}`,
-        places: [
-          {
-            name: "Foodbox Resto",
-            image: `${require("../../assets/tabs/l1.png")}`,
-            km: "1.3",
-            crowd_status: "low",
-          },
-          {
-            name: "Daff Pizza",
-            image: `${require("../../assets/tabs/l2.png")}`,
-            km: "5.3",
-            crowd_status: "high",
-          },
-          {
-            name: "Tartufo Ristorante",
-            image: `${require("../../assets/tabs/img1.png")}`,
-            km: "2.3",
-            crowd_status: "yellow",
-          },
-        ],
-      },
-    ],
-    dinner: [
-      {
-        title: "Popular dinner spots",
-        subtitle: "that fill up quickly",
-        image: `${require("../../assets/tabs/dinner.png")}`,
-        places: [
-          {
-            name: "Happy Table",
-            image: `${require("../../assets/tabs/d1.png")}`,
-            km: "1.3",
-            crowd_status: "low",
-          },
-          {
-            name: "Smiley Dinner",
-            image: `${require("../../assets/tabs/d2.png")}`,
-            km: "5.3",
-            crowd_status: "high",
-          },
-          {
-            name: "Tartufo Ristorante",
-            image: `${require("../../assets/tabs/img1.png")}`,
-            km: "2.3",
-            crowd_status: "medium",
-          },
-        ],
-      },
-    ],
-  };
 
 
   const [isPM , setIsPm] = useState(false);
@@ -271,9 +185,7 @@ useEffect(()=>{
   };
 
   
-  useEffect(() => {
-    setGoodPlace(goodPlaces[currentCategory]);
-  }, [currentCategory]);
+
 
 
 
@@ -306,10 +218,7 @@ useEffect(()=>{
   const handleSelectedSearchedPlaceToNavigate = (place) =>{
     console.log("SELECTD PLACE", place.kilometers)
     handleRecentVisited(place.name, place.vicinity, place.kilometers,  place.location.lat,  place.location.lng)
-   setMapLocation({
-     lat: place.location.lat,
-     long: place.location.lng
-   })
+   setMapLocation(place)
    router.push('/Map')
   }
 
@@ -368,7 +277,18 @@ useEffect(()=>{
 
   useEffect(()=>{
     getRecentVisited();
+    handleGetRandomReviews();
   },[])
+
+  const [randomReviews, setRandomReviews] = useState([])
+  const handleGetRandomReviews = async () => {
+    try {
+      const response = await API.randomReviews();
+      setRandomReviews(response.data)
+    } catch (error) {
+      console.log(error)
+    }
+  }
 
   return (
     <SafeAreaView className="flex-1 bg-white">
@@ -800,56 +720,41 @@ the start of the new calendar year.
               </View>
             </View>
 
-            <View className="flex flex-col mt-1">
-              <View className="flex-row gap-2 mt-2">
-                <Text
-                  style={{ fontFamily: "PoppinsThin" }}
-                  className="absolute right-1 text-gray-500 text-md"
-                >
-                  20 Sept
-                </Text>
-                <Image source={require("../../assets/tabs/p1.png")} />
-                <View className="flex-1">
-                  <Text
-                    style={{ fontFamily: "PoppinsThin" }}
-                    className="text-xl text-secondary"
-                  >
-                    Samantha Smith
-                  </Text>
-                  <Text
-                    style={{ fontFamily: "PoppinsMedium" }}
-                    className="text-md"
-                  >
-                    “Sky Cafe - The food was good and the cafe has a great
-                    ambiance!”
-                  </Text>
-                </View>
-              </View>
+            <View className="flex flex-col mt-1 ">
 
-              <View className="flex-row gap-2 mt-2">
+             <ScrollView>
+
+             {randomReviews?.map((item, index)=> (
+              <View key={index} className="flex-row gap-2 mt-2">
+              <Text
+                style={{ fontFamily: "PoppinsThin" }}
+                className="absolute right-1 text-gray-500 text-md"
+              >
+               {item.date}
+              </Text>
+              <Image source={{uri: `${item.photo_url}`}} className="w-14 h-14" />
+              <View className="flex-1">
                 <Text
                   style={{ fontFamily: "PoppinsThin" }}
-                  className="absolute right-1 text-gray-500 text-md"
+                  className="text-xl text-secondary w-48"
+                  numberOfLines={1}
                 >
-                  10 June
+                  {item.reviewer_name}
                 </Text>
-                <Image source={require("../../assets/tabs/p2.png")} />
-                <View className="flex-1">
-                  <Text
-                    style={{ fontFamily: "PoppinsThin" }}
-                    className="text-xl text-secondary"
-                  >
-                    John Doe Rizzo
-                  </Text>
-                  <Text
-                    style={{ fontFamily: "PoppinsMedium" }}
-                    className="text-md"
-                  >
-                    “Sunset Park - Be sure to visit, you'll definitely enjoy the
-                    sunset!”
-                  </Text>
-                </View>
+                <Text
+                  style={{ fontFamily: "PoppinsMedium" }}
+                  className="text-md"
+                >
+                  “{item.name} - {item.review_text}”
+                </Text>
               </View>
+            </View>
+             ))}
+
+
+             </ScrollView>
+
+           
             </View>
           </View>
         </ScrollView>

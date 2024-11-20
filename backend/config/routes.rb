@@ -16,6 +16,8 @@ Rails.application.routes.draw do
     post 'users/set_otp', to: 'users#set_otp'
     post 'users/validate_otp', to: 'users#check_otp'
     patch 'users/update_password', to: 'users#update_password'
+   # Route for creating a premium user
+    post 'users/create_premium_user', to: 'users#create_premium_user'
 
     # DELETE ACCOUNT
     delete 'users/delete', to: 'users#delete_account'
@@ -66,6 +68,10 @@ Rails.application.routes.draw do
     post 'user/places', to: 'savedplaces#create'
     get 'user/places', to: 'savedplaces#user_savedplaces'
     delete 'user/savedplaces', to: 'savedplaces#delete_saved_place'
+
+
+    #REVIEWS
+    get 'random/reviews', to: 'reviews#random_user_reviews'
 
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html

@@ -118,6 +118,34 @@ class UsersController < ApplicationController
       end
     end
 
+    def create_premium_user
+      # Extract and permit the user parameters including the password_key
+      user_params = params.require(:user).permit(:name, :email, :password, :password_confirmation, :password_key)
+  
+      # Get the password_key from the environment variable
+      correct_password_key = "password123"
+  
+      # Check if the password_key provided in the request matches the one in the environment
+      if user_params[:password_key] == correct_password_key
+        # Set the premium attribute to true for premium users
+        user_params = user_params.except(:password_key)  # Remove the password_key before saving
+  
+        # Create the user with premium set to true
+        user = User.new(user_params.merge(premium: true))
+  
+        if user.save
+          # Return success message with user details
+          render json: { message: "Premium user created successfully!", user: user }, status: :created
+        else
+          # If user creation fails, return error messages
+          render json: { errors: user.errors.full_messages }, status: :unprocessable_entity
+        end
+      else
+        # If password_key is incorrect, return an unauthorized error
+        render json: { error: "Invalid password key" }, status: :unauthorized
+      end
+    end
+
 
 
     private

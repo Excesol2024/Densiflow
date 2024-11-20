@@ -1,5 +1,5 @@
 import axios from "axios";
-import {paymentIntent, CurrentUser, Authentication, Weather, Feedbacks, Notifications, Places } from "../../constant/Endpoint"
+import {paymentIntent, CurrentUser, Authentication, Weather, Feedbacks, Notifications, Places, Reviews } from "../../constant/Endpoint"
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SERVER_URL } from '@env'
 
@@ -67,4 +67,6 @@ export const API = {
   getSavedPlaces: ()=> apiHelper(Places.getSavedPlaces, "GET"),
   FindPlaces: (params)=> apiHelper(Places.findPlace, "GET", undefined, params),
   deletePlace: (params)=> apiHelper(Places.deleteSavedPlace, "DELETE", undefined, params),
+
+  randomReviews: ()=> apiHelper(Reviews.randomReviews, "GET"),
 };
