@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -9,6 +9,8 @@ import {
   Pressable,
   Alert,
   ActivityIndicator,
+  Animated,
+  Easing,
   Modal,
 } from "react-native";
 import AntDesign from "@expo/vector-icons/AntDesign";
@@ -277,14 +279,152 @@ useEffect(()=>{
 
   useEffect(()=>{
     getRecentVisited();
-    handleGetRandomReviews();
+    // handleGetRandomReviews();
   },[])
+
+  const reviewsRandom = [
+    {
+        "date": "12 Jul",
+        "location": {
+            "lat": 8.116361,
+            "lng": 122.6654672
+        },
+        "name": "Folk's Coffee & Tea Shop",
+        "photo_url": "https://lh3.googleusercontent.com/a/ACg8ocKm453w1H-9pdg60ldcbUq2utQxP1OOOux6cu2NSx_KC3FljQ=s128-c0x00000000-cc-rp-mo",
+        "place_id": "ChIJe59Qefu_UzIR4rht9LerHU4",
+        "review_text": "JD jbdujjsjjf DJ",
+        "reviewer_name": "Sandy Alib"
+    },
+    {
+        "date": "02 Jul",
+        "location": {
+            "lat": 8.119416599999997,
+            "lng": 122.6667346
+        },
+        "name": "Arlene's Cafe",
+        "photo_url": "https://lh3.googleusercontent.com/a-/ALV-UjWiiXh3RJ4oENpNil0IzkqO72VwImIIy4uDUibMEYDRac8iiOO4=s128-c0x00000000-cc-rp-mo-ba3",
+        "place_id": "ChIJQ8Xr0AC_UzIRKSNkr_ler4I",
+        "review_text": "We ordered Fried Chicken, Eggloo Waffle and Frapp. It was delicious. The staff are nice and friendly. We will definitely  coming back. Highly recommended 👌",
+        "reviewer_name": "Analyn Heasley"
+    },
+    {
+        "date": "07 Jul",
+        "location": {
+            "lat": 8.119416599999997,
+            "lng": 122.6667346
+        },
+        "name": "Arlene's Cafe",
+        "photo_url": "https://lh3.googleusercontent.com/a-/ALV-UjWdjcQJEGg8GDVX87__QxKrN-ceIY45U20j6s6aEVQhQ-iZ7EBI=s128-c0x00000000-cc-rp-mo",
+        "place_id": "ChIJQ8Xr0AC_UzIRKSNkr_ler4I",
+        "review_text": "Visited from Auckland New Zealand. Fantastic, mouthwatering food and superlative service and great prices. World class experience! A must visit Cafe.",
+        "reviewer_name": "murray heasley"
+    },
+    {
+        "date": "25 Jun",
+        "location": {
+            "lat": 8.119416599999997,
+            "lng": 122.6667346
+        },
+        "name": "Arlene's Cafe",
+        "photo_url": "https://lh3.googleusercontent.com/a-/ALV-UjWmCsVy2R5ujxaMtXleVM-85bQBNUclQrz5-hfx6RwcYlVmqQAj=s128-c0x00000000-cc-rp-mo",
+        "place_id": "ChIJQ8Xr0AC_UzIRKSNkr_ler4I",
+        "review_text": "I Have A Fun Time The Service Crew Was Kind Food Was Great 👍 But The Man Name Rex Was Very Chaka Anyway Good Service Would Definitely Recommend 😁",
+        "reviewer_name": "Kim.Roldan Flogio"
+    },
+    {
+        "date": "05 Aug",
+        "location": {
+            "lat": 8.119416599999997,
+            "lng": 122.6667346
+        },
+        "name": "Arlene's Cafe",
+        "photo_url": "https://lh3.googleusercontent.com/a/ACg8ocKvtiaaTlaKdBF-lb7NeKUpM1zYbCDQqbmvdATrqo2Og7QxBw=s128-c0x00000000-cc-rp-mo",
+        "place_id": "ChIJQ8Xr0AC_UzIRKSNkr_ler4I",
+        "review_text": "Their frappe and waffle combos are the best.",
+        "reviewer_name": "Merlyn Maribojoc"
+    },
+    {
+        "date": "06 Sep",
+        "location": {
+            "lat": 8.120186900000002,
+            "lng": 122.6688904
+        },
+        "name": "C-Tea Pearls Milktea",
+        "photo_url": "https://lh3.googleusercontent.com/a-/ALV-UjUB1ZfbT-gMVxrsRp0mk3PWJxSKIjEL3kgRIIU34OJ_u1JLg223=s128-c0x00000000-cc-rp-mo",
+        "place_id": "ChIJI-wdIeK_UzIRy3QbBwsghvw",
+        "review_text": "Taste good",
+        "reviewer_name": "Crystelyn Baylon"
+    },
+    {
+        "date": "12 May",
+        "location": {
+            "lat": 8.120186900000002,
+            "lng": 122.6688904
+        },
+        "name": "C-Tea Pearls Milktea",
+        "photo_url": "https://lh3.googleusercontent.com/a/ACg8ocJqGhUlUXoRwA9h3mEddGuoY1EaSQe2QqwOQFe2KY3ELfP6eA=s128-c0x00000000-cc-rp-mo-ba3",
+        "place_id": "ChIJI-wdIeK_UzIRy3QbBwsghvw",
+        "review_text": "Lami Cheap Pure milk tea",
+        "reviewer_name": "Benj Kho"
+    },
+    {
+        "date": "11 Sep",
+        "location": {
+            "lat": 8.1194746,
+            "lng": 122.678467
+        },
+        "name": "Wiry Internet Cafe",
+        "photo_url": "https://lh3.googleusercontent.com/a-/ALV-UjVL7tpDajvfRXmNiMDOWOq6Z6FkBVzdvpMkta3YSAnLUbnB7MgA3g=s128-c0x00000000-cc-rp-mo",
+        "place_id": "ChIJ_Wk3f2S-UzIRr6rLXxSly20",
+        "review_text": "ok",
+        "reviewer_name": "JULITO ELUMBA"
+    },
+    {
+        "date": "24 Nov",
+        "location": {
+            "lat": 8.1164045,
+            "lng": 122.6652805
+        },
+        "name": "CUBES & BUCKET",
+        "photo_url": "https://lh3.googleusercontent.com/a-/ALV-UjW4z7tgvqxUUAWWI1SUeVG6HgE3zoD-6KmHOr_IBh2_r1DC59br=s128-c0x00000000-cc-rp-mo",
+        "place_id": "ChIJmcLO1w2_UzIRb5EGDajbqrQ",
+        "review_text": "perfect",
+        "reviewer_name": "DELL TIJAMO"
+    },
+    {
+        "date": "24 May",
+        "location": {
+            "lat": 8.1186584,
+            "lng": 122.6651732
+        },
+        "name": "Mely's Eatery",
+        "photo_url": "https://lh3.googleusercontent.com/a-/ALV-UjWov3DMQ7nSVIwdLn6r7SPi7rE4aTHbQq_6XJTxHArgRaHWN1M0=s128-c0x00000000-cc-rp-mo-ba2",
+        "place_id": "ChIJ95sTVR-_UzIRFBd5_kZCCZQ",
+        "review_text": "👍",
+        "reviewer_name": "Sonny Calabroso"
+    },
+    {
+        "date": "24 Mar",
+        "location": {
+            "lat": 8.1202952,
+            "lng": 122.6659272
+        },
+        "name": "Griller's Hangout",
+        "photo_url": "https://lh3.googleusercontent.com/a/ACg8ocLYTWBNp2lzkpJGa1aJX4cm3GSae1N990olj9RYSre-IKxCQA=s128-c0x00000000-cc-rp-mo",
+        "place_id": "ChIJaZ7iQm-_UzIRMJRO4J0brdQ",
+        "review_text": "I and my friends dine here once or twice per week. Love the alfresco and wide space. They cook the food after you order which we love the most. ❤️",
+        "reviewer_name": "Melannie Jade Aguiles"
+    },
+
+  ]
+
 
   const [randomReviews, setRandomReviews] = useState([])
   const handleGetRandomReviews = async () => {
     try {
       const response = await API.randomReviews();
       setRandomReviews(response.data)
+      console.log(response.data)
     } catch (error) {
       console.log(error)
     }
@@ -722,37 +862,37 @@ the start of the new calendar year.
 
             <View className="flex flex-col mt-1 ">
 
-             <ScrollView>
-
-             {randomReviews?.map((item, index)=> (
-              <View key={index} className="flex-row gap-2 mt-2">
-              <Text
-                style={{ fontFamily: "PoppinsThin" }}
-                className="absolute right-1 text-gray-500 text-md"
-              >
-               {item.date}
-              </Text>
-              <Image source={{uri: `${item.photo_url}`}} className="w-14 h-14" />
-              <View className="flex-1">
-                <Text
-                  style={{ fontFamily: "PoppinsThin" }}
-                  className="text-xl text-secondary w-48"
-                  numberOfLines={1}
-                >
-                  {item.reviewer_name}
-                </Text>
-                <Text
-                  style={{ fontFamily: "PoppinsMedium" }}
-                  className="text-md"
-                >
-                  “{item.name} - {item.review_text}”
-                </Text>
-              </View>
-            </View>
-             ))}
-
-
-             </ScrollView>
+            <ScrollView>
+      {reviewsRandom.map((item, index) => (
+        <View
+          key={`${item.reviewer_name}-${index}`}
+          className="flex-row gap-2 mt-2"
+        >
+          <Text
+            style={{ fontFamily: "PoppinsThin" }}
+            className="absolute right-1 text-gray-500 text-md"
+          >
+            {item.date}
+          </Text>
+          <Image source={{ uri: item.photo_url }} className="w-14 h-14" />
+          <View className="flex-1">
+            <Text
+              style={{ fontFamily: "PoppinsThin" }}
+              className="text-xl text-secondary w-48"
+              numberOfLines={1}
+            >
+              {item.reviewer_name}
+            </Text>
+            <Text
+              style={{ fontFamily: "PoppinsMedium" }}
+              className="text-md"
+            >
+              “{item.name} - {item.review_text}”
+            </Text>
+          </View>
+        </View>
+      ))}
+    </ScrollView>
 
            
             </View>

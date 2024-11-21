@@ -72,6 +72,7 @@ Rails.application.routes.draw do
 
     #REVIEWS
     get 'random/reviews', to: 'reviews#random_user_reviews'
+    post 'user/reviews', to: 'reviews#create'
 
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
