@@ -28,7 +28,7 @@ const Index = () => {
       }else{
         setTimeout(() => {
           setIsShowSplashScreen(false);
-          router.replace('/(getstarted)/Start')
+          router.replace('/(tabs)/Home')
         }, 2000)
       }
     } catch (error) {
