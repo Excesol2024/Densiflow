@@ -30,7 +30,8 @@ export const Feedbacks = {
 }
 
 export const Reviews = {
-    randomReviews: "/random/reviews"
+    randomReviews: "/random/reviews",
+    createReviews: "/user/reviews",
 }
 
 export const Notifications = {

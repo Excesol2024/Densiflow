@@ -264,10 +264,8 @@ const Home = () => {
     }
   };
 
-  useEffect(() => {
-    getRecentVisited();
-    // handleGetRandomReviews();
-  }, []);
+
+
 
   const reviewsRandom = [
     {
@@ -419,20 +417,73 @@ const Home = () => {
     },
   ];
 
-  const [reviews, setReviews] = useState(reviewsRandom);
-  const [fadeAnimValues, setFadeAnimValues] = useState(
-    reviewsRandom.map(() => new Animated.Value(1))
-  );
+  const [randomReviews, setRandomReviews] = useState([]);
+  const userLocation = `${userCity}, ${userSubregion}`;
+
+  const handleGetRandomReviews = async () => {
+    try {
+      const response = await API.randomReviews({ location: userLocation });
+      setRandomReviews(response.data);
+      setFadeAnimValues(response.data.map(() => new Animated.Value(1)));
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const [comments, setComments] = useState('')
+  const [errorComments, setErrorComments] = useState('');
+
+ 
+  const handleReviewsInputChange = (field, value) => {
+    // Update the specific field's value
+    if (field === "comments") {
+      setComments(value);
+    }
+
+    // Clear the error for the specific field
+    if (errorComments[field]) {
+      setErrorComments((prevErrors) => ({ ...prevErrors, [field]: "" }));
+    }
+  };
+
+  const createReviewsforPlace = async () =>{
+    if(comments === "") {
+      setErrorComments('This field is required!')
+      return
+    }
+    const body = {
+      review: {
+        comments: comments,
+        location: userLocation
+      }
+    }
+    console.log(body)
+    try {
+      const response = await API.createUserReviews(body)
+      if(response.data){
+        setComments('')
+        Alert.alert("Successfully added Reviews");
+        handleGetRandomReviews();
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+
+
+  const [fadeAnimValues, setFadeAnimValues] = useState([]);
+
 
   const fadeOutAndMoveToEnd = () => {
-    if (reviews.length > 0) {
+    if (randomReviews.length > 0 && fadeAnimValues[0]) {
       Animated.timing(fadeAnimValues[0], {
         toValue: 0,
         duration: 500,
         useNativeDriver: true,
       }).start(() => {
         // Move the faded-out item to the end of the array
-        setReviews((prevReviews) => {
+        setRandomReviews((prevReviews) => {
           const [fadedItem, ...remainingReviews] = prevReviews;
           return [...remainingReviews, fadedItem];
         });
@@ -453,20 +504,13 @@ const Home = () => {
     }, 3000); // Trigger every 3 seconds
 
     return () => clearInterval(interval); // Clean up interval on unmount
-  }, [fadeAnimValues, reviews]);
+  }, [fadeAnimValues, randomReviews]);
 
-  const [randomReviews, setRandomReviews] = useState([]);
-  const userLocation = `${userCity}, ${userSubregion}`;
+  useEffect(() => {
+    getRecentVisited();
+    handleGetRandomReviews();
+  }, []);
 
-  const handleGetRandomReviews = async () => {
-    try {
-      const response = await API.randomReviews({ location: userLocation });
-      setRandomReviews(response.data);
-      console.log(response.data);
-    } catch (error) {
-      console.log(error);
-    }
-  };
 
   return (
     <SafeAreaView className="flex-1 bg-white">
@@ -954,19 +998,23 @@ ${
                     height: 128, // Adjust height as needed
                   }}
                   className="border-2 border-secondary rounded-lg mt-2"
-                  placeholderTextColor="gray"
-                  placeholder="“Share your tips or reviews about the spot!”"
+                  placeholderTextColor={`${errorComments ? 'red' : 'gray'}`}
+                  placeholder={`${errorComments ? errorComments : '“Share your tips or reviews about the spot!”'}`}
+                  value={comments}
+                  onChangeText={(text) => handleReviewsInputChange("comments", text)}
                 />
                 <Text className="absolute right-3 bottom-2">
                   {" "}
-                  <NextSvg />
+                  <Pressable onPress={()=> createReviewsforPlace()}>
+                  <NextSvg /> 
+                  </Pressable>
                 </Text>
               </View>
             </View>
 
             <View className="flex flex-col mt-1 ">
               <ScrollView>
-                {reviews.slice(0, 5).map((item, index) => (
+                {randomReviews?.slice(0, 5).map((item, index) => (
                   <Animated.View
                     style={[{ opacity: fadeAnimValues[index] }]}
                     key={`${item.reviewer_name}-${index}`}

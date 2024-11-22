@@ -53,7 +53,7 @@ Rails.application.routes.draw do
     post "places/types", to: 'places#places_types'
 
     #SUGGESTED_PLACE
-    # get "places/suggested", to: 'places#suggested_places'
+    get "places/suggested", to: 'places#suggested_places'
 
     get "places/search", to: 'places#search_places'
     get "places/find", to: 'savedplaces#find_place'

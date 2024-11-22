@@ -18,17 +18,17 @@ const Index = () => {
       if(history && !Token){
         setTimeout(() => {
           setIsShowSplashScreen(false);
-          router.replace('/(auth)/Login')
+          router.push('/(auth)/Login')
         }, 2000)
       }else if(Token){
         setTimeout(() => {
           setIsShowSplashScreen(false);
-          router.replace('/(tabs)/Home')
+          router.push('/(tabs)/Home')
         }, 2000)
       }else{
         setTimeout(() => {
           setIsShowSplashScreen(false);
-          router.replace('/(tabs)/Home')
+          router.push('/(getstarted)/Start')
         }, 2000)
       }
     } catch (error) {
