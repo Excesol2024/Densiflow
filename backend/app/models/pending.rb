@@ -1,2 +1,0 @@
-class Pending < ApplicationRecord
-end
