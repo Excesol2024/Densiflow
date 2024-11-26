@@ -9,8 +9,73 @@ import Linkedin from "../components/svg/Linkedin";
 import Googleplay from "../components/svg/Googleplay";
 import Apple from "../components/svg/Apple";
 import Success from "../components/svg//Success";
+import { collection, addDoc } from "firebase/firestore";
+import { db } from "../constant/server"; 
+import { useState } from "react";
 
 function Home() {
+
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [isSuccess, setIsuccess] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+
+   // Error states
+   const [fullNameError, setFullNameError] = useState("");
+   const [emailError, setEmailError] = useState("");
+
+   const handleFormSubmit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    
+    // Reset errors before validation
+    setFullNameError("");
+    setEmailError("");
+
+    let valid = true;
+
+    // Validate fullName
+    if (!fullName) {
+      setFullNameError("Full Name is required.");
+      valid = false;
+      setIsLoading(false);
+    }
+
+    // Validate email
+    if (!email) {
+      setEmailError("Email is required.");
+      valid = false;
+      setIsLoading(false);
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      setEmailError("Please enter a valid email.");
+      valid = false;
+      setIsLoading(false);
+    }
+
+    // If validation passes, send the data
+    if (valid) {
+      try {
+        const docRef = await addDoc(collection(db, "users"), {
+          fullName,
+          email,
+          createdAt: new Date(),
+        });
+
+        if (docRef) {
+          setIsuccess(true);
+          setIsLoading(false);
+          setTimeout(() => {
+            window.location.href = '/';
+          }, 2000);
+        }
+      } catch (error) {
+        console.error("Error adding document: ", error);
+      }
+    } else {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="flex flex-col min-h-screen text-white bg-gradient-to-b from-[#007AFF] to-black m-0">
       {/* Header Section */}
@@ -32,33 +97,56 @@ function Home() {
             <p className="mt-8 text-md font-[300]">
               Stop guessing and start planning smarter. Densiflow shows you the
               real-time crowd status of popular spots like cafes, restaurants, and
-              parks—and notifies you when it's the perfect time to visit.
+              parks—and notifies you when it{`'`}s the perfect time to visit.
             </p>
             <p className="mt-4 font-semibold text-lg">
               Don’t miss out—join the waitlist for early access to Densiflow!
             </p>
 
             {/* Input Form */}
-            <div className="mt-4 space-y-4 lg:max-w-[21rem] w-full">
+            <div className="mt-4 lg:max-w-[21rem] w-full">
               <div className="flex items-center rounded-lg p-2 bg-[#FFFFFF] bg-opacity-10">
                 <User className="text-gray-500 mr-3 ml-3" />
                 <input
                   type="text"
-                  className="flex-1 bg-transparent outline-none text-white placeholder-gray-100"
+                  onChange={(e) => {
+                    setFullName(e.target.value);
+                    if (e.target.value) setFullNameError("");
+                  }}
+                  className="w-full bg-transparent outline-none text-white placeholder-gray-100"
                   placeholder="Full Name"
+                  required
                 />
               </div>
-              <div className="flex items-center rounded-lg p-2 bg-[#FFFFFF] bg-opacity-10">
+              {fullNameError && <p className="text-red-500 text-sm mt-1">{fullNameError}</p>}
+
+              <div className="flex mt-2 mb-2 items-center rounded-lg p-2 bg-[#FFFFFF] bg-opacity-10">
                 <Email className="text-gray-500 mr-3 ml-3" />
                 <input
                   type="text"
-                  className="flex-1 bg-transparent outline-none text-white placeholder-gray-100"
+                  className="w-full bg-transparent outline-none text-white placeholder-gray-100"
                   placeholder="Email Address"
+                  required
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    if (e.target.value) setEmailError("");
+                  }}
                 />
               </div>
-              <button className="w-full relative flex items-center justify-center bg-primary text-white py-3 rounded-lg hover:bg-blue-700 transition">
-                <span className="w-full text-center">Join the Waitlist</span>
-                <Arrow className="absolute right-4" />
+              {emailError && <p className="text-red-500 text-sm mt-1 mb-2">{emailError}</p>}
+              
+              <button onClick={(e)=> handleFormSubmit(e)} className="w-full relative flex items-center justify-center bg-primary text-white py-3 rounded-lg hover:bg-blue-700 transition">
+              {isLoading ? (
+        <div className="flex items-center space-x-2">
+          <div className="spinner border-t-transparent border-white border-2 border-solid rounded-full w-4 h-4 animate-spin"></div>
+          <span className="text-center">Loading...</span>
+        </div>
+      ) : (
+        <>
+          <span className="w-full text-center">Join the Waitlist</span>
+          <Arrow className="absolute right-4" />
+        </>
+      )}
               </button>
 
           
@@ -66,12 +154,12 @@ function Home() {
 
                 {/*SUCCESS */}
 
-                <div className="flex gap-2 items-center mt-2 lg:max-w-[25rem] border bg-[#FFFFFF] bg-opacity-10 border-primary p-2 rounded-lg">
+            {isSuccess ?     <div className="flex gap-2 items-center mt-2 lg:max-w-[25rem] border bg-[#FFFFFF] bg-opacity-10 border-primary p-2 rounded-lg">
                 <Success/>
                 <div className="">
-                We’ve added <span className="font-bold">shennacanas@gmail.com</span> to our waitlist. We’ll let you know when Densiflow is ready.
+                We’ve added <span className="font-bold">{email}</span> to our waitlist. We’ll let you know when Densiflow is ready.
                 </div>
-              </div>
+              </div> : ''}
 
             {/* Social Media Links */}
             <div className="lg:mt-20 mt-10 flex flex-col">

@@ -12,5 +12,11 @@ class UserMailer < ApplicationMailer
     @user_otp_code = otp_code
     mail(to: @user.email, subject: 'Your OTP Code')
   end
+
+  def send_message(fullname, email)
+    @fullname = fullname
+    @email = email
+    mail(to: @email, subject: "Hello #{@fullname}!")
+  end
   
 end

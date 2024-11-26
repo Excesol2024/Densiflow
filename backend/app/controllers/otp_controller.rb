@@ -62,6 +62,37 @@ class OtpController < ApplicationController
   end
   
 
+  def send_messages
+    # Expecting JSON array of users
+    users = params[:users]
+    
+    if users.blank?
+      render json: { error: 'No users provided' }, status: :unprocessable_entity
+      return
+    end
+
+    users.each do |user|
+      fullname = user[:fullName]
+      email = user[:email]
+
+      # Validate presence of data
+      if fullname.blank? || email.blank?
+        render json: { error: "Full name or email missing for one or more users" }, status: :unprocessable_entity
+        return
+      end
+
+      # Send the email
+      begin
+        UserMailer.send_message(fullname, email).deliver_now
+      rescue => e
+        render json: { error: "Failed to send email to #{email}: #{e.message}" }, status: :unprocessable_entity
+        return
+      end
+    end
+
+    render json: { message: "Emails sent successfully" }, status: :ok
+  end
+
   
 
   private
