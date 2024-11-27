@@ -79,7 +79,7 @@ function Home() {
   return (
     <div className="flex flex-col min-h-screen text-white bg-gradient-to-b from-[#007AFF] to-black m-0">
       {/* Header Section */}
-      <div className="w-full flex justify-between items-center px-6 lg:px-36 py-4">
+      <div className="w-full flex justify-between items-center px-4 lg:px-36 py-4">
         <img src="/logo.png" alt="Densiflow Logo" className="h-14" />
       </div>
 
@@ -164,11 +164,21 @@ function Home() {
             {/* Social Media Links */}
             <div className="lg:mt-20 mt-10 flex flex-col">
               <div className="flex gap-4 md:justify-start justify-center">
+                <a href="https://www.youtube.com/@peakmediaph" target="_blank">
                 <Youtube className="text-gray-400 hover:text-white transition" />
+                </a>
+                <a href="https://www.facebook.com/Excesol" target="_blank">
                 <Facebook className="text-gray-400 hover:text-white transition" />
+                </a>
+                <a href="https://x.com/excesolutions" target="_blank">
                 <Twitter className="text-gray-400 hover:text-white transition" />
+                </a>
+                <a href="https://www.instagram.com/excesolutions" target="_blank">
                 <Instagram className="text-gray-400 hover:text-white transition" />
+                </a>
+                <a href="https://www.linkedin.com/company/excesol" target="_blank">
                 <Linkedin className="text-gray-400 hover:text-white transition" />
+                </a>
               </div>
               <p className="text-lg mt-4 md:text-start text-center">
                 © 2024 Densiflow. All Rights Reserved.

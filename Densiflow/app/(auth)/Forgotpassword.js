@@ -119,9 +119,10 @@ const Forgotpassword = () => {
 
     }
 
-    const handleValidateOtp = async () =>{
-      const otpString = otp.join('');
+    const otpString = otp.join('');
 
+    const handleValidateOtp = async () =>{
+      
     setEffectLoading(true)
       const body = {
         email: email,
@@ -160,15 +161,15 @@ const Forgotpassword = () => {
       setEffectLoading(true)
       const body = {
         email: email,
-        otp: otp,
+        otp: otpString,
         password: password,
         password_confirmation: confirmPassword,
       }
-
       try {
         const response = await API.resetPassword(body)
         if(response.data.status === "success"){
           setTimeout(() => {
+            setEffectLoading(false)
             router.push('/Success')
           }, 1000);
         }
