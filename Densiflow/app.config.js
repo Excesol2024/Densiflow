@@ -60,6 +60,21 @@ export default {
         {
           locationAlwaysAndWhenInUsePermission: "Allow Densiflow to use your location."
         }
+      ],
+      // [
+      //   "expo-build-properties",
+      //   {
+      //     "ios": {
+      //       "useFrameworks": "static"
+      //     }
+      //   }
+      // ],
+      [
+        "react-native-google-mobile-ads",
+        {
+          "androidAppId": "ca-app-pub-5194664435495552~7528590557",
+          // "iosAppId": "ca-app-pub-xxxxxxxx~xxxxxxxx"
+        }
       ]
     ],
     extra: {

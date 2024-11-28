@@ -9,7 +9,7 @@ import Alert1 from "../../components/svg/Alert1";
 import Alert2 from "../../components/svg/Alert2";
 import Alert3 from "../../components/svg/Alert3";
 import { API } from "../../components/Protected/Api";
-import { formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow } from "date-fns";
 
 import {
   GestureHandlerRootView,
@@ -18,51 +18,6 @@ import {
 
 const Alerts = () => {
   const [Notification, setNotification] = useState([]);
-
-  const Notifications = [
-    {
-      name: "Green Tree Cafe!",
-      element: GreenSvg,
-      description:
-        "is currently not crowded with only 10 people. Perfect for you!",
-      time: "10 seconds",
-    },
-    {
-      name: "Sunset Lake Park",
-      element: YellowSvg,
-      description:
-        "is currently Moderately Busy with 25 people. Close to your preference!",
-      time: "2 minutes",
-    },
-    {
-      name: "Firefly Roodeck",
-      element: RedSvg,
-      description:
-        "is currently Very Crowded with 75 people. Above your preference!",
-      time: "3 hours",
-    },
-    {
-      name: "Announcements!",
-      element: Alert1,
-      description:
-        "is currently Very Crowded with 75 people. Above your preference!",
-      time: "10 seconds",
-    },
-    {
-      name: "New Features!",
-      element: Alert2,
-      description:
-        "is currently Moderately Busy with 25 people. Close to your preference!",
-      time: "2 minutes",
-    },
-    {
-      name: "App Updates",
-      element: Alert3,
-      description:
-        "is currently Very Crowded with 75 people. Above your preference!",
-      time: "3 hours",
-    },
-  ];
 
   const handleGetUserNotifications = async () => {
     try {
@@ -124,8 +79,66 @@ const Alerts = () => {
           </Text>
         </View>
 
-        {/** NO NOTIFICATIONS */}
-        <View className="flex-1 items-center justify-center p-4 hidden">
+        {Notification.length > 0 ? (
+          <ScrollView style={{ flex: 1 }} className="mt-4">
+            {/* NOTIFICATIONS */}
+            <View className="flex-1 p-4 mb-16">
+              {Notification.filter(
+                (notif) =>
+                  notif.crowd_status &&
+                  notif.crowd_status !== "unknown" &&
+                  notif.crowd_status !== "null"
+              ).map((notif) => (
+                <Swipeable
+                  key={notif.id}
+                  animationOptions={true}
+                  friction={1}
+                  overshootRight={false}
+                  renderRightActions={() => RightSwipe(notif.id)}
+                >
+                  <View className="flex-row gap-2 bg-white items-center mt-3">
+                    {/* Time formatting */}
+                    <Text
+                      style={{ fontFamily: "PoppinsThin" }}
+                      className="absolute top-[-1] right-3 text-gray-400"
+                    >
+                      {formatDistanceToNow(new Date(notif.scheduled_time), {
+                        addSuffix: true,
+                      })}
+                    </Text>
+
+                    {/* Crowd Status Icons */}
+                    {notif.crowd_status === "low" ? (
+                      <GreenSvg />
+                    ) : notif.crowd_status === "medium" ? (
+                      <YellowSvg />
+                    ) : notif.crowd_status === "high" ? (
+                      <RedSvg />
+                    ) : null}
+
+                    <View className="flex-1 mt-3">
+                      <Text
+                        style={{ fontFamily: "PoppinsBold" }}
+                        numberOfLines={1}
+                        className="text-lg w-44"
+                      >
+                        {notif.name}
+                      </Text>
+                      <Text
+                        style={{ fontFamily: "PoppinsThin" }}
+                        className="text-md"
+                      >
+                        {notif.crowd_status === "low"
+                          ? "is currently not crowded with only 10 people. Perfect for you!"
+                          : "is experiencing moderate crowding, but still a good option!"}
+                      </Text>
+                    </View>
+                  </View>
+                </Swipeable>
+              ))}
+            </View>
+          </ScrollView>
+        ) : (
           <View className="flex-1 items-center justify-center p-4">
             <MessageSvg />
             <Text
@@ -134,7 +147,6 @@ const Alerts = () => {
             >
               No Notifications!
             </Text>
-
             <Text
               style={{ fontFamily: "PoppinsThin" }}
               className="text-center text-lg mt-2"
@@ -142,63 +154,7 @@ const Alerts = () => {
               We’ll let you know when there will be something to update you.
             </Text>
           </View>
-        </View>
-
-        <ScrollView style={{ flex: 1 }} className="mt-4">
-          {/* NOTIFICATIONS */}
-          <View className="flex-1 p-4  mb-16">
-            {Notification.filter(
-              (notif) =>
-                notif.crowd_status &&
-                notif.crowd_status !== "unknown" &&
-                notif.crowd_status !== "null"
-            ).map((notif) => (
-              <Swipeable
-                animationOptions={true}
-                friction={1}
-                overshootRight={false}
-                renderRightActions={() => RightSwipe(notif.id)}
-                key={notif.id}
-              >
-                <View className="flex-row gap-2 bg-white items-center mt-3">
-                  {/* Time formatting */}
-                  <Text
-                    style={{ fontFamily: "PoppinsThin" }}
-                    className="absolute top-[-1] right-3 text-gray-400"
-                  >
-                   {formatDistanceToNow(new Date(notif.scheduled_time), { addSuffix: true })}
-                  </Text>
-                  {notif.crowd_status === "low" ? (
-                    <GreenSvg />
-                  ) : notif.crowd_status === "medium" ? (
-                    <YellowSvg />
-                  ) : notif.crowd_status === "high" ? (
-                    <RedSvg />
-                  ) : (
-                    ""
-                  )}
-                  <View className="flex-1 mt-3">
-                    <Text
-                      style={{ fontFamily: "PoppinsBold" }}
-                      numberOfLines={1}
-                      className="text-lg w-44"
-                    >
-                      {notif.name}
-                    </Text>
-                    <Text
-                      style={{ fontFamily: "PoppinsThin" }}
-                      className="text-md "
-                    >
-                      {notif.crowd_status === "low"
-                        ? "is currently not crowded with only 10 people. Perfect for you!"
-                        : "is experiencing moderate crowding, but still a good option!"}
-                    </Text>
-                  </View>
-                </View>
-              </Swipeable>
-            ))}
-          </View>
-        </ScrollView>
+        )}
       </View>
     </GestureHandlerRootView>
   );
