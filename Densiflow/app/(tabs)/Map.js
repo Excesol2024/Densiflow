@@ -126,8 +126,8 @@ const Map = () => {
   
 
 const handleSelectedPlacesTypes = async(placeName) =>{
-
-  setPlacesFocus(placeName)
+  setMapLocation([])
+  setPlacesFocus(placeName) 
   setIsAlreadySaved(false)
   setIsClicked(false)
   const body = {
@@ -422,23 +422,25 @@ useEffect(() => {
 
 
    {/* Places Markers */}
-   {placesTypes.map((place, index) => (
-    <Marker
-      key={index}
-      onPress={()=> handleClickedSelectedPlacesTypes(place)}
-      coordinate={{latitude: place.location.lat, longitude: place.location.lng}}
-    >
-      <View>
-      <View className="flex-1 justify-center items-center"></View>
-      <View className="relative w-14 h-14  shadow-2xl shadow-gray-500 ">
-        <Image 
-          source={{ uri: place.icon }} // Replace with your image URL
-          className="w-14 h-14" // Image size
-        />
-      </View>
-      </View>
-    </Marker>
-  ))}
+  {isValidLocation ? ('') : (
+     placesTypes.map((place, index) => (
+      <Marker
+        key={index}
+        onPress={()=> handleClickedSelectedPlacesTypes(place)}
+        coordinate={{latitude: place.location.lat, longitude: place.location.lng}}
+      >
+        <View>
+        <View className="flex-1 justify-center items-center"></View>
+        <View className="relative w-14 h-14  shadow-2xl shadow-gray-500 ">
+          <Image 
+            source={{ uri: place.icon }} // Replace with your image URL
+            className="w-14 h-14" // Image size
+          />
+        </View>
+        </View>
+      </Marker>
+    ))
+  )}
 
 
    

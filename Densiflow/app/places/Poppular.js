@@ -23,12 +23,8 @@ const Poppular = () => {
         }
       }
 
-      const handleSelectedPlacesToNavigate = (lat, long) =>{
-        console.log(lat, long)
-        setMapLocation({
-          lat: lat,
-          long: long
-        })
+      const handleSelectedPlacesToNavigate = (place) =>{
+        setMapLocation(place)
         router.push('/Map')
       }
 
@@ -89,7 +85,7 @@ const Poppular = () => {
             <View key={rowIndex} className="flex-row justify-between mb-4">
               {popularPlaces.slice(rowIndex * 2, rowIndex * 2 + 2).map((place, index) => (
                 <Pressable key={index}
-                onPress={()=>handleSelectedPlacesToNavigate(place.location.lat, place.location.lng)}
+                onPress={()=>handleSelectedPlacesToNavigate(place)}
                 className="w-1/2 p-2">
                   <View className="rounded-xl overflow-hidden h-28">
                     <Image source={{ uri: place.image_url }} className="w-full h-full" />

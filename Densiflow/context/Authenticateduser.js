@@ -23,11 +23,16 @@ export const AuthenticatedProvider = ({ children }) => {
   const handleLoggedInUser = async () => {
     const token = await AsyncStorage.getItem('Authorization');
     console.log("TOKEN", token);
+   if(token){
     const dataresponse = await API.getCurrentUser();
     setCurrentUser(dataresponse.data)
       setIsloggedIn({
         authUser: true
       })
+   } else {
+    handleLogoutUser();
+    return
+   }
   };
 
   useEffect(() => {

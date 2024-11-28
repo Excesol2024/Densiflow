@@ -48,7 +48,7 @@ const Home = () => {
       const today = new Date();
       const options = { month: "long", day: "numeric" };
       return today.toLocaleDateString("en-US", options);
-      // return "April 9";
+      // return "January 1";
     };
 
     useEffect(() => {
@@ -57,7 +57,7 @@ const Home = () => {
   
       // Filter festivals based on user city and date
       const festivals = majorFestivals.filter((festival) => {
-        const matchesCity = festival.location === userCity;
+        const matchesCity = festival.location === userAddress;
   
         const matchesDate =
           festival.date.includes(today) || // Direct match
@@ -167,8 +167,8 @@ const Home = () => {
   }, []);
 
   useEffect(() => {
-    // handleGetPopularPlaces();
-    // handleGetRecommendedPlaces();
+    handleGetPopularPlaces();
+    handleGetRecommendedPlaces();
     updatePlaceBasedOnTime();
   }, []);
 
@@ -232,10 +232,7 @@ const Home = () => {
       place.location.lat,
       place.location.lng
     );
-    setMapLocation({
-      lat: place.location.lat,
-      long: place.location.lng,
-    });
+    setMapLocation(place);
     router.push("/Map");
   };
 
@@ -603,7 +600,7 @@ const Home = () => {
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={{ alignItems: "center" }}
             >
-              {popularPlaces?.map((places, index) => (
+              {popularPlaces?.slice(0, 5).map((places, index) => (
                 <Pressable
                   key={index}
                   className="mr-2 "
@@ -670,7 +667,7 @@ ${
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={{ alignItems: "center" }}
             >
-              {recommendedPlaces?.map((places, index) => (
+              {recommendedPlaces?.slice(0, 5).map((places, index) => (
                 <Pressable
                   key={index}
                   className="mr-2 "
@@ -718,7 +715,7 @@ ${
             </ScrollView>
           </View>
 
-          <View className="flex-1 w-full mt-5 mb-5 ">
+          <View className="flex-1 w-full mt-5 mb-10 ">
             <Text style={{ fontFamily: "PoppinsThin" }} className="text-xl">
               Recents Visited
             </Text>
@@ -942,7 +939,7 @@ ${
                     </Text>
                     <Image
                       source={{ uri: item.photo_url }}
-                      className="w-14 h-14"
+                      className="w-14 h-14 rounded-full"
                     />
                     <View className="flex-1">
                       <Text
