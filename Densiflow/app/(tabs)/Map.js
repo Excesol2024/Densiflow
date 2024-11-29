@@ -345,7 +345,7 @@ useEffect(() => {
   const [isAlreadySaved, setIsAlreadySaved] = useState(false)
 
   const handleClickedSelectedPlacesTypes = async (placesDetails) => {
-    console.log(placesDetails.place_id)
+    console.log(placesDetails)
     try {
       const response = await API.FindPlaces({ query: placesDetails.place_id})
       console.log(response.data.status)
@@ -430,11 +430,10 @@ useEffect(() => {
         coordinate={{latitude: place.location.lat, longitude: place.location.lng}}
       >
         <View>
-        <View className="flex-1 justify-center items-center"></View>
-        <View className="relative w-14 h-14  shadow-2xl shadow-gray-500 ">
+        <View className="relative flex-1 w-20 h-20  shadow-2xl shadow-gray-500 ">
           <Image 
             source={{ uri: place.icon }} // Replace with your image URL
-            className="w-14 h-14" // Image size
+            className="w-16 h-16" // Image size
           />
         </View>
         </View>
@@ -559,8 +558,19 @@ useEffect(() => {
     >{place.vicinity}</Text>
       <View className="flex-row items-center gap-2">
         <Text>{place.kilometers} km</Text>
-        <View className={`w-20 h-3 rounded-full ${place.crowd_status === "low" ? ' bg-green-500' : 
-          place.crowd_status === "medium" ? 'bg-yellow-500' : place.crowd_status === "high" ? ' bg-red-500' : '' }`}></View>
+        <View className="h-2 w-2 bg-gray-300 rounded-full "></View>
+                      <View
+                        className={` h-3 rounded-full
+${
+  place.crowd_status === "high"
+    ? "bg-red-500 w-20"
+    : place.crowd_status === "medium"
+    ? "bg-yellow-300 w-14"
+    : place.crowd_status === "low"
+    ? "bg-green-500 w-8"
+    : ""
+} ml-1`}
+                      />
       </View>
   </View>
 </Pressable>
@@ -571,7 +581,7 @@ useEffect(() => {
   
 
   {isClicked ?  <View className="flex-1 absolute w-full p-2 bottom-24 z-50 ">
-   <View className="flex flex-row p-3 bg-white shadow-2xl shadow-gray-700 rounded-2xl">
+   <View className="flex flex-row p-3 bg-white shadow-lg shadow-gray-900 rounded-2xl">
       {isAlreadySaved ?  <Pressable className="absolute right-3.5 top-3">
        <Bookmark/>
        </Pressable> : 
@@ -579,7 +589,7 @@ useEffect(() => {
        <Bookmarks/>
        </Pressable>
       }
-      <View className="absolute right-3 bottom-16">
+      <View className="absolute right-3 bottom-20">
       <Pressable onPress={()=> handleSettingUpNotifications(selectedPlaceTypes)}> 
       <Alert/>
          </Pressable>
@@ -597,21 +607,91 @@ useEffect(() => {
            numberOfLines={1} // Limit to 1 line
            ellipsizeMode="tail" // Add ellipsis if the text overflows
         >{selectedPlaceTypes.vicinity}</Text>
+{selectedPlaceTypes?.opening_hours?.open_now === false ? (
+  <Text style={{ fontFamily: "PoppinsBold" }} className="text-red-400">
+    CLOSED
+  </Text>
+) : selectedPlaceTypes?.opening_hours?.open_now === true ? (
+  <Text style={{ fontFamily: "PoppinsBold" }} className="text-green-400">
+    OPEN
+  </Text>
+) : (
+  <Text style={{ fontFamily: "PoppinsBold" }} className="text-red-400">
+    CLOSED
+  </Text>
+)}
         <View className="flex flex-row gap-1 items-center">
           <Kilometer/>
           <Text style={{ fontFamily: "PoppinsBold" }} className="text-secondary mt-1">{selectedPlaceTypes.kilometers} Kilometer</Text>
         </View>
 
-        {selectedPlaceTypes.crowd_status === "low" ?    <View className="flex flex-row gap-1 items-center">
-          <FontAwesome name="dot-circle-o" size={14} color="#68D391" />
-          <Text style={{ fontFamily: "PoppinsBold" }} className="text-green-400 mt-1">Not Crowded (5-15)</Text>
-        </View> : selectedPlaceTypes === "medium" ?    <View className="flex flex-row gap-1 items-center">
-          <FontAwesome name="dot-circle-o" size={14} color="#F59E0B" />
-          <Text style={{ fontFamily: "PoppinsBold" }} className="text-yellow-400 mt-1">Moderately Busy (16-30)</Text>
-        </View> : selectedPlaceTypes.crowd_status === "high" ?   <View className="flex flex-row gap-1 items-center">
-          <FontAwesome name="dot-circle-o" size={14} color="#EF4444" />
-          <Text style={{ fontFamily: "PoppinsBold" }} className="text-red-400 mt-1">Very Crowded (31+)</Text>
-        </View> : '' }
+        {selectedPlaceTypes?.crowd_status === "low" ? (
+  <View className="flex flex-row gap-1 items-center">
+    <FontAwesome
+      name="dot-circle-o"
+      size={14}
+      color={`${
+        selectedPlaceTypes?.opening_hours?.open_now === false || selectedPlaceTypes?.opening_hours === null
+          ? "gray"
+          : "#68D391"
+      }`}
+    />
+    <Text
+      style={{ fontFamily: "PoppinsBold" }}
+      className={`mt-1 ${
+        selectedPlaceTypes?.opening_hours?.open_now === false || selectedPlaceTypes?.opening_hours === null
+          ? "text-gray-500"
+          : "text-green-400"
+      }`}
+    >
+      Not Crowded (5-15)
+    </Text>
+  </View>
+) : selectedPlaceTypes?.crowd_status === "medium" ? (
+  <View className="flex flex-row gap-1 items-center">
+    <FontAwesome
+      name="dot-circle-o"
+      size={14}
+      color={`${
+        selectedPlaceTypes?.opening_hours?.open_now === false || selectedPlaceTypes?.opening_hours === null
+          ? "gray"
+          : "#F59E0B"
+      }`}
+    />
+    <Text
+      style={{ fontFamily: "PoppinsBold" }}
+      className={`mt-1 ${
+        selectedPlaceTypes?.opening_hours?.open_now === false || selectedPlaceTypes?.opening_hours === null
+          ? "text-gray-500"
+          : "text-yellow-400"
+      }`}
+    >
+      Moderately Busy (16-30)
+    </Text>
+  </View>
+) : selectedPlaceTypes?.crowd_status === "high" ? (
+  <View className="flex flex-row gap-1 items-center">
+    <FontAwesome
+      name="dot-circle-o"
+      size={14}
+      color={`${
+        selectedPlaceTypes?.opening_hours?.open_now === false || selectedPlaceTypes?.opening_hours === null
+          ? "gray"
+          : "#EF4444"
+      }`}
+    />
+    <Text
+      style={{ fontFamily: "PoppinsBold" }}
+      className={`mt-1 ${
+        selectedPlaceTypes?.opening_hours?.open_now === false || selectedPlaceTypes?.opening_hours === null
+          ? "text-gray-500"
+          : "text-red-400"
+      }`}
+    >
+      Very Crowded (31+)
+    </Text>
+  </View>
+) : null}
      
       </View>
     </View>
