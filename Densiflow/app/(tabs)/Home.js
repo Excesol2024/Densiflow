@@ -167,9 +167,9 @@ const Home = () => {
   }, []);
 
   useEffect(() => {
-    handleGetPopularPlaces();
-    handleGetRecommendedPlaces();
-    updatePlaceBasedOnTime();
+    // handleGetPopularPlaces();
+    // handleGetRecommendedPlaces();
+    // updatePlaceBasedOnTime();
   }, []);
 
   useEffect(() => {

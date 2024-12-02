@@ -536,28 +536,53 @@ class Googleapi
     begin
       # Perform the HTTP GET request
       response = Net::HTTP.get(uri)
-      # Parse the JSON response
-      places = JSON.parse(response)
+      place_details = JSON.parse(response)["result"]
   
-      formatted_places = places["result"].map do |place|
-
-        place_location = place.dig("geometry", "location")
-        place_lat = place_location["lat"]
-        place_lng = place_location["lng"]
-        distance = haversine_distance(lat, long, place_lat, place_lng)
-
-        {
-          location: place.dig("geometry", "location"),
-          name: place["name"],
-          place_id: place_id,
-           kilometers: distance.round(2)
-        }
+      return [] if place_details.nil?
+  
+      # Extract necessary data
+      place_location = place_details.dig("geometry", "location")
+      place_lat = place_location["lat"]
+      place_lng = place_location["lng"]
+      distance = haversine_distance(lat, long, place_lat, place_lng)
+  
+      # Extract reviews and determine recent ones
+      reviews = place_details["reviews"] || []
+      current_time_philippines = Time.now.to_i + 8 * 60 * 60
+      recent_reviews = reviews.select do |review|
+        review_time_philippines = review["time"] + 8 * 60 * 60
+        (current_time_philippines - review_time_philippines) <= 60 * 60
       end
-      
-      formatted_places
+  
+      user_ratings_total = place_details["user_ratings_total"] || 0
+      crowd_status = case
+                     when user_ratings_total > 30 && recent_reviews.any?
+                       "high"
+                     when user_ratings_total.between?(15, 30) && recent_reviews.any?
+                       "medium"
+                     else
+                       "low"
+                     end
+  
+      # Photo URL
+      photo_reference = place_details.dig("photos", 0, "photo_reference")
+      photo_url = photo_reference ? "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=#{photo_reference}&key=#{@api_key}" : nil
+  
+      # Return formatted data
+      {
+        location: place_location,
+        name: place_details["name"],
+        place_id: place_id,
+        opening_hours: place_details["opening_hours"],
+        rating: place_details["rating"],
+        reviews: reviews,
+        crowd_status: crowd_status,
+        image_url: photo_url,
+        kilometers: distance.round(2)
+      }
     rescue StandardError => e
       # Log the error and return an empty array or handle it as needed
-      puts "Error fetching places: #{e.message}"
+      puts "Error fetching place details: #{e.message}"
       []
     end
   end

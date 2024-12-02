@@ -7,10 +7,25 @@ import Lock from "../../components/svg/Lock";
 import Eye from "../../components/svg/Eye";
 import Arrowright from "../../components/svg/Arrowright";
 
-const ResetPassword = ({password, setPassword, confirmationPassword, setConfirmationPassword, handleResetPassword}) => {
+const ResetPassword = ({password, setPassword, confirmationPassword, setConfirmationPassword, handleResetPassword, errors, setErrors}) => {
     const router = useRouter();
 
+    const handleInputChange = (field, text) => {
+      // Update the respective field
+      if (field === "password") {
+        setPassword(text);
+      } else if (field === "confirmationPassword") {
+        setConfirmationPassword(text);
+      }
+  
+      // Clear the error for the specific field
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        [field]: "", // Clear the error for the given field
+      }));
+    };
 
+    
 
   return (
     <View className="flex-1 p-4">
@@ -23,7 +38,8 @@ const ResetPassword = ({password, setPassword, confirmationPassword, setConfirma
         <Text style={{ fontFamily: 'PoppinsMedium' }} className="text-3xl mb-3">Reset Password</Text>
         <Text style={{ fontFamily: 'PoppinsMedium' }} className="mb-4">Please type something you’ll remember</Text>
         
-        <View className="flex-row items-center border border-gray-300 rounded-lg p-3 mb-4">
+  <View className="flex-2 mb-3">
+  <View className={`flex-row items-center border rounded-lg p-3 ${errors.password ? 'border-red-500' : 'border-gray-300'}`}>
         <Lock className=" text-gray-400 ml-1" />
         <TextInput
           placeholder="New Password"
@@ -31,26 +47,32 @@ const ResetPassword = ({password, setPassword, confirmationPassword, setConfirma
           className="ml-3 flex-1"
           style={{ fontFamily: "PoppinsMedium" }}
           value={password}
-          onChangeText={setPassword}
+          onChangeText={(text) => handleInputChange("password", text)}
           secureTextEntry
         />
         <Eye />
       </View>
+      {errors.password &&  <Text  style={{ fontFamily: "PoppinsMedium" }} className="mt-0.5 text-red-500">{errors.password}</Text>}
+  </View>
 
-      <View className="flex-row items-center border border-gray-300 rounded-lg p-3 mb-4">
+  <View className="flex-2 mb-3">
+  <View className={`flex-row items-center border rounded-lg p-3 ${errors.confirmationPassword ? 'border-red-500' : 'border-gray-300'}`}>
         <Lock className=" text-gray-400 ml-1" />
         <TextInput
-          placeholder="Confirm Password"
-          placeholderTextColor={'#747688'}
-          className="ml-3 flex-1"
-          style={{ fontFamily: "PoppinsMedium" }}
-          value={confirmationPassword}
-          onChangeText={setConfirmationPassword}
-          secureTextEntry
-        />
+            placeholder="Confirm Password"
+            placeholderTextColor={"#747688"}
+            className="ml-3 flex-1"
+            style={{ fontFamily: "PoppinsMedium" }}
+            value={confirmationPassword}
+            onChangeText={(text) => handleInputChange("confirmationPassword", text)}
+            secureTextEntry
+          />
         <Eye />
       </View>
+      {errors.confirmationPassword &&  <Text  style={{ fontFamily: "PoppinsMedium" }} className="mt-0.5 text-red-500">{errors.confirmationPassword}</Text>}
 
+
+  </View>
       <View className=" ml-8 mr-8 mt-4">
     <TouchableOpacity
         className="bg-secondary p-4 rounded-xl shadow-2xl shadow-primary"
@@ -79,4 +101,9 @@ ResetPassword.propTypes = {
   setPassword: PropTypes.func.isRequired,
   setConfirmationPassword: PropTypes.func.isRequired,
   handleResetPassword: PropTypes.func.isRequired,
+  errors: PropTypes.shape({
+    password: PropTypes.string,
+    confirmationPassword: PropTypes.string,
+  }).isRequired,
+  setErrors: PropTypes.func.isRequired,
   };

@@ -24,6 +24,10 @@ const Forgotpassword = () => {
     const [isTimerActive, setIsTimerActive] = useState(true);
     const { setEffectLoading } = useContext(LoadingEffectsContext)
     const [otpError, setOtpError] = useState("");
+    const [errors, setErrors] = useState({
+      password: "",
+      confirmationPassword: ""
+    })
 
 
     useEffect(() => {
@@ -146,19 +150,36 @@ const Forgotpassword = () => {
       }
     }
 
+    const passwordComplexityRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
     const handleResetPassword = async () => {
 
-      if (password.length < 8) {
-        Alert.alert("Validation Error", "Password must be at least 8 characters long.");
-        return;
-      }
-  
-      if (password !== confirmPassword) {
-        Alert.alert("Validation Error", "Passwords do not match!");
-        return;
-      }
-
+      let newErrors = {};
       setEffectLoading(true)
+
+         // Password validations
+    if (password === "") {
+      newErrors.password = "Password should not be empty.";
+    } else if (password.length < 8) {
+      newErrors.password = "Password must be at least 8 characters long.";
+    } else if (!passwordComplexityRegex.test(password)) {
+      newErrors.password = "Password must include at least one uppercase letter, one number, and one special character.";
+    }
+  
+    // Confirm password validation
+    if (confirmPassword === "") {
+      newErrors.confirmationPassword = "Confirm password should not be empty.";
+    } else if (password !== confirmPassword) {
+      newErrors.confirmationPassword = "Passwords do not match.";
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      setEffectLoading(false);
+      return;
+    }
+
+
       const body = {
         email: email,
         otp: otpString,
@@ -185,7 +206,7 @@ const Forgotpassword = () => {
     timer={timer} handleResendOtp={handleResendOtp} handleVerifyOtp={handleValidateOtp} otpError={otpError} setOtpError={setOtpError}/>
     </> : isVerifyPassword ? <>
       <ResetPassword password={password} setPassword={setPassword} confirmationPassword={confirmPassword}
-       setConfirmationPassword={setConfirmPassword} handleResetPassword={handleResetPassword}/>
+       setConfirmationPassword={setConfirmPassword} handleResetPassword={handleResetPassword} errors={errors} setErrors={setErrors}/>
     </> : <>
     <View className="flex-1  p-4">
     <View className="mt-8 flex-row items-center">

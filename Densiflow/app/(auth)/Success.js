@@ -11,7 +11,7 @@ const Success = () => {
       <View className="flex-2">
         <View className="flex-2 items-center">
           <LottieView 
-          source={require("../../assets/animation/ann.json")}
+          source={require("../../assets/animation/newcheckmarks.json")}
           autoPlay
           loop
           className="w-full h-36"

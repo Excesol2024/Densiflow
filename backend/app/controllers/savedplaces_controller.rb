@@ -1,3 +1,4 @@
+require_relative '../api/googleapi'
 class SavedplacesController < ApplicationController
   before_action :authenticate_user!
 
@@ -69,10 +70,40 @@ class SavedplacesController < ApplicationController
     end
   end
 
+  def update_savedPlaces_crowdStatus
+    if current_user
+      lat = current_user.lat
+      long = current_user.long
+      saved_places = current_user.savedplaces
+  
+      # Initialize Google API service
+      google_service = Googleapi.new(nil)
+  
+      updated_places = saved_places.map do |saved_place|
+        # Fetch detailed place information for each saved place
+        place_info = google_service.place_information(lat, long, saved_place.placesID)
+        
+        # Check if place information is available
+        next unless place_info.present?
+  
+        # Update the saved place with crowd status or other fields
+        saved_place.update(
+          crowd_status: place_info[:crowd_status],
+        )
+        # Return updated saved place details
+        saved_place
+      end.compact
+  
+      render json: { status: 'success', updated_places: updated_places }, status: :ok
+    else
+      render json: { status: 'error', message: 'User not authenticated' }, status: :unauthorized
+    end
+  end
+
   private
 
   def save_places_params
-    params.require(:savedplace).permit(:name, :address, :lat, :long, :crowd_status, :image_url, :placesID)
+    params.require(:savedplace).permit(:name, :address, :lat, :long, :crowd_status, :image_url, :placesID, :icon_url)
   end
 
 end

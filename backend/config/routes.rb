@@ -57,6 +57,7 @@ Rails.application.routes.draw do
 
     get "places/search", to: 'places#search_places'
     get "places/find", to: 'savedplaces#find_place'
+    get "savedplaces", to: 'savedplaces#update_savedPlaces_crowdStatus'
 
 
     post "sampleplaces/types", to: 'places#sampleplaces_types'
