@@ -26,7 +26,7 @@ export const LoadingEffectsProvider = ({ children }) => {
   const [isSelectingMap, setIsSelectingMap] = useState(false);
   const [selectedMap, setSelectedMap] = useState("");
   const [isSearching, setIsSearching] = useState(false);
-  const [isSaved, setIsSaved] = useState("");
+  const [isSaved, setIsSaved] = useState([]);
 
   const [isSettingNotif, setIsSettingNotif] = useState(false);
   const [placeDetails, setPlaceDetails] = useState([]);

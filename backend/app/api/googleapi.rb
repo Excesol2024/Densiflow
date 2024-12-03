@@ -574,6 +574,7 @@ class Googleapi
         name: place_details["name"],
         place_id: place_id,
         opening_hours: place_details["opening_hours"],
+        vicinity: place_details["vicinity"],
         rating: place_details["rating"],
         reviews: reviews,
         crowd_status: crowd_status,

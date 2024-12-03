@@ -28,18 +28,26 @@ const Saved = () => {
   // Fetch saved places from the API
   const fetchSavedPlaces = async () => {
     try {
+      // Fetch the saved places from the API
       const response = await API.getSavedPlaces();
       const places = response.data.updated_places;
-      console.log(places);
+  
+      // Log the retrieved saved places (optional for debugging)
+      console.log("SAVEDPLACES", places);
+  
+      // Sort the places in descending order by created_at
       const sortedFiltered = places.sort((a, b) => {
         const dateA = new Date(a.created_at);
         const dateB = new Date(b.created_at);
-        return dateB - dateA; // Sort in descending order of created_at
+        return dateB - dateA; // Descending: newest to oldest
       });
+  
+      // Update the state with the sorted places
       setSavedPlaces(sortedFiltered);
       setFilteredPlaces(sortedFiltered); // Initialize filteredPlaces with all places
     } catch (error) {
-      console.log(error);
+      // Log any errors for debugging
+      console.error("Error fetching saved places:", error);
     }
   };
 
@@ -87,15 +95,16 @@ const Saved = () => {
       vicinity: place.address,
       crowd_status: place.crowd_status,
       image_url: place.image_url,
-      placeID: place.placeID,
+      opening_hours: place.opening_hours,
+      place_id: place.placeID,
       location: {
         lat: place.lat,
         lng: place.long,
       },
     };
     console.log(body);
-    // setMapLocation(body)
-    // router.push('/Map')
+    setMapLocation(body)
+    router.push('/Map')
   };
 
   const RightSwipe = (placeID, id) => {

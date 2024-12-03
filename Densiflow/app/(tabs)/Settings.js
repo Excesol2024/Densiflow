@@ -1,4 +1,4 @@
-import { View, Text, Pressable, ScrollView, Linking } from 'react-native'
+import { View, Text, Pressable, ScrollView, Linking, Share } from 'react-native'
 import React, { useContext, useState, useEffect } from 'react'
 import AntDesign from "@expo/vector-icons/AntDesign";
 import First from '../../components/svg/profile/First';
@@ -76,6 +76,29 @@ const Profile = () => {
     return subscriber; // unsubscribe on unmount
   }, []);
 
+  const url = "https://www.facebook.com/kyle.ganados.3"
+
+  const shareApp = async () => {
+    try {
+      const result = await Share.share({
+        message: ('Densiflow App' +  '\n' + url)
+      })
+      
+      if(result.action === Share.sharedAction){
+        if(result.activityType){
+          console.log('shared activity types of : ', result.activityType)
+        } else {
+          console.log("shared")
+        }
+      }else if(result.action === Share.dismissedAction){
+        console.log("dismissed")
+      }
+
+    } catch (error) {
+      console.log(error.message)
+    }
+  }
+
   if (initializing) return null;
 
   return (
@@ -147,7 +170,7 @@ const Profile = () => {
 
           <View className="flex-2 mt-4">
             <View  className="flex-2 bg-gray-200 mt-2 p-4 rounded-lg">
-             <Pressable>
+             <Pressable onPress={() => shareApp() }>
              <View className="flex-row gap-3 items-center mb-4">
                 <Fifth/>
                 <Text style={{ fontFamily: "PoppinsMedium" }} className="text-lg">Share App</Text>

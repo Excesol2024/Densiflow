@@ -47,6 +47,23 @@ class NotificationsController < ApplicationController
     end
   end
 
+  def find_notifications
+    place_id = params[:query]
+  
+    if current_user
+
+      notification = current_user.notifications.find_by(placesID: place_id)
+  
+      if notification
+        render json: { status: "success", place: notification }, status: :ok
+      else
+        render json: { status: "error", message: "Notifications not found" }, status: :ok
+      end
+    else
+      render json: { status: 'error', message: 'User not authenticated' }, status: :unauthorized
+    end
+  end
+
 
   private
 

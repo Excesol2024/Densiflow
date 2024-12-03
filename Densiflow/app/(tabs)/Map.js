@@ -84,6 +84,20 @@ const Map = () => {
     },
   ];
 
+  const checkIfPlaceIsSaved = async () => {
+    try {
+      const response = await API.FindPlaces({ query: mapLocation.place_id });
+      if (response.data.status === "success") {
+        setIsAlreadySaved(true);
+        setIsClicked(true);
+      } else if (response.data.status === "error") {
+        setIsClicked(true);
+      }
+    } catch (error) {
+      
+    }
+  }
+
   useEffect(() => {
     if (isValidLocation) {
       setIsClicked(true);
@@ -416,14 +430,12 @@ const Map = () => {
       },
     };
 
-    console.log(selectedPlaceTypes);
-    setIsSaved(selectedPlaceTypes.place_id);
-
     try {
       const response = await API.savedPlace(body);
       console.log(response.data);
       if (response.data) {
         setIsAlreadySaved(true);
+       setIsSaved(response.data);
       }
     } catch (error) {
       console.log(error);

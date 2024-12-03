@@ -90,8 +90,22 @@ class SavedplacesController < ApplicationController
         saved_place.update(
           crowd_status: place_info[:crowd_status],
         )
-        # Return updated saved place details
-        saved_place
+          # Return updated saved place details with opening_hours
+      {
+        id: saved_place.id,
+        name: place_info[:name],
+        place_id: place_info[:place_id],
+        crowd_status: place_info[:crowd_status],
+        opening_hours: place_info[:opening_hours],
+        address: place_info[:vicinity],
+        rating: place_info[:rating],
+        reviews: place_info[:reviews],
+        kilometers: place_info[:kilometers],
+        image_url: place_info[:image_url],
+        lat: saved_place.lat,
+        long: saved_place.long,
+        created_at: saved_place.created_at.strftime('%Y-%m-%d %H:%M:%S')
+      }
       end.compact
   
       render json: { status: 'success', updated_places: updated_places }, status: :ok
