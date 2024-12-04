@@ -23,7 +23,7 @@ const Saved = () => {
   const [savedPlaces, setSavedPlaces] = useState([]);
   const [filteredPlaces, setFilteredPlaces] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const { isSaved } = useContext(LoadingEffectsContext);
+  const { isSaved, setMapLocation } = useContext(LoadingEffectsContext);
   const router = useRouter();
   // Fetch saved places from the API
   const fetchSavedPlaces = async () => {
@@ -32,8 +32,7 @@ const Saved = () => {
       const response = await API.getSavedPlaces();
       const places = response.data.updated_places;
   
-      // Log the retrieved saved places (optional for debugging)
-      console.log("SAVEDPLACES", places);
+ 
   
       // Sort the places in descending order by created_at
       const sortedFiltered = places.sort((a, b) => {
@@ -87,7 +86,7 @@ const Saved = () => {
     }
   };
 
-  const { setMapLocation } = useContext(LoadingEffectsContext);
+
 
   const handleSelectedPlaceToNavigate = (place) => {
     const body = {
@@ -96,13 +95,13 @@ const Saved = () => {
       crowd_status: place.crowd_status,
       image_url: place.image_url,
       opening_hours: place.opening_hours,
-      place_id: place.placeID,
+      place_id: place.place_id,
       location: {
         lat: place.lat,
         lng: place.long,
       },
     };
-    console.log(body);
+ 
     setMapLocation(body)
     router.push('/Map')
   };

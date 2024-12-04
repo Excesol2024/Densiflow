@@ -37,7 +37,8 @@ export const Reviews = {
 export const Notifications = {
     addNotifications: "/user/notify",
     userNotifications: "/user/all_notifications",
-    deleteNotifications: "/user/notifications"
+    deleteNotifications: "/user/notifications",
+    findNotifications: "/find/notifications"
 }
 
 export const Places = {

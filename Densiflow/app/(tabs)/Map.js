@@ -28,6 +28,7 @@ import axios from "axios";
 import { AuthenticatedContext } from "../../context/Authenticateduser";
 import { API } from "../../components/Protected/Api";
 import { LoadingEffectsContext } from "../../context/Loadingeffect";
+import RedNotif from "../../components/svg/RedNotif";
 
 const Map = () => {
   const mapRef = useRef(null);
@@ -36,6 +37,7 @@ const Map = () => {
   const [isAm, setIsAM] = useState(true);
   const [placeFocus, setPlacesFocus] = useState("");
   const [placesTypes, setPlacesTypes] = useState([]);
+  const [isAlreadyNotify, setIsAlreadyNotify] = useState(false)
 
   const {
     isSelecting,
@@ -84,22 +86,40 @@ const Map = () => {
     },
   ];
 
-  const checkIfPlaceIsSaved = async () => {
+  const checkIfPlaceIsSavedAndNotify = async () => {
+    console.log("CHECKING PLACE", mapLocation.place_id)
     try {
-      const response = await API.FindPlaces({ query: mapLocation.place_id });
-      if (response.data.status === "success") {
-        setIsAlreadySaved(true);
-        setIsClicked(true);
-      } else if (response.data.status === "error") {
-        setIsClicked(true);
+      // Perform API calls in parallel
+      const [response, result] = await Promise.all([
+        API.FindPlaces({ query: mapLocation.place_id }),
+        API.FindNotifications({ query: mapLocation.place_id })
+      ]);
+  
+      // Handle notification check
+      if (result?.data?.status === "success") {
+        setIsAlreadyNotify(true);
+      }else{
+        setIsAlreadyNotify(false);
       }
+
+ 
+      // Handle place saved check
+      if (response?.data?.status === "success") {
+        setIsAlreadySaved(true);
+      }else{
+        setIsAlreadySaved(false);
+      }
+
+      // Indicate user interaction
+      setIsClicked(true);
     } catch (error) {
-      
+      console.error("Error checking place and notifications:", error);
     }
-  }
+  };
 
   useEffect(() => {
     if (isValidLocation) {
+      checkIfPlaceIsSavedAndNotify()
       setIsClicked(true);
       setSelectedPlaceTypes(mapLocation);
       mapRef.current.animateToRegion(
@@ -401,18 +421,32 @@ const Map = () => {
   const handleClickedSelectedPlacesTypes = async (placesDetails) => {
     console.log(placesDetails);
     try {
-      const response = await API.FindPlaces({ query: placesDetails.place_id });
-      console.log(response.data.status);
-      if (response.data.status === "success") {
-        setIsAlreadySaved(true);
-        setSelectedPlaceTypes(placesDetails);
-        setIsClicked(true);
-      } else if (response.data.status === "error") {
-        setSelectedPlaceTypes(placesDetails);
-        setIsClicked(true);
+      // Perform API calls in parallel
+      const [response, result] = await Promise.all([
+        API.FindPlaces({ query: placesDetails.place_id }),
+        API.FindNotifications({ query: placesDetails.place_id })
+      ]);
+  
+      // Handle notification check
+      if (result?.data?.status === "success") {
+        setIsAlreadyNotify(true);
+      }else{
+        setIsAlreadyNotify(false);
       }
+
+ 
+      // Handle place saved check
+      if (response?.data?.status === "success") {
+        setIsAlreadySaved(true);
+      }else{
+        setIsAlreadySaved(false);
+      }
+
+      // Indicate user interaction
+      setIsClicked(true);
+      setSelectedPlaceTypes(placesDetails)
     } catch (error) {
-      console.log(error);
+      console.error("Error checking place and notifications:", error);
     }
   };
 
@@ -711,16 +745,17 @@ ${
               </Pressable>
             )}
             <View className="absolute right-3 bottom-20">
+             {isAlreadyNotify ? <RedNotif/> :
               <Pressable
-                onPress={() => handleSettingUpNotifications(selectedPlaceTypes)}
-              >
-                <Alert />
-              </Pressable>
+              onPress={() => handleSettingUpNotifications(selectedPlaceTypes)}
+            >
+              <Alert />
+            </Pressable>}
             </View>
             <View>
               <Image
                 source={{ uri: selectedPlaceTypes.image_url }}
-                className="w-28 h-24 rounded-xl"
+                className="w-28 h-full rounded-xl"
               />
             </View>
 

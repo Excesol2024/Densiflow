@@ -34,10 +34,12 @@ Rails.application.routes.draw do
     post "user/notifications", to: 'weather#send_push_notification'
     get "user/notifications", to: 'weather#show_access_token'
 
+
     #USERS NOTIFICATIONS
     post "user/notify", to: 'notifications#create'
     get "user/all_notifications", to: "notifications#user_notifications"
     delete "user/notifications", to: "notifications#delete_notifications"
+    get "find/notifications", to: "notifications#find_notifications"
 
     #FEEDBACKS
     post "user/feedbacks", to: 'feedbacks#create'

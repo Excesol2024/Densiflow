@@ -98,8 +98,6 @@ class SavedplacesController < ApplicationController
         crowd_status: place_info[:crowd_status],
         opening_hours: place_info[:opening_hours],
         address: place_info[:vicinity],
-        rating: place_info[:rating],
-        reviews: place_info[:reviews],
         kilometers: place_info[:kilometers],
         image_url: place_info[:image_url],
         lat: saved_place.lat,

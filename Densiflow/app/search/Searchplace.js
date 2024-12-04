@@ -120,6 +120,23 @@ const Searchplace = () => {
     }
   };
 
+  const handleClickSearchPlaces = async (placeName) => {
+    setSearchText(placeName)
+    setIsTyping(true);
+    try {
+      const response = await API.getSearchedPlaces({ query: placeName });
+      if(response.data.length <= 0){
+        setIsNoResults(true)
+        handleSearch()
+      } else {
+        setSearchResults(response.data);
+        handleSearch();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const handleBack = () => {
     setIsSearching(false);
     setSearchResults([]);
@@ -184,8 +201,9 @@ const Searchplace = () => {
                   </Text>
                   {recentSearches.length > 0 ? (
                     recentSearches.map((search, index) => (
-                      <View
+                      <Pressable
                         key={index}
+                        onPress={()=> handleClickSearchPlaces(search)}
                         className="flex-row items-center gap-5 mb-2"
                       >
                         <Clock />
@@ -195,7 +213,7 @@ const Searchplace = () => {
                         >
                           {search}
                         </Text>
-                      </View>
+                      </Pressable>
                     ))
                   ) : (
                     <Text
