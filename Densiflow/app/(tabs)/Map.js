@@ -29,6 +29,7 @@ import { AuthenticatedContext } from "../../context/Authenticateduser";
 import { API } from "../../components/Protected/Api";
 import { LoadingEffectsContext } from "../../context/Loadingeffect";
 import RedNotif from "../../components/svg/RedNotif";
+import { useRouter } from "expo-router";
 
 const Map = () => {
   const mapRef = useRef(null);
@@ -38,6 +39,7 @@ const Map = () => {
   const [placeFocus, setPlacesFocus] = useState("");
   const [placesTypes, setPlacesTypes] = useState([]);
   const [isAlreadyNotify, setIsAlreadyNotify] = useState(false)
+  const router = useRouter();
 
   const {
     isSelecting,
@@ -391,7 +393,7 @@ const Map = () => {
   };
 
   const handleSearchFocus = () => {
-    setIsSearching(true);
+    router.push('/search/Searchplace')
   };
 
   const handleSelectedSearchedPlaceToNavigate = (lat, long) => {

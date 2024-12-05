@@ -220,7 +220,7 @@ const Home = () => {
   );
 
   const handleSearchFocus = () => {
-    setIsSearching(true);
+    router.push('/search/Searchplace')
   };
 
   const handleSelectedPlacesToNavigate = (place) => {

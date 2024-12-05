@@ -154,14 +154,10 @@ const Searchplace = () => {
   };
 
   return (
-    <Modal
-      animationType="slide" // or 'fade' or 'none'
-      transparent={true} // Makes the background semi-transparent
-    >
       <View className="flex-1 bg-white">
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View className="flex-1  p-5">
-            <View className="rounded-full border border-gray-400 bg-white">
+            <View className="rounded-full border mt-8 border-gray-400 bg-white">
               <View className="flex-row items-center bg-transparent rounded-full p-1.5">
                 {isTyping ? (
                   <Pressable onPress={() => handleBack()}>
@@ -326,7 +322,7 @@ const Searchplace = () => {
           </View>
         </TouchableWithoutFeedback>
       </View>
-    </Modal>
+    
   );
 };
 
