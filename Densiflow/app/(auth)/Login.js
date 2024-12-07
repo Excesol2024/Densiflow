@@ -342,7 +342,7 @@ async function registerForPushNotificationsAsync() {
             style={{ fontFamily: "PoppinsMedium" }}
             className="text-2xl mb-4 text-start "
           >
-            Sign In
+            Login Update
           </Text>
           <View className="mb-4">
      <View className={`flex-row items-center border rounded-lg p-3 ${errors.email ? 'border-red-500' : 'border-gray-300'}`}>

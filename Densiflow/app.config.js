@@ -7,7 +7,7 @@ export default {
     name: "Densiflow",
     slug: "Densiflow",
     version: "1.0.0",
-    scheme: "Densiflow",
+    scheme: "densiflow",
     orientation: "portrait",
     icon: "./assets/icon.png",
     userInterfaceStyle: "light",
@@ -81,6 +81,12 @@ export default {
       eas: {
         projectId: "67aff93e-33f4-48c3-9f07-958375977b40"
       }
-    }
+    },
+    updates: {
+      url: "https://u.expo.dev/67aff93e-33f4-48c3-9f07-958375977b40",
+    },
+    runtimeVersion: {
+      policy: "appVersion",
+    },
   }
 };
