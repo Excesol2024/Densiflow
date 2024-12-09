@@ -29,6 +29,8 @@ import { AuthenticatedContext } from "../../context/Authenticateduser";
 import { API } from "../../components/Protected/Api";
 import { LoadingEffectsContext } from "../../context/Loadingeffect";
 import RedNotif from "../../components/svg/RedNotif";
+import Reviews from "../../components/svg/Reviews";
+import Reviewed from "../../components/svg/Reviewed";
 import { useRouter } from "expo-router";
 
 const Map = () => {
@@ -39,6 +41,7 @@ const Map = () => {
   const [placeFocus, setPlacesFocus] = useState("");
   const [placesTypes, setPlacesTypes] = useState([]);
   const [isAlreadyNotify, setIsAlreadyNotify] = useState(false)
+  const [isAlreadyReviewed, setIsAlreadyReviewed] = useState(false)
   const router = useRouter();
 
   const {
@@ -53,7 +56,13 @@ const Map = () => {
     nearbyPlaceTypes,
     setNearbyPlaceTypes,
     handleSelectedPlaceToNotif,
+    setIsReviewing
   } = useContext(LoadingEffectsContext);
+
+  const handleSettingUpReviews = (placedetails) =>{
+    setIsReviewing(true)
+    console.log(placedetails)
+  }
 
   const newMapLat = parseFloat(mapLocation.location?.lat);
   const newMapLong = parseFloat(mapLocation.location?.lng);
@@ -734,19 +743,21 @@ ${
       {isClicked ? (
         <View className="flex-1 absolute w-full p-2 bottom-24 z-50 ">
           <View className="flex flex-row p-3 bg-white shadow-lg shadow-gray-900 rounded-2xl">
+          <View className="absolute right-3.5 top-9">
             {isAlreadySaved ? (
-              <Pressable className="absolute right-3.5 top-3">
+              <Pressable >
                 <Bookmark />
               </Pressable>
             ) : (
               <Pressable
                 onPress={() => handleSavedPlaces()}
-                className="absolute right-3.5 top-3"
+              
               >
                 <Bookmarks />
               </Pressable>
             )}
-            <View className="absolute right-3 bottom-20">
+              </View>
+            <View className="absolute right-3 top-16">
              {isAlreadyNotify ? <RedNotif/> :
               <Pressable
               onPress={() => handleSettingUpNotifications(selectedPlaceTypes)}
@@ -754,13 +765,21 @@ ${
               <Alert />
             </Pressable>}
             </View>
-            <View>
+            <View className="absolute right-3 bottom-8">
+             {isAlreadyReviewed ? <Reviewed/> :
+              <Pressable
+              onPress={() => handleSettingUpReviews(selectedPlaceTypes)}
+            >
+              <Reviews />
+            </Pressable>}
+            </View>
+              <View className="flex-row mb-1.5 mt-1.5">
+              <View>
               <Image
                 source={{ uri: selectedPlaceTypes.image_url }}
                 className="w-28 h-full rounded-xl"
               />
             </View>
-
             <View className="ml-2">
               <Text
                 style={{ fontFamily: "PoppinsBold", fontSize: 16 }}
@@ -884,6 +903,7 @@ ${
                 </View>
               ) : null}
             </View>
+              </View>
           </View>
         </View>
       ) : (

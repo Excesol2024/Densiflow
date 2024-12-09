@@ -10,11 +10,12 @@ import { LoadingEffectsContext } from "../context/Loadingeffect";
 import { API } from './Protected/Api';
 import Searchplace from '../app/search/Searchplace';
 import LottieView from "lottie-react-native"
+import NextSvg from './svg/next';
 
 const TabBar = ({ state, descriptors, navigation }) => {
 
   const { isSelectingGender, setIsSelectingGender, handleMapSelections, isSelectingMap , selectedMap, isSearching,
-    isSettingNotif, setIsSettingNotif, placeDetails
+    isSettingNotif, setIsSettingNotif, placeDetails, isReviewing, setIsReviewing
   } = useContext(LoadingEffectsContext)
 
   const [isSuccess, setIsSuccess] = useState(false)
@@ -201,6 +202,60 @@ const TabBar = ({ state, descriptors, navigation }) => {
           </Pressable>
          </View>
          </View>
+       </View>
+        </View>
+       </Modal>
+
+       
+       <Modal 
+        animationType="slide" // or 'fade' or 'none'
+        transparent={true} // Makes the background semi-transparent
+        visible={isReviewing}
+       >
+        <View className="flex-1 justify-center items-center" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)',}}>
+        <View className="absolute h-72 w-screen bg-gray-50 right-0 bottom-0 rounded-t-3xl " style={{zIndex: 2}}>
+          <Pressable onPress={()=> setIsReviewing(false)} className="absolute right-4 top-4"> 
+            <Close/>
+          </Pressable>
+          <View className="flex-1 justify-center items-center pl-5 pr-5">
+              <Text
+                className="text-lg text-secondary"
+                style={{ fontFamily: "PoppinsBold" }}
+              >
+                Quick Review
+              </Text>
+              <View className="flex-2  w-full ">
+                <TextInput
+                  style={{
+                    fontFamily: "PoppinsThin",
+                    textAlignVertical: "top", // Aligns text to the top
+                    paddingTop: 10, // Adds space at the top
+                    paddingLeft: 12, // Padding on the left
+                    paddingRight: 8, // Padding on the right
+                    paddingBottom: 8, // Padding at the bottom
+                    height: 160, // Adjust height as needed
+                  }}
+                  className="border-2 border-secondary rounded-lg mt-2"
+                  placeholder='“Share your tips or reviews about the spot!”'
+                  // placeholderTextColor={`${errorComments ? "red" : "gray"}`}
+                  // placeholder={`${
+                  //   errorComments
+                  //     ? errorComments
+                  //     : "“Share your tips or reviews about the spot!”"
+                  // }`}
+                  // value={comments}
+                  // onChangeText={(text) =>
+                  //   handleReviewsInputChange("comments", text)
+                  // }
+                />
+                <Text className="absolute right-3 bottom-2">
+                  {" "}
+                  <Pressable>
+                    <NextSvg />
+                  </Pressable>
+                </Text>
+              </View>
+            </View>
        </View>
         </View>
        </Modal>

@@ -35,6 +35,8 @@ export const LoadingEffectsProvider = ({ children }) => {
 
   const [mapLocation, setMapLocation] = useState([]);
 
+  const [isReviewing, setIsReviewing] = useState(true);
+
   useEffect(() => {
     handleSetMap();
   }, [isSelectingMap]);
@@ -110,6 +112,7 @@ export const LoadingEffectsProvider = ({ children }) => {
         handleSelectedPlaceToNotif,
         placeDetails,
         setPlaceDetails,
+        isReviewing, setIsReviewing
       }}
     >
       {children}

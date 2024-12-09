@@ -76,6 +76,7 @@ Rails.application.routes.draw do
     #REVIEWS
     get 'random/reviews', to: 'reviews#random_user_reviews'
     post 'user/reviews', to: 'reviews#create'
+    get "find/reviews", to: "reviews#find_reviews"
 
 
     #BULK_EMAIL

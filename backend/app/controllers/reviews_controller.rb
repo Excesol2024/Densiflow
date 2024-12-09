@@ -57,10 +57,27 @@ class ReviewsController < ApplicationController
     end
   end
 
+  def find_reviews
+    place_id = params[:query]
+  
+    if current_user
+      # Find the saved place by place_id for the current user
+      place_reviews = current_user.reviews.find_by(placesID: place_id)
+  
+      if place_reviews
+        render json: { status: "success", review: place_reviews }, status: :ok
+      else
+        render json: { status: "error", message: "Review not found" }, status: :ok
+      end
+    else
+      render json: { status: 'error', message: 'User not authenticated' }, status: :unauthorized
+    end
+  end
+
   private
 
   def reviews_params
-    params.require(:review).permit(:comments, :location)
+    params.require(:review).permit(:comments, :location, :placeID)
   end
 
   # create_table "reviews", force: :cascade do |t|

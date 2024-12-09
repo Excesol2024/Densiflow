@@ -10,9 +10,19 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_12_02_114054) do
+ActiveRecord::Schema[7.1].define(version: 2024_12_09_085321) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "appupdates", force: :cascade do |t|
+    t.string "title"
+    t.text "descriptions"
+    t.string "notification_type"
+    t.bigint "user_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_appupdates_on_user_id"
+  end
 
   create_table "notifications", force: :cascade do |t|
     t.string "lat"
@@ -46,6 +56,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_12_02_114054) do
     t.string "photo_url"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "placeID"
   end
 
   create_table "savedplaces", force: :cascade do |t|
@@ -60,6 +71,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_12_02_114054) do
     t.datetime "updated_at", null: false
     t.string "placesID"
     t.string "icon_url"
+    t.string "place_name"
     t.index ["user_id"], name: "index_savedplaces_on_user_id"
   end
 
@@ -94,6 +106,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_12_02_114054) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  add_foreign_key "appupdates", "users"
   add_foreign_key "notifications", "users"
   add_foreign_key "savedplaces", "users"
 end
