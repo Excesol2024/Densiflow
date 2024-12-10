@@ -125,6 +125,7 @@ const Home = () => {
 
       setUserCity(response[0].city);
       setUserSubregion(response[0].subregion);
+      setUserAddress(`${response[0].city}, ${response[0].subregion}`)
     }
   };
 
@@ -215,7 +216,7 @@ const Home = () => {
   const [notificationsPermission, setNotificationsPermission] = useState(false);
   const [mapsPermission, setMapsPermission] = useState(false);
   const [messageSent, setMessageSent] = useState(false);
-  const { setMapLocation, setIsSelectingGender, setIsSearching } = useContext(
+  const { setMapLocation, setIsSelectingGender, setUserAddress } = useContext(
     LoadingEffectsContext
   );
 
@@ -516,7 +517,7 @@ const Home = () => {
           <View className="mb-3">
             <Text
               style={{ fontFamily: "PoppinsBold" }}
-              className="text-xl mt-3"
+              className="text-lg mt-3"
             >
               Today in your Area
             </Text>
@@ -569,7 +570,7 @@ const Home = () => {
   ) : (
     <Text
       style={{ fontFamily: "PoppinsMedium" }}
-      className="text-lg text-center mt-2 text-gray-400"
+      className="text-md text-center mt-2 text-gray-400"
     >
       No events today, but your area has so much to offer! Try exploring some
       popular spots.
@@ -578,8 +579,6 @@ const Home = () => {
 </View>
           
           </View>
-
-          {/**POPULAR AND RECOMMENDED */}
 
           {/**POPULAR*/}
           <View className="mt-4">
@@ -648,8 +647,126 @@ ${
             </ScrollView>
           </View>
 
-          {/**RECOMMENDED*/}
-          <View className="mt-3">
+
+          {/**SUGGESTED PLACE */}
+          <View key={currentCategory} className="flex-1 mt-5">
+         
+            {currentCategory === "coffee" ?    <View className="flex-row items-center gap-4 flex-1 relative">
+              <Image
+                source={require("../../assets/tabs/cuate.png")}
+                className="h-26"
+              />
+              <View>
+                <Text
+                  style={{ fontFamily: "PoppinsBold" }}
+                  className="text-lg break-words text-secondary"
+                >
+                  “Quiet cafes for
+                </Text>
+                <Text
+                  style={{ fontFamily: "PoppinsBold" }}
+                  className="text-lg break-words text-secondary"
+                >
+                  your morning coffee”
+                </Text>
+              </View>
+            </View> : currentCategory === "lunch" ?   <View className="flex-row items-center gap-4 flex-1 relative">
+              <Image
+                source={require("../../assets/tabs/pana.png")}
+                className="h-26"
+              />
+              <View>
+                <Text
+                  style={{ fontFamily: "PoppinsBold" }}
+                  className="text-lg break-words text-secondary"
+                >
+                 “Perfect lunch spots
+                </Text>
+                <Text
+                  style={{ fontFamily: "PoppinsBold" }}
+                  className="text-lg break-words text-secondary"
+                >
+                 with moderate crowds”
+                </Text>
+              </View>
+            </View> : currentCategory === "dinner" ?    <View className="flex-row items-center gap-4 flex-1 relative">
+              <Image
+                source={require("../../assets/tabs/dinner.png")}
+                className="h-26"
+              />
+              <View>
+                <Text
+                  style={{ fontFamily: "PoppinsBold" }}
+                  className="text-lg break-words text-secondary"
+                >
+              “Popular dinner spots 
+                </Text>
+                <Text
+                  style={{ fontFamily: "PoppinsBold" }}
+                  className="text-lg break-words text-secondary"
+                >
+                 that fill up quickly”
+                </Text>
+              </View>
+            </View> : ''}
+
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{ alignItems: "center" }}
+              className="mt-3 mb-5"
+            >
+              {suggestedGoodPlace?.map((places, index) => (
+                <Pressable
+                  key={index}
+                  className="mr-2 "
+                  onPress={() => handleSelectedPlacesToNavigate(places)}
+                >
+                  <View className="rounded-xl overflow-hidden w-48 h-36">
+                    {/* <Image source={{uri: `${places.image_url}`}} className="w-full h-full " /> */}
+                    <Image
+                      source={{ uri: places.image_url }}
+                      className="w-full h-full "
+                    />
+                  </View>
+                  <View className=" flex pl-2">
+                    <Text
+                      style={{ fontFamily: "PoppinsBold", width: 140 }} // Adjust the width as needed
+                      className="text-md mt-2"
+                      numberOfLines={1} // Limit to one line
+                      ellipsizeMode="tail" // Adds the ellipsis at the end
+                    >
+                      {places.name}
+                    </Text>
+                    <View className="flex flex-row gap-1 items-center">
+                      <Text
+                        style={{ fontFamily: "PoppinsMedium" }}
+                        className="text-sm text-gray-400"
+                      >
+                        {places.kilometers}km
+                      </Text>
+                      <View className="h-2 w-2 bg-gray-300 rounded-full "></View>
+                      <View
+                        className={` h-3 rounded-full
+${
+  places.crowd_status === "high"
+    ? "bg-red-500 w-20"
+    : places.crowd_status === "medium"
+    ? "bg-yellow-300 w-14"
+    : places.crowd_status === "low"
+    ? "bg-green-500 w-8"
+    : ""
+} ml-1`}
+                      />
+                    </View>
+                  </View>
+                </Pressable>
+              ))}
+            </ScrollView>
+          </View>
+
+               {/**RECOMMENDED*/}
+               <View className="mt-3">
             <View className="flex-row mb-1 justify-between">
               <Text className="text-lg" style={{ fontFamily: "PoppinsBold" }}>
                 Recommended
@@ -716,8 +833,8 @@ ${
           </View>
 
           <View className="flex-1 w-full mt-5 mb-10 ">
-            <Text style={{ fontFamily: "PoppinsThin" }} className="text-xl">
-              Recents Visited
+            <Text style={{ fontFamily: "PoppinsBold" }} className="text-lg">
+              Recents Spots
             </Text>
 
             <View className="">
@@ -766,163 +883,13 @@ ${
             </View>
           </View>
 
-          {/**SUGGESTED PLACE */}
-          <View key={currentCategory} className="flex-1">
-         
-            {currentCategory === "coffee" ?    <View className="flex-row items-center gap-4 flex-1 relative">
-              <Image
-                source={require("../../assets/tabs/cuate.png")}
-                className="h-26"
-              />
-              <View>
-                <Text
-                  style={{ fontFamily: "PoppinsBold" }}
-                  className="text-lg break-words text-secondary"
-                >
-                  “Quiet cafes for
-                </Text>
-                <Text
-                  style={{ fontFamily: "PoppinsBold" }}
-                  className="text-lg break-words text-secondary"
-                >
-                  your morning coffee”
-                </Text>
-              </View>
-            </View> : currentCategory === "lunch" ?   <View className="flex-row items-center gap-4 flex-1 relative">
-              <Image
-                source={require("../../assets/tabs/pana.png")}
-                className="h-26"
-              />
-              <View>
-                <Text
-                  style={{ fontFamily: "PoppinsBold" }}
-                  className="text-lg break-words text-secondary"
-                >
-                 “Perfect lunch spots
-                </Text>
-                <Text
-                  style={{ fontFamily: "PoppinsBold" }}
-                  className="text-lg break-words text-secondary"
-                >
-                 with moderate crowds”
-                </Text>
-              </View>
-            </View> : currentCategory === "dinner" ?    <View className="flex-row items-center gap-4 flex-1 relative">
-              <Image
-                source={require("../../assets/tabs/dinner.png")}
-                className="h-26"
-              />
-              <View>
-                <Text
-                  style={{ fontFamily: "PoppinsBold" }}
-                  className="text-lg break-words text-secondary"
-                >
-              “Popular dinner spots 
-                </Text>
-                <Text
-                  style={{ fontFamily: "PoppinsBold" }}
-                  className="text-lg break-words text-secondary"
-                >
-                 that fill up quickly”
-                </Text>
-              </View>
-            </View> : ''}
-
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={{ alignItems: "center" }}
-              className="mt-2"
-            >
-              {suggestedGoodPlace?.map((places, index) => (
-                <Pressable
-                  key={index}
-                  className="mr-2 "
-                  onPress={() => handleSelectedPlacesToNavigate(places)}
-                >
-                  <View className="rounded-xl overflow-hidden w-48 h-36">
-                    {/* <Image source={{uri: `${places.image_url}`}} className="w-full h-full " /> */}
-                    <Image
-                      source={{ uri: places.image_url }}
-                      className="w-full h-full "
-                    />
-                  </View>
-                  <View className=" flex pl-2">
-                    <Text
-                      style={{ fontFamily: "PoppinsBold", width: 140 }} // Adjust the width as needed
-                      className="text-md mt-2"
-                      numberOfLines={1} // Limit to one line
-                      ellipsizeMode="tail" // Adds the ellipsis at the end
-                    >
-                      {places.name}
-                    </Text>
-                    <View className="flex flex-row gap-1 items-center">
-                      <Text
-                        style={{ fontFamily: "PoppinsMedium" }}
-                        className="text-sm text-gray-400"
-                      >
-                        {places.kilometers}km
-                      </Text>
-                      <View className="h-2 w-2 bg-gray-300 rounded-full "></View>
-                      <View
-                        className={` h-3 rounded-full
-${
-  places.crowd_status === "high"
-    ? "bg-red-500 w-20"
-    : places.crowd_status === "medium"
-    ? "bg-yellow-300 w-14"
-    : places.crowd_status === "low"
-    ? "bg-green-500 w-8"
-    : ""
-} ml-1`}
-                      />
-                    </View>
-                  </View>
-                </Pressable>
-              ))}
-            </ScrollView>
-          </View>
-
           <View className=" flex-1 mb-20">
-            <View className="flex-1 justify-center items-center mt-10">
-              <Text
-                className="text-lg text-secondary"
-                style={{ fontFamily: "PoppinsBold" }}
-              >
-                Quick Review
-              </Text>
-              <View className="flex-1 w-full">
-                <TextInput
-                  style={{
-                    fontFamily: "PoppinsThin",
-                    textAlignVertical: "top", // Aligns text to the top
-                    paddingTop: 10, // Adds space at the top
-                    paddingLeft: 12, // Padding on the left
-                    paddingRight: 8, // Padding on the right
-                    paddingBottom: 8, // Padding at the bottom
-                    height: 128, // Adjust height as needed
-                  }}
-                  className="border-2 border-secondary rounded-lg mt-2"
-                  placeholderTextColor={`${errorComments ? "red" : "gray"}`}
-                  placeholder={`${
-                    errorComments
-                      ? errorComments
-                      : "“Share your tips or reviews about the spot!”"
-                  }`}
-                  value={comments}
-                  onChangeText={(text) =>
-                    handleReviewsInputChange("comments", text)
-                  }
-                />
-                <Text className="absolute right-3 bottom-2">
-                  {" "}
-                  <Pressable onPress={() => createReviewsforPlace()}>
-                    <NextSvg />
-                  </Pressable>
+          <Text
+                  style={{ fontFamily: "PoppinsBold" }}
+                  className="text-lg break-words"
+                >
+              Featured Feedback
                 </Text>
-              </View>
-            </View>
-
             <View className="flex flex-col mt-1 ">
               <ScrollView>
                 {randomReviews?.slice(0, 5).map((item, index) => (

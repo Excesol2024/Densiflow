@@ -65,6 +65,27 @@ class PlacesController < ApplicationController
       end
   end
 
+  def find_place
+    place_id = params[:query]
+  
+    if current_user
+      # Check if the place exists in saved places, notifications, or reviews
+      is_saved = current_user.savedplaces.exists?(placesID: place_id)
+      is_in_notifications = current_user.notifications.exists?(placesID: place_id)
+      is_reviewed = current_user.reviews.exists?(placeID: place_id)
+  
+      # Render the result
+      render json: {
+        status: "success",
+        saved: is_saved,
+        in_notifications: is_in_notifications,
+        reviewed: is_reviewed,
+      }, status: :ok
+    else
+      render json: { status: 'error', message: 'User not authenticated' }, status: :unauthorized
+    end
+  end
+
 
 
 

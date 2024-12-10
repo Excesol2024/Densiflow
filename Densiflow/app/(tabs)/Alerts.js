@@ -136,6 +136,7 @@ const Alerts = () => {
                   </View>
                 </Swipeable>
               ))}
+              
             </View>
           </ScrollView>
         ) : (

@@ -51,4 +51,5 @@ export const Places = {
     getSavedPlaces: "/savedplaces",
     findPlace: "/places/find",
     deleteSavedPlace: "/user/savedplaces",
+    PlaceSavedNotifReview: '/find_place',
 }

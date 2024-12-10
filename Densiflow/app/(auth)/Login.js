@@ -269,6 +269,7 @@ async function registerForPushNotificationsAsync() {
         });
         const tokenWithBearer = response.headers.get("Authorization");
         const token = tokenWithBearer.split(" ")[1];
+        console.log("LOGIN TOKEN", token)
         await AsyncStorage.setItem("Authorization", JSON.stringify(token));
         await AsyncStorage.setItem("Email", email);
         setEffectLoading(false);

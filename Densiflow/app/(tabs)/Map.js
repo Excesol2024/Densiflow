@@ -36,16 +36,14 @@ import { useRouter } from "expo-router";
 const Map = () => {
   const mapRef = useRef(null);
   const { currentUser } = useContext(AuthenticatedContext);
-  const imageProfile = `${currentUser?.user.photo_url}`;
-  const [isAm, setIsAM] = useState(true);
   const [placeFocus, setPlacesFocus] = useState("");
   const [placesTypes, setPlacesTypes] = useState([]);
   const [isAlreadyNotify, setIsAlreadyNotify] = useState(false)
-  const [isAlreadyReviewed, setIsAlreadyReviewed] = useState(false)
+
+  const [isAlreadyReview, setIsAlreadyReview] = useState(false)
   const router = useRouter();
 
   const {
-    isSelecting,
     mapLocation,
     setMapLocation,
     setIsSelectingMap,
@@ -56,7 +54,8 @@ const Map = () => {
     nearbyPlaceTypes,
     setNearbyPlaceTypes,
     handleSelectedPlaceToNotif,
-    setIsReviewing
+    setIsReviewing,
+    handleSelectedPlaceToReview
   } = useContext(LoadingEffectsContext);
 
   const handleSettingUpReviews = (placedetails) =>{
@@ -100,29 +99,13 @@ const Map = () => {
   const checkIfPlaceIsSavedAndNotify = async () => {
     console.log("CHECKING PLACE", mapLocation.place_id)
     try {
-      // Perform API calls in parallel
-      const [response, result] = await Promise.all([
-        API.FindPlaces({ query: mapLocation.place_id }),
-        API.FindNotifications({ query: mapLocation.place_id })
-      ]);
-  
-      // Handle notification check
-      if (result?.data?.status === "success") {
-        setIsAlreadyNotify(true);
-      }else{
-        setIsAlreadyNotify(false);
-      }
-
- 
-      // Handle place saved check
-      if (response?.data?.status === "success") {
-        setIsAlreadySaved(true);
-      }else{
-        setIsAlreadySaved(false);
-      }
-
-      // Indicate user interaction
+      const response = await API.findPlaceSavedNotifReview({ query: placesDetails.place_id})
+      console.log("RESPONSE DATA", response.data.reviewed)
+      setIsAlreadySaved(response.data.saved);
+      setIsAlreadyNotify(response.data.in_notifications);
+      setIsAlreadyReview(response.data.reviewed);
       setIsClicked(true);
+      setSelectedPlaceTypes(placesDetails)
     } catch (error) {
       console.error("Error checking place and notifications:", error);
     }
@@ -416,15 +399,7 @@ const Map = () => {
     });
   };
 
-  const [isTyping, setIsTyping] = useState(false);
-
-  const handleFocus = () => {
-    console.log("PRESSED");
-    if (!isTyping) {
-      setIsTyping(true);
-    }
-  };
-
+  
   const [isClicked, setIsClicked] = useState(false);
   const [selectedPlaceTypes, setSelectedPlaceTypes] = useState([]);
   const [isAlreadySaved, setIsAlreadySaved] = useState(false);
@@ -432,28 +407,11 @@ const Map = () => {
   const handleClickedSelectedPlacesTypes = async (placesDetails) => {
     console.log(placesDetails);
     try {
-      // Perform API calls in parallel
-      const [response, result] = await Promise.all([
-        API.FindPlaces({ query: placesDetails.place_id }),
-        API.FindNotifications({ query: placesDetails.place_id })
-      ]);
-  
-      // Handle notification check
-      if (result?.data?.status === "success") {
-        setIsAlreadyNotify(true);
-      }else{
-        setIsAlreadyNotify(false);
-      }
-
- 
-      // Handle place saved check
-      if (response?.data?.status === "success") {
-        setIsAlreadySaved(true);
-      }else{
-        setIsAlreadySaved(false);
-      }
-
-      // Indicate user interaction
+      const response = await API.findPlaceSavedNotifReview({ query: placesDetails.place_id})
+      console.log("RESPONSE DATA", response.data)
+      setIsAlreadySaved(response.data.saved);
+      setIsAlreadyNotify(response.data.in_notifications);
+      setIsAlreadyReview(response.data.reviewed);
       setIsClicked(true);
       setSelectedPlaceTypes(placesDetails)
     } catch (error) {
@@ -492,6 +450,11 @@ const Map = () => {
     handleSelectedPlaceToNotif(place);
   };
 
+  const handleSettingUpReview = (place) => {
+    setIsClicked(false);
+    handleSelectedPlaceToReview(place);
+  };
+
   return (
     <View className="flex-1 ">
       {/** GOOGLE MAP */}
@@ -513,7 +476,8 @@ const Map = () => {
         )}
 
         <Marker
-          onPress={() => handleMarkerPress("Place Title")}
+          // onPress={() => handleMarkerPress("Place Title")}
+          onPress={()=> console.log(isAlreadyReview)}
           coordinate={{
             latitude: initialRegion.latitude,
             longitude: initialRegion.longitude,
@@ -743,7 +707,7 @@ ${
       {isClicked ? (
         <View className="flex-1 absolute w-full p-2 bottom-24 z-50 ">
           <View className="flex flex-row p-3 bg-white shadow-lg shadow-gray-900 rounded-2xl">
-          <View className="absolute right-3.5 top-9">
+          <View className="absolute right-3.5 top-8">
             {isAlreadySaved ? (
               <Pressable >
                 <Bookmark />
@@ -766,9 +730,9 @@ ${
             </Pressable>}
             </View>
             <View className="absolute right-3 bottom-8">
-             {isAlreadyReviewed ? <Reviewed/> :
+             {isAlreadyReview ? <Reviewed/> :
               <Pressable
-              onPress={() => handleSettingUpReviews(selectedPlaceTypes)}
+              onPress={() => handleSettingUpReview(selectedPlaceTypes)}
             >
               <Reviews />
             </Pressable>}
@@ -786,6 +750,7 @@ ${
                 className="w-40"
                 numberOfLines={1} // Limit to 1 line
                 ellipsizeMode="tail" // Add ellipsis if the text overflows
+                onPress={()=> console.log(isAlreadyReview)}
               >
                 {selectedPlaceTypes.name}
               </Text>

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_12_09_085321) do
+ActiveRecord::Schema[7.1].define(version: 2024_12_10_094401) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -57,6 +57,9 @@ ActiveRecord::Schema[7.1].define(version: 2024_12_09_085321) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "placeID"
+    t.string "place_name"
+    t.bigint "user_id", null: false
+    t.index ["user_id"], name: "index_reviews_on_user_id"
   end
 
   create_table "savedplaces", force: :cascade do |t|
@@ -108,5 +111,6 @@ ActiveRecord::Schema[7.1].define(version: 2024_12_09_085321) do
 
   add_foreign_key "appupdates", "users"
   add_foreign_key "notifications", "users"
+  add_foreign_key "reviews", "users"
   add_foreign_key "savedplaces", "users"
 end

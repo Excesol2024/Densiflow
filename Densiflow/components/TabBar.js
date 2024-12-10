@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, Image, TextInput, Pressable, KeyboardAvoidingView, Modal } from 'react-native';
+import { View, Text, TouchableOpacity, Image, TextInput, Pressable, KeyboardAvoidingView, Modal, Alert } from 'react-native';
 import React, { useState, useContext, useEffect } from 'react';
 import MapSvg from './svg/map';
 import HomeSvg from './svg/home';
@@ -15,7 +15,7 @@ import NextSvg from './svg/next';
 const TabBar = ({ state, descriptors, navigation }) => {
 
   const { isSelectingGender, setIsSelectingGender, handleMapSelections, isSelectingMap , selectedMap, isSearching,
-    isSettingNotif, setIsSettingNotif, placeDetails, isReviewing, setIsReviewing
+    isSettingNotif, setIsSettingNotif, placeDetails, isReviewing, setIsReviewing, userAddress
   } = useContext(LoadingEffectsContext)
 
   const [isSuccess, setIsSuccess] = useState(false)
@@ -105,6 +105,47 @@ const TabBar = ({ state, descriptors, navigation }) => {
         setIsAM(true)
       }
     },[])
+
+    const [comments, setComments] = useState("");
+    const [errorComments, setErrorComments] = useState("");
+  
+    const handleReviewsInputChange = (field, value) => {
+      // Update the specific field's value
+      if (field === "comments") {
+        setComments(value);
+      }
+  
+      // Clear the error for the specific field
+      if (errorComments[field]) {
+        setErrorComments((prevErrors) => ({ ...prevErrors, [field]: "" }));
+      }
+    };
+  
+    const createReviewsforPlace = async () => {
+      if (comments === "") {
+        setErrorComments("This field is required!");
+        return;
+      }
+      const body = {
+        review: {
+          comments: comments,
+          location: userAddress,
+          placeID: placeDetails.place_id,
+          place_name: placeDetails.name,
+        },
+      };
+      console.log(body);
+      try {
+        const response = await API.createUserReviews(body);
+        if (response.data) {
+          setComments("");
+          Alert.alert("Successfully added Reviews");
+          setIsReviewing(false)
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
   
 
   return (
@@ -236,21 +277,20 @@ const TabBar = ({ state, descriptors, navigation }) => {
                     height: 160, // Adjust height as needed
                   }}
                   className="border-2 border-secondary rounded-lg mt-2"
-                  placeholder='“Share your tips or reviews about the spot!”'
-                  // placeholderTextColor={`${errorComments ? "red" : "gray"}`}
-                  // placeholder={`${
-                  //   errorComments
-                  //     ? errorComments
-                  //     : "“Share your tips or reviews about the spot!”"
-                  // }`}
-                  // value={comments}
-                  // onChangeText={(text) =>
-                  //   handleReviewsInputChange("comments", text)
-                  // }
+                  placeholderTextColor={`${errorComments ? "red" : "gray"}`}
+                  placeholder={`${
+                    errorComments
+                      ? errorComments
+                      : "“Share your tips or reviews about the spot!”"
+                  }`}
+                  value={comments}
+                  onChangeText={(text) =>
+                    handleReviewsInputChange("comments", text)
+                  }
                 />
                 <Text className="absolute right-3 bottom-2">
                   {" "}
-                  <Pressable>
+                  <Pressable onPress={()=> createReviewsforPlace()}>
                     <NextSvg />
                   </Pressable>
                 </Text>

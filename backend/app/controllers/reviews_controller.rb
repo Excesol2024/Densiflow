@@ -14,8 +14,8 @@ class ReviewsController < ApplicationController
                          .order(created_at: :desc)
                          .map do |review|
         {
-          name: review.location, # Assuming location acts as the establishment name
-          place_id: nil,         # DB reviews might not have a Google Place ID
+          name: review.place_name, # Assuming location acts as the establishment name
+          place_id: review.placeID,         # DB reviews might not have a Google Place ID
           location: { lat: lat, lng: long }, # Current user's lat and long
           reviewer_name: review.username,
           photo_url: review.photo_url,
@@ -41,12 +41,14 @@ class ReviewsController < ApplicationController
 
   def create
     if current_user
-      review = Review.new(reviews_params)
-      review.username = current_user.name 
-      review.lat = current_user.lat
-      review.long = current_user.long
-      review.photo_url = current_user.photo_url
-
+      review = current_user.reviews.build(reviews_params) # Build the review associated with the user
+      review.assign_attributes(
+        username: current_user.name,
+        lat: current_user.lat,
+        long: current_user.long,
+        photo_url: current_user.photo_url
+      )
+  
       if review.save
         render json: { message: 'Review created successfully', review: review }, status: :created
       else
@@ -77,7 +79,7 @@ class ReviewsController < ApplicationController
   private
 
   def reviews_params
-    params.require(:review).permit(:comments, :location, :placeID)
+    params.require(:review).permit(:comments, :location, :placeID, :place_name)
   end
 
   # create_table "reviews", force: :cascade do |t|

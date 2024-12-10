@@ -29,13 +29,14 @@ export const LoadingEffectsProvider = ({ children }) => {
   const [isSaved, setIsSaved] = useState([]);
 
   const [isSettingNotif, setIsSettingNotif] = useState(false);
-  const [placeDetails, setPlaceDetails] = useState([]);
+  const [placeDetails, setPlaceDetails] = useState({});
 
   const [nearbyPlaceTypes, setNearbyPlaceTypes] = useState("");
 
   const [mapLocation, setMapLocation] = useState([]);
 
-  const [isReviewing, setIsReviewing] = useState(true);
+  const [isReviewing, setIsReviewing] = useState(false);
+  const [userAddress, setUserAddress] = useState('')
 
   useEffect(() => {
     handleSetMap();
@@ -86,6 +87,12 @@ export const LoadingEffectsProvider = ({ children }) => {
     console.log("SELECTED PLACE TO NOTIF", place);
   };
 
+  const handleSelectedPlaceToReview = (place) => {
+    setIsReviewing(true);
+    setPlaceDetails(place);
+    console.log("SELECTED PLACE TO NOTIF", place);
+  };
+
   return (
     <LoadingEffectsContext.Provider
       value={{
@@ -112,7 +119,9 @@ export const LoadingEffectsProvider = ({ children }) => {
         handleSelectedPlaceToNotif,
         placeDetails,
         setPlaceDetails,
-        isReviewing, setIsReviewing
+        isReviewing, setIsReviewing,
+        handleSelectedPlaceToReview,
+        userAddress, setUserAddress
       }}
     >
       {children}

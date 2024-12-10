@@ -123,7 +123,7 @@ class UsersController < ApplicationController
       user_params = params.require(:user).permit(:name, :email, :password, :password_confirmation, :password_key)
   
       # Get the password_key from the environment variable
-      correct_password_key = "password123"
+      correct_password_key = "#{Rails.application.credentials[:admin_password]}"
   
       # Check if the password_key provided in the request matches the one in the environment
       if user_params[:password_key] == correct_password_key

@@ -46,6 +46,7 @@ Rails.application.routes.draw do
 
 
     # RECOMMENDED_PLACES
+    get "find_place", to: 'places#find_place'
     get "places/recommended", to: 'places#recommended'
 
     #POPULAR_PLACE
@@ -81,6 +82,9 @@ Rails.application.routes.draw do
 
     #BULK_EMAIL
     post 'send_message', to: 'otp#send_messages'
+
+    #APP_UPDATE
+    post 'send_update', to: 'appupdates#create'
 
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html

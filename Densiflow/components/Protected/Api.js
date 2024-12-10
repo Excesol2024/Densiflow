@@ -68,6 +68,7 @@ export const API = {
   getSavedPlaces: ()=> apiHelper(Places.getSavedPlaces, "GET"),
   FindPlaces: (params)=> apiHelper(Places.findPlace, "GET", undefined, params),
   deletePlace: (params)=> apiHelper(Places.deleteSavedPlace, "DELETE", undefined, params),
+  findPlaceSavedNotifReview: (params)=> apiHelper(Places.PlaceSavedNotifReview, "GET", undefined, params),
 
   randomReviews: (params)=> apiHelper(Reviews.randomReviews, "GET", undefined, params),
   createUserReviews: (body)=> apiHelper(Reviews.createReviews, "POST", body),
