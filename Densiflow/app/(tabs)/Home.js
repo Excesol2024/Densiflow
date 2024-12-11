@@ -390,7 +390,7 @@ const Home = () => {
 
   useEffect(() => {
     getRecentVisited();
-    handleGetRandomReviews();
+    // handleGetRandomReviews();
   }, []);
 
   const happeningToday = [

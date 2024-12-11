@@ -85,6 +85,8 @@ Rails.application.routes.draw do
 
     #APP_UPDATE
     post 'send_update', to: 'appupdates#create'
+    delete "user/appupdates", to: "appupdates#delete_appupdates"
+    get "user/appupdates", to: "appupdates#user_appupdates"
 
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html

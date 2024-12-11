@@ -9,7 +9,7 @@ import Alert1 from "../../components/svg/Alert1";
 import Alert2 from "../../components/svg/Alert2";
 import Alert3 from "../../components/svg/Alert3";
 import { API } from "../../components/Protected/Api";
-import { formatDistanceToNow } from "date-fns";
+import { formatDistanceToNowStrict } from "date-fns";
 
 import {
   GestureHandlerRootView,
@@ -17,57 +17,110 @@ import {
 } from "react-native-gesture-handler";
 
 const Alerts = () => {
-  const [Notification, setNotification] = useState([]);
+  const [combinedAlerts, setCombinedAlerts] = useState([]);
 
   const handleGetUserNotifications = async () => {
     try {
       const response = await API.userNotifications();
-      const sortedFiltered = response.data.data.sort((a, b) => {
-        const dateA = new Date(a.created_at);
-        const dateB = new Date(b.created_at);
-        return dateB - dateA; // Sort in descending order of created_at
-      });
-      setNotification(sortedFiltered);
+      // Ensure that response.data.data is an array; default to an empty array if not
+      const notifications = Array.isArray(response?.data?.data) ? response.data.data : [];
+      // Safely filter notifications to exclude unwanted items
+      return notifications.filter(
+        (notif) => notif.crowd_status && notif.crowd_status !== "unknown"
+      );
     } catch (error) {
-      console.log(error);
+      console.log("Error fetching notifications:", error);
+      // Return an empty array on error
+      return [];
     }
   };
 
-  const deleteNotifications = async (id) => {
-    console.log(id);
-    const arr = [...Notification];
-    const index = arr.findIndex((item) => item.id === id);
-    arr.splice(index, 1); // Remove the item from the array
-    setNotification(arr);
+  const fetchAppUpdates = async () => {
     try {
-      const response = await API.deleteNotifications({ id: id });
-      console.log(response.data);
-      if (response.data) {
-        handleGetUserNotifications();
-      }
+      const response = await API.appUpdates();
+      // Ensure response structure is correct and handle edge cases
+      return response?.data?.data || [];
     } catch (error) {
-      console.log(error);
+      console.log("Error fetching app updates:", error);
+      // Return an empty array on error to ensure other data sources are unaffected
+      return [];
     }
+  };
+
+  // const deleteNotifications = async (id) => {
+  //   const updatedAlerts = combinedAlerts.filter((alert) => alert.id !== id);
+  //   setCombinedAlerts(updatedAlerts);
+  //   try {
+  //     const response = await API.deleteNotifications({ id });
+  //     if (response.data) {
+  //       refreshAlerts();
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
+
+  const deleteNotifications = async (id) => {
+    // Find the deleted alert based on the id
+    const deletedAlert = combinedAlerts.find((alert) => alert.id === id);
+  
+    if (deletedAlert) {
+      try {
+        let response;
+        
+        // Determine if it's a notification or an app update and log the message
+        if (deletedAlert.crowd_status !== undefined) {
+          console.log(`Deleting notification with id: ${id}`);
+          response = await API.deleteNotifications({ id });
+        } else if (deletedAlert.notification_type !== undefined) {
+          console.log(`Deleting app update with id: ${id}`);
+          response = await API.deleteAppUpdates({ id });
+        } else {
+          console.log(`Deleting unknown alert type with id: ${id}`);
+          return; // Exit early if it's an unknown type
+        }
+  
+        // Only update the state if the API call was successful
+        if (response.data) {
+          const updatedAlerts = combinedAlerts.filter((alert) => alert.id !== id);
+          setCombinedAlerts(updatedAlerts);
+          refreshAlerts();
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
+  
+
+  const refreshAlerts = async () => {
+    const notifications = await handleGetUserNotifications();
+    const appUpdates = await fetchAppUpdates();
+
+    const combined = [...notifications, ...appUpdates].sort((a, b) => {
+      const dateA = new Date(a.created_at);
+      const dateB = new Date(b.created_at);
+      return dateB - dateA; // Sort from newest to oldest
+    });
+
+    setCombinedAlerts(combined);
   };
 
   useEffect(() => {
-    handleGetUserNotifications();
+    refreshAlerts();
   }, []);
 
-  const RightSwipe = (id) => {
-    console.log(id);
-    return (
-      <Pressable
-        onPress={() => deleteNotifications(id)}
-        className="flex-row  justify-end items-center bg-red-500 shadow-lg shadow-gray-900 mt-3 p-3"
-      >
-        <AntDesign name="delete" size={24} color="white" />
-        <Text style={{ fontFamily: "PoppinsBold" }} className="text-white ml-2">
-          Delete
-        </Text>
-      </Pressable>
-    );
-  };
+  const RightSwipe = (id) => (
+    <Pressable
+      onPress={() => deleteNotifications(id)}
+      className="flex-row justify-end items-center bg-red-500 shadow-lg mt-3 p-3"
+    >
+      <AntDesign name="delete" size={24} color="white" />
+      <Text style={{ fontFamily: "PoppinsBold" }} className="text-white ml-2">
+        Delete
+      </Text>
+    </Pressable>
+  );
 
   return (
     <GestureHandlerRootView className="flex-1">
@@ -79,64 +132,60 @@ const Alerts = () => {
           </Text>
         </View>
 
-        {Notification.length > 0 ? (
+        {combinedAlerts.length > 0 ? (
           <ScrollView style={{ flex: 1 }} className="mt-4">
-            {/* NOTIFICATIONS */}
             <View className="flex-1 p-4 mb-16">
-              {Notification.filter(
-                (notif) =>
-                  notif.crowd_status &&
-                  notif.crowd_status !== "unknown" &&
-                  notif.crowd_status !== "null"
-              ).map((notif) => (
+              {combinedAlerts.map((alert) => (
                 <Swipeable
-                  key={notif.id}
+                  key={alert.id}
                   animationOptions={true}
                   friction={1}
                   overshootRight={false}
-                  renderRightActions={() => RightSwipe(notif.id)}
+                  renderRightActions={() => RightSwipe(alert.id)}
                 >
-                  <View className="flex-row gap-2 bg-white items-center mt-3">
-                    {/* Time formatting */}
-                    <Text
-                      style={{ fontFamily: "PoppinsThin" }}
-                      className="absolute top-[-1] right-3 text-gray-400"
-                    >
-                      {formatDistanceToNow(new Date(notif.scheduled_time), {
-                        addSuffix: true,
-                      })}
-                    </Text>
+                  <View className="flex-row gap-2 justify-center bg-white items-center mt-3">
+                  <Text
+  style={{ fontFamily: "PoppinsThin" }}
+  className="absolute top-[-1] right-3 text-gray-400"
+>
+  {formatDistanceToNowStrict(new Date(alert.created_at))}
+</Text>
 
-                    {/* Crowd Status Icons */}
-                    {notif.crowd_status === "low" ? (
+                    {alert.crowd_status === "low" ? (
                       <GreenSvg />
-                    ) : notif.crowd_status === "medium" ? (
+                    ) : alert.crowd_status === "medium" ? (
                       <YellowSvg />
-                    ) : notif.crowd_status === "high" ? (
+                    ) : alert.crowd_status === "high" ? (
                       <RedSvg />
+                    ) : alert.notification_type === "info" ? (
+                      <Alert1 />
+                    ) : alert.notification_type === "features" ? (
+                      <Alert2 />
+                    ) : alert.notification_type === "update" ? (
+                      <Alert3 />
                     ) : null}
 
-                    <View className="flex-1 mt-3">
+                    <View className="flex-1 mt-3 h-16 justify-center">
                       <Text
-                        style={{ fontFamily: "PoppinsBold" }}
+                        style={{ fontFamily: "PoppinsBold", fontSize: 15 }}
                         numberOfLines={1}
-                        className="text-lg w-44"
+                        className="w-44"
                       >
-                        {notif.name}
+                        {alert.name || alert.title}
                       </Text>
                       <Text
                         style={{ fontFamily: "PoppinsThin" }}
                         className="text-md"
                       >
-                        {notif.crowd_status === "low"
-                          ? "is currently not crowded with only 10 people. Perfect for you!"
-                          : "is experiencing moderate crowding, but still a good option!"}
+                        {alert.descriptions ||
+                          (alert.crowd_status === "low"
+                            ? "is currently not crowded with only 10 people. Perfect for you!"
+                            : "is experiencing moderate crowding, but still a good option!")}
                       </Text>
                     </View>
                   </View>
                 </Swipeable>
               ))}
-              
             </View>
           </ScrollView>
         ) : (

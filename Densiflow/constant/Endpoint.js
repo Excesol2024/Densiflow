@@ -53,3 +53,8 @@ export const Places = {
     deleteSavedPlace: "/user/savedplaces",
     PlaceSavedNotifReview: '/find_place',
 }
+
+export const AppUpdate = {
+    deleteAppUpdates: "/user/appupdates",
+    getAppUpdates: "/user/appupdates",
+}

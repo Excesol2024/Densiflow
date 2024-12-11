@@ -30,7 +30,7 @@ class AppupdatesController < ApplicationController
     end
 
 
-    def destroy
+    def delete_appupdates
         # Find the app update belonging to the current_user
         appupdate = current_user.appupdates.find_by(id: params[:id])
     
