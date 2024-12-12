@@ -18,7 +18,7 @@ const Index = () => {
       if(history && !Token){
         setTimeout(() => {
           setIsShowSplashScreen(false);
-         router.push('/(auth)/Success')
+         router.push('/(auth)/Login')
         }, 2000)
       }else if(Token){
         setTimeout(() => {

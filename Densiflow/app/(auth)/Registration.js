@@ -17,12 +17,15 @@ import auth from '@react-native-firebase/auth';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { LoginManager, AccessToken } from 'react-native-fbsdk-next';
 import { LoadingEffectsContext } from '../../context/Loadingeffect';
+import Unhide from '../../components/svg/Unhide';
 
 const Registration = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [passwordHidden, setPasswordHidden] = useState(true)
+  const [confirmPasswordHidden, setConfirmPasswordHidden] = useState(true)
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [otp, setOtp] = useState(['', '', '', '']);
   const router = useRouter();
@@ -379,8 +382,13 @@ const Registration = () => {
           style={{ fontFamily: "PoppinsMedium" }}
           value={password}
           onChangeText={(text) => handleInputChange("password", text)}
+          secureTextEntry={passwordHidden}
         />
-         <Eye />
+          {passwordHidden ?  <Pressable onPress={()=> setPasswordHidden(false)}>
+  <Eye />
+  </Pressable> :  <Pressable onPress={()=> setPasswordHidden(true)}>
+  <Unhide />
+  </Pressable>}
       </View>
       {errors.password &&  <Text  style={{ fontFamily: "PoppinsMedium" }} className="mt-0.5 text-red-500">{errors.password}</Text>}
     </View>
@@ -394,9 +402,13 @@ const Registration = () => {
           style={{ fontFamily: "PoppinsMedium" }}
           value={confirmPassword}
           onChangeText={(text) => handleInputChange("confirm_password", text)}
-          secureTextEntry
+          secureTextEntry={confirmPasswordHidden}
         />
-        <Eye />
+        {confirmPasswordHidden ?  <Pressable onPress={()=> setConfirmPasswordHidden(false)}>
+  <Eye />
+  </Pressable> :  <Pressable onPress={()=> setConfirmPasswordHidden(true)}>
+  <Unhide />
+  </Pressable>}
       </View>
       {errors.confirm_password &&  <Text  style={{ fontFamily: "PoppinsMedium" }} className="mt-0.5 text-red-500">{errors.confirm_password}</Text>}
 

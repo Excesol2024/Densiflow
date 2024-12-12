@@ -30,6 +30,7 @@ import Constants from 'expo-constants';
 import messaging from '@react-native-firebase/messaging';
 import * as Location from 'expo-location';
 import { LoadingEffectsContext } from "../../context/Loadingeffect";
+import Unhide from "../../components/svg/Unhide";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -42,6 +43,7 @@ Notifications.setNotificationHandler({
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [passwordHidden, setPasswordHidden] = useState(true)
   const router = useRouter();
   const { setIsloggedIn } = useContext(AuthenticatedContext);
   const [isToggle, setIsToggle] = useState(true);
@@ -343,7 +345,7 @@ async function registerForPushNotificationsAsync() {
             style={{ fontFamily: "PoppinsMedium" }}
             className="text-2xl mb-4 text-start "
           >
-            Login Update
+            Login
           </Text>
           <View className="mb-4">
      <View className={`flex-row items-center border rounded-lg p-3 ${errors.email ? 'border-red-500' : 'border-gray-300'}`}>
@@ -374,9 +376,13 @@ async function registerForPushNotificationsAsync() {
     style={{ fontFamily: "PoppinsMedium" }}
     value={password}
     onChangeText={(text) => handleInputChange("password", text)}
-    secureTextEntry
+    secureTextEntry={passwordHidden}
   />
+  {passwordHidden ?  <Pressable onPress={()=> setPasswordHidden(false)}>
   <Eye />
+  </Pressable> :  <Pressable onPress={()=> setPasswordHidden(true)}>
+  <Unhide />
+  </Pressable>}
 </View>
 {errors.password && (
   <Text style={{ fontFamily: "PoppinsMedium" }} className="text-sm text-start text-red-500 mt-0.5">
