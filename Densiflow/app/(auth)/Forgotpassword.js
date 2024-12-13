@@ -8,6 +8,7 @@ import ResetPassword from './Resetpassword.js';
 import Email from "../../components/svg/Email";
 import Arrowright from "../../components/svg/Arrowright"; 
 import { LoadingEffectsContext } from '../../context/Loadingeffect.js';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 const Forgotpassword = () => {
@@ -199,6 +200,16 @@ const Forgotpassword = () => {
       }
     }
 
+    const handleGoBack = async () => {
+      const loggedIn = await AsyncStorage.getItem("logged_in");
+      if(loggedIn){
+        router.push('/(tabs)/Settings')
+        return
+      } else {
+        router.push('/(auth)/Login')
+      }
+    }
+ 
   return (
     <>
     {isVerifyOtp ? <>
@@ -210,7 +221,7 @@ const Forgotpassword = () => {
     </> : <>
     <View className="flex-1  p-4">
     <View className="mt-8 flex-row items-center">
-        <TouchableOpacity onPress={() => router.push("/")}>
+        <TouchableOpacity onPress={() => handleGoBack()}>
           <AntDesign name="arrowleft" size={30} color="black" />
         </TouchableOpacity>
       </View>

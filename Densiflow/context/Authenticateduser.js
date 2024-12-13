@@ -47,12 +47,12 @@ export const AuthenticatedProvider = ({ children }) => {
 
   const handleLogoutUser = async () => {
     await AsyncStorage.removeItem('Authorization');
-    await AsyncStorage.removeItem('recentVisited')
+    await AsyncStorage.removeItem('recentVisited');
+    await AsyncStorage.removeItem('logged_in');
       setIsloggedIn({
         authUser: false,
       });
-      router.replace('/')
-  
+      router.push('/(auth)/Login')
   };
 
   return (

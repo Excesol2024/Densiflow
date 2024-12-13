@@ -101,6 +101,11 @@ const Profile = () => {
 
   if (initializing) return null;
 
+  const handleChangedPassword = async () => {
+    await AsyncStorage.setItem("logged_in", "true");
+    router.push('/(auth)/Forgotpassword')
+  }
+
   return (
     <View className="flex-1 bg-white">
        <View className="flex-2 flex-row top-10 gap-3 items-center p-2">
@@ -120,7 +125,7 @@ const Profile = () => {
                 <Text style={{ fontFamily: "PoppinsMedium" }} className="text-lg">Account</Text>
               </View>
              </Pressable>
-            <Pressable onPress={()=>{router.replace('/(auth)/Forgotpassword')}}>
+            <Pressable onPress={()=>handleChangedPassword()}>
               
             <View className="flex-row gap-3 items-center mb-4">
                 <Second/>

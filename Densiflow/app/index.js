@@ -14,18 +14,27 @@ const Index = () => {
     try {
       const Token = await AsyncStorage.getItem('Authorization')
       const history =  await AsyncStorage.getItem("history");
+      const storedValue = await AsyncStorage.getItem("remember_me");
       console.log("HISTORY", history);
-      if(history && !Token){
+      if(history && !Token && !storedValue){
+        await AsyncStorage.removeItem('Authorization')
         setTimeout(() => {
           setIsShowSplashScreen(false);
          router.push('/(auth)/Login')
         }, 2000)
-      }else if(Token){
+      }else if(Token && storedValue){
         setTimeout(() => {
           setIsShowSplashScreen(false);
           router.push('/(tabs)/Home')
         }, 2000)
-      }else{
+      }else if(Token && !storedValue){
+        await AsyncStorage.removeItem('Authorization')
+        setTimeout(() => {
+          setIsShowSplashScreen(false);
+          router.push('/(auth)/Login')
+        }, 2000)
+      }
+      else{
         setTimeout(() => {
           setIsShowSplashScreen(false);
           router.push('/(getstarted)/Start')

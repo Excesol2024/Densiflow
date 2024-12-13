@@ -31,6 +31,7 @@ import messaging from '@react-native-firebase/messaging';
 import * as Location from 'expo-location';
 import { LoadingEffectsContext } from "../../context/Loadingeffect";
 import Unhide from "../../components/svg/Unhide";
+import { WEBCLIENTID } from '@env'
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -46,7 +47,7 @@ export default function Login() {
   const [passwordHidden, setPasswordHidden] = useState(true)
   const router = useRouter();
   const { setIsloggedIn } = useContext(AuthenticatedContext);
-  const [isToggle, setIsToggle] = useState(true);
+  const [isToggle, setIsToggle] = useState(false);
   const { setEffectLoading } = useContext(LoadingEffectsContext)
   const [errors, setErrors] = useState({
     email: "",
@@ -60,6 +61,30 @@ export default function Login() {
     });
     
   }, []);
+
+  useEffect(() => {
+    // Check AsyncStorage for existing "remember_me" value on component mount
+    const getRememberMeStatus = async () => {
+      const storedValue = await AsyncStorage.getItem("remember_me");
+      if (storedValue === "true") {
+        setIsToggle(true);
+      }
+    };
+    getRememberMeStatus();
+  }, []);
+
+  const handleToggle = async () => {
+    const newToggleState = !isToggle;
+    setIsToggle(newToggleState);
+
+    if (newToggleState) {
+      // Save "remember_me: true" to AsyncStorage
+      await AsyncStorage.setItem("remember_me", "true");
+    } else {
+      // Remove "remember_me" from AsyncStorage
+      await AsyncStorage.removeItem("remember_me");
+    }
+  };
 
 
   const [firebaseToken, setFirebaseToken] = useState('')
@@ -218,7 +243,7 @@ async function registerForPushNotificationsAsync() {
         await AsyncStorage.setItem("Email", email);
         setEffectLoading(false);
         setTimeout(() => {
-          router.push("/");
+          router.push("/(tabs)/Home");
         }, 1000);
       } else {
         setEffectLoading(false);
@@ -276,7 +301,7 @@ async function registerForPushNotificationsAsync() {
         await AsyncStorage.setItem("Email", email);
         setEffectLoading(false);
         setTimeout(() => {
-          router.push("/");
+          router.push("/(tabs)/Home");
         }, 1000);
       } else {
         setEffectLoading(false);
@@ -395,7 +420,7 @@ async function registerForPushNotificationsAsync() {
             <View className="flex-row">
               <Toggle
                 toggle={isToggle}
-                setToggle={setIsToggle}
+                setToggle={handleToggle}
                 color={"#007AFF"}
                 size={12}
                 filled={true}
