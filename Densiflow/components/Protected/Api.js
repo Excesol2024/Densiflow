@@ -47,6 +47,7 @@ const apiHelper = async (endpoint, method, body = {}, params = {}) => {
 export const API = {
   buySubscriptions: () => apiHelper(paymentIntent.buySubscriptions, "POST"),
   getCurrentUser: ()=> apiHelper(CurrentUser.getSignedUser, "GET"),
+  updateToken: (body)=> apiHelper(CurrentUser.updateToken, "PATCH", body),
   logout: () => apiHelper(Authentication.logoutUser, "DELETE"),
   deleteAccount: (body) => apiHelper(Authentication.deleteAccount, "DELETE", body),
   getCurrentUserWeather: (body)=> apiHelper(Weather.getCurrentweather, "POST", body),

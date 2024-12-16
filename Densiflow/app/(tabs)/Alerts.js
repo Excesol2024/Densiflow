@@ -179,8 +179,8 @@ const Alerts = () => {
                       >
                         {alert.descriptions ||
                           (alert.crowd_status === "low"
-                            ? "is currently not crowded with only 10 people. Perfect for you!"
-                            : "is experiencing moderate crowding, but still a good option!")}
+                            ? "s currently not crowded with only 10+ people. Perfect for you!"
+                            : alert.crowd_status === "medium" ? "is moderately crowded with 15+ people. Plan accordingly." : "is currently crowded with 30+ people. Consider visiting later!")}
                       </Text>
                     </View>
                   </View>

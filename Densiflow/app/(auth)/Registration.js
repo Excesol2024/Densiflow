@@ -18,6 +18,8 @@ import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { LoginManager, AccessToken } from 'react-native-fbsdk-next';
 import { LoadingEffectsContext } from '../../context/Loadingeffect';
 import Unhide from '../../components/svg/Unhide';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { AuthenticatedContext } from '../../context/Authenticateduser';
 
 const Registration = () => {
   const [name, setName] = useState('');
@@ -32,6 +34,7 @@ const Registration = () => {
   const [timer, setTimer] = useState(60); // Timer starting at 60 seconds
   const [isTimerActive, setIsTimerActive] = useState(true);
   const { setEffectLoading } = useContext(LoadingEffectsContext)
+  const { firebaseToken, expoPushToken } = useContext(AuthenticatedContext)
   const [errors, setErrors] = useState({
     name: "",
     email: "",
@@ -39,6 +42,10 @@ const Registration = () => {
     confirm_password: ""
   })
   const [otpError, setOtpError] = useState("");
+
+
+
+
 
   useEffect(()=>{
     GoogleSignin.configure({
@@ -122,11 +129,29 @@ const Registration = () => {
       }
     }
 
+    const login_payload = {
+      user: {
+        email: user.user.email,
+        password: user.user.uid,
+      },
+       expo_token: expoPushToken,
+       firebase_token: firebaseToken
+    };
+
    try {
     const response = await API.createManualAccount(payload);
-    console.log(response.data)
-    router.push('/')
-    setEffectLoading(false)
+    if(response.data.status === 'success'){
+      const result = await API.loginUser(login_payload);
+      if (result.data.status === "ok") {
+        const tokenWithBearer = result.headers.get("Authorization");
+        const token = tokenWithBearer.split(" ")[1];
+        await AsyncStorage.setItem("Authorization", JSON.stringify(token));
+        await AsyncStorage.setItem("Email", email);
+        setEffectLoading(false)
+        setIsModalVisible(false);
+        router.push("/(tabs)/Home");
+    }
+   }
    } catch (error) {
     console.log(error)
     Alert.alert("Email has Already Signed In")
@@ -242,17 +267,32 @@ const Registration = () => {
     setEffectLoading(true)
     const body = {
         email: email,
-        otp: otpString
+        otp: otpString,
     }
+
+    const payload = {
+      user: {
+        email: email,
+        password: password,
+      },
+       expo_token: expoPushToken,
+       firebase_token: firebaseToken
+    };
+
     try {
       const response = await API.register(body)
-      console.log("FINAL REGISTER", response.data.status)
-      if(response.data.status === "success"){
-        setEffectLoading(false)
+      console.log("FINAL REGISTER", response.data)
+      if(response.data.status === 'success'){
+        const result = await API.loginUser(payload);
+        if (result.data.status === "ok") {
+          const tokenWithBearer = result.headers.get("Authorization");
+          const token = tokenWithBearer.split(" ")[1];
+          await AsyncStorage.setItem("Authorization", JSON.stringify(token));
+          await AsyncStorage.setItem("Email", email);
+          setEffectLoading(false)
           setIsModalVisible(false);
-          setTimeout(() => {
-            router.push('/')
-          }, 2000);
+          router.push("/(tabs)/Home");
+      }
       }
     } catch (error) {
       console.log("ERROR",error)
@@ -343,7 +383,7 @@ const Registration = () => {
 
       
     <View className="flex-1 justify-center ">
-    <Text style={{ fontFamily: 'PoppinsMedium' }} className="text-2xl mb-6 text-start">Sign Up</Text>
+    <Text onPress={()=> console.log(expoPushToken, firebaseToken)} style={{ fontFamily: 'PoppinsMedium' }} className="text-2xl mb-6 text-start">Sign Up</Text>
 
   <View className="mb-3">
   <View className={`flex-row items-center border rounded-lg p-3 ${errors.name ? 'border-red-500' : 'border-gray-300'}`}>

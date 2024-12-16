@@ -34,6 +34,7 @@
     "expo-status-bar": "~1.12.1",
     "expo-updates": "~0.25.27",
     "lottie-react-native": "6.7.0",
+    "moti": "^0.29.0",
     "nativewind": "^2.0.11",
     "prop-types": "^15.8.1",
     "react": "18.2.0",

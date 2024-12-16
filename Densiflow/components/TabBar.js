@@ -11,12 +11,15 @@ import { API } from './Protected/Api';
 import Searchplace from '../app/search/Searchplace';
 import LottieView from "lottie-react-native"
 import NextSvg from './svg/next';
+import { AuthenticatedContext } from '../context/Authenticateduser';
 
 const TabBar = ({ state, descriptors, navigation }) => {
 
   const { isSelectingGender, setIsSelectingGender, handleMapSelections, isSelectingMap , selectedMap, isSearching,
     isSettingNotif, setIsSettingNotif, placeDetails, isReviewing, setIsReviewing, userAddress
   } = useContext(LoadingEffectsContext)
+
+  const { handleLoggedInUser } = useContext(AuthenticatedContext);
 
   const [isSuccess, setIsSuccess] = useState(false)
 
@@ -61,6 +64,7 @@ const TabBar = ({ state, descriptors, navigation }) => {
         const reponse = await API.updateUserGender(body);
         if(reponse.data.status === "success"){
           setIsSelectingGender(false)
+          handleLoggedInUser();
         }
       } catch (error) {
         console.log(error)

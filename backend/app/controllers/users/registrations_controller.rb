@@ -19,12 +19,14 @@ class Users::RegistrationsController < Devise::RegistrationsController
   
       # Build the actual user from the pending user data
       build_resource(sign_up_params)
+
+      token = generate_jwt_token(resource)  
   
       if resource.save
         # Destroy the pending user record after successful registration
         pending_user.destroy
   
-        render json: {status: "success", message: "User successfully registered." }, status: :ok
+        render json: {status: "success", message: "User successfully registered.", token: token }, status: :ok
       else
         render json: { errors: resource.errors.full_messages }, status: :unprocessable_entity
       end
@@ -94,6 +96,12 @@ class Users::RegistrationsController < Devise::RegistrationsController
   #   super(resource)
   # end
 
+  private 
+
+  def generate_jwt_token(user)
+    payload = { user_id: user.id } # No expiration field
+    JWT.encode(payload, Rails.application.secrets.secret_key_base) # Encode payload with secret key
+  end
  
 
 end

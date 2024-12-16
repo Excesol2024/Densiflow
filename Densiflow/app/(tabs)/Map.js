@@ -433,6 +433,8 @@ const Map = () => {
       },
     };
 
+    console.log("SAVED PLACES BODY", body)
+
     try {
       const response = await API.savedPlace(body);
       console.log(response.data);

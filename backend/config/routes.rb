@@ -6,6 +6,7 @@ Rails.application.routes.draw do
 
 
    get "/me" => "users#current_user_info"
+   patch "/firebase/expo/token" => "users#update_current_user_info"
 
    post 'initial_registration', to: 'otp#initial_registration'
    post 'payment', to: 'stripes#payment_intent'

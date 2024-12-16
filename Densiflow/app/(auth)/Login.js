@@ -24,11 +24,7 @@ import Toggle from "react-native-toggle-input";
 import auth from "@react-native-firebase/auth";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { LoginManager, AccessToken } from "react-native-fbsdk-next";
-import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
-import Constants from 'expo-constants';
-import messaging from '@react-native-firebase/messaging';
-import * as Location from 'expo-location';
 import { LoadingEffectsContext } from "../../context/Loadingeffect";
 import Unhide from "../../components/svg/Unhide";
 import { WEBCLIENTID } from '@env'
@@ -48,7 +44,8 @@ export default function Login() {
   const router = useRouter();
   const { setIsloggedIn } = useContext(AuthenticatedContext);
   const [isToggle, setIsToggle] = useState(false);
-  const { setEffectLoading } = useContext(LoadingEffectsContext)
+  const { setEffectLoading } = useContext(LoadingEffectsContext);
+  const {firebaseToken, expoPushToken} = useContext(AuthenticatedContext);
   const [errors, setErrors] = useState({
     email: "",
     password: ""
@@ -57,7 +54,7 @@ export default function Login() {
   useEffect(() => {
     GoogleSignin.configure({
       webClientId:
-        "401998714323-e76k10at7c8qm1e6fpm0n71kf01upj9q.apps.googleusercontent.com",
+      WEBCLIENTID,
     });
     
   }, []);
@@ -87,66 +84,66 @@ export default function Login() {
   };
 
 
-  const [firebaseToken, setFirebaseToken] = useState('')
-  async function requestUserPermission() {
-    const authStatus = await messaging().requestPermission();
-    const enabled =
-      authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-      authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+  // const [firebaseToken, setFirebaseToken] = useState('')
+  // async function requestUserPermission() {
+  //   const authStatus = await messaging().requestPermission();
+  //   const enabled =
+  //     authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+  //     authStatus === messaging.AuthorizationStatus.PROVISIONAL;
   
-    if (enabled) {
-      console.log('Authorization status:', authStatus);
-    }
-  }
+  //   if (enabled) {
+  //     console.log('Authorization status:', authStatus);
+  //   }
+  // }
 
-  const getUserToken = async () =>{
-    const token = await messaging().getToken()
-    console.log("firebase token", token)
-    setFirebaseToken(token)
-  }
+  // const getUserToken = async () =>{
+  //   const token = await messaging().getToken()
+  //   console.log("firebase token", token)
+  //   setFirebaseToken(token)
+  // }
 
 
-  //PUSH NOTIFICATIONS
-  const [expoPushToken, setExpoPushToken] = useState('');
+  // //PUSH NOTIFICATIONS
+  // const [expoPushToken, setExpoPushToken] = useState('');
  
-  useEffect(() => {
-    requestUserPermission();
-    getUserToken();
-    registerForPushNotificationsAsync()
-      .then(token => {
-        setExpoPushToken(token);
-        console.log(token);
-      })
-      .catch((error) => setExpoPushToken(`${error}`));
+  // useEffect(() => {
+  //   requestUserPermission();
+  //   getUserToken();
+  //   registerForPushNotificationsAsync()
+  //     .then(token => {
+  //       setExpoPushToken(token);
+  //       console.log(token);
+  //     })
+  //     .catch((error) => setExpoPushToken(`${error}`));
 
-  }, []);
+  // }, []);
 
-  // Function to register for push notifications
-async function registerForPushNotificationsAsync() {
-  let token;
-  await Location.requestForegroundPermissionsAsync();
-  const { status: existingStatus } = await Notifications.getPermissionsAsync();
-  let finalStatus = existingStatus;
+//   // Function to register for push notifications
+// async function registerForPushNotificationsAsync() {
+//   let token;
+//   await Location.requestForegroundPermissionsAsync();
+//   const { status: existingStatus } = await Notifications.getPermissionsAsync();
+//   let finalStatus = existingStatus;
 
-  if (existingStatus !== 'granted') {
-    const { status } = await Notifications.requestPermissionsAsync();
-    finalStatus = status;
-  }
+//   if (existingStatus !== 'granted') {
+//     const { status } = await Notifications.requestPermissionsAsync();
+//     finalStatus = status;
+//   }
 
-  if (finalStatus !== 'granted') {
-    alert('Failed to get push token for push notification!');
-    return;
-  }
-  try {
-    await AsyncStorage.setItem('NotificationPermission', "granted");
-    await AsyncStorage.setItem('LocationPermission', "granted");
-    token = (await Notifications.getExpoPushTokenAsync()).data;
-    console.log("expo token", token)
-  } catch (error) {
-    console.error('Error fetching push token:', error);
-  }
-  return token;
-}
+//   if (finalStatus !== 'granted') {
+//     alert('Failed to get push token for push notification!');
+//     return;
+//   }
+//   try {
+//     await AsyncStorage.setItem('NotificationPermission', "granted");
+//     await AsyncStorage.setItem('LocationPermission', "granted");
+//     token = (await Notifications.getExpoPushTokenAsync()).data;
+//     console.log("expo token", token)
+//   } catch (error) {
+//     console.error('Error fetching push token:', error);
+//   }
+//   return token;
+// }
 
 
 

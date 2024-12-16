@@ -7,7 +7,7 @@ const TabsHomeScreen = () => {
     tabBar={props=> <TabBar {...props}/>}
     >
         <Tabs.Screen name='Home' options={{
-            title: 'home',
+            title: 'Home',
             headerShown: false
         }} />
           <Tabs.Screen name='Saved' options={{

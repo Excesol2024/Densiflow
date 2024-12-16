@@ -17,7 +17,8 @@ export const Authentication = {
 export const CurrentUser = {
     getSignedUser: "/me",
     uploadProfilePicture: "/user/update_photo",
-    updateUserGender: "/user/gender"
+    updateUserGender: "/user/gender",
+    updateToken: "/firebase/expo/token",
 }
 
 export const Weather = {

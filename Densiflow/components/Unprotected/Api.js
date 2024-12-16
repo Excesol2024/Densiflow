@@ -24,7 +24,9 @@ const apiHelper = async (endpoint, method, body, params)=>{
         throw error.response?.data
     }
 }
-console.log("SERVER",newServeUrl)
+console.log("LOCAL_SERVER",newServeUrl)
+console.log("SERVER",SERVER_URL)
+
 export const API = {
     loginUser: (body => apiHelper(Authentication.loginUser, "POST", body)),
     register: (body => apiHelper(Authentication.userRegistration, "POST", body)),

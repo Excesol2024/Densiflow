@@ -81,7 +81,7 @@ const Profile = () => {
   const shareApp = async () => {
     try {
       const result = await Share.share({
-        message: ('Densiflow App' +  '\n' + url)
+        message: ('App link shared! Thanks for helping us grow!' +  '\n' + url)
       })
       
       if(result.action === Share.sharedAction){

@@ -154,23 +154,22 @@ const Home = () => {
   };
 
   const handleIsSelectingGender = () => {
-    if (currentUser?.user.gender === "male") {
+    if (currentUser?.user.gender === null) {
       setIsSelectingGender(true);
     } else {
       console.log("FEMALE");
     }
   };
 
-  useEffect(() => {
-    handleIsSelectingGender();
-    getUserCurrentLocation();
-    getCurrentDate();
-  }, []);
+
 
   useEffect(() => {
     // handleGetPopularPlaces();
     // handleGetRecommendedPlaces();
     // updatePlaceBasedOnTime();
+    handleIsSelectingGender();
+    getUserCurrentLocation();
+    getCurrentDate();
   }, []);
 
   useEffect(() => {
@@ -649,7 +648,7 @@ ${
 
 
           {/**SUGGESTED PLACE */}
-          <View key={currentCategory} className="flex-1 mt-5">
+          <View key={currentCategory} className="flex-1 mt-8">
          
             {currentCategory === "coffee" ?    <View className="flex-row items-center gap-4 flex-1 relative">
               <Image
