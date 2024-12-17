@@ -19,12 +19,12 @@ import NextSvg from "../../components/svg/next";
 import * as Location from "expo-location";
 import { API } from "../../components/Protected/Api";
 import Notif from "../../components/svg/Notif";
-
 import { AuthenticatedContext } from "../../context/Authenticateduser";
 import { LoadingEffectsContext } from "../../context/Loadingeffect";
 import { router } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { majorFestivals, nationalHoliday } from "../../components/events/Events";
+import SkeletonLoader from "../places/SkeletonLoader";
 
 const Home = () => {
   const [searchText, setSearchText] = useState("");
@@ -33,6 +33,10 @@ const Home = () => {
   const [dateToday, setDateToday] = useState("");
   const [celcius, setCelcius] = useState("");
   const [weatherStatus, setWeatherStatus] = useState("");
+  const [isPopularPlaceLoading, setIsPopularLoading] = useState(true);
+  const [isRecommendedPlaceLoading, setIsRecommendedLoading] = useState(true);
+  const [isSuggestedPlaceLoading, setIsSuggestedLoading] = useState(true);
+  const [isRandomReviews, setIsRandomReviews] = useState(true);
   const { handleLoggedInUser, setSubscribed, currentUser } =
     useContext(AuthenticatedContext);
 
@@ -581,9 +585,9 @@ const Home = () => {
 
           {/**POPULAR*/}
           <View className="mt-4">
-            <View className="flex-row mb-1 justify-between">
+          <View className="flex-row mb-1 justify-between">
               <Text className="text-lg" style={{ fontFamily: "PoppinsBold" }}>
-                Popular Near you
+                Popular Near You
               </Text>
               <Text
                 onPress={() => router.push("/places/Poppular")}
@@ -597,52 +601,77 @@ const Home = () => {
               horizontal
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={{ alignItems: "center" }}
+              className="flex-row gap-3"
             >
-              {popularPlaces?.slice(0, 5).map((places, index) => (
-                <Pressable
-                  key={index}
-                  className="mr-2 "
-                  onPress={() => handleSelectedPlacesToNavigate(places)}
-                >
-                  <View className="rounded-xl overflow-hidden w-48 h-36">
-                    <Image
-                      source={{ uri: `${places.image_url}` }}
-                      className="w-full h-full "
-                    />
-                  </View>
-                  <View className=" flex pl-2">
-                    <Text
-                      style={{ fontFamily: "PoppinsBold", width: 140 }} // Adjust the width as needed
-                      className="text-md mt-2"
-                      numberOfLines={1} // Limit to one line
-                      ellipsizeMode="tail" // Adds the ellipsis at the end
-                    >
-                      {places.name}
-                    </Text>
-                    <View className="flex flex-row gap-1 items-center">
-                      <Text
-                        style={{ fontFamily: "PoppinsMedium" }}
-                        className="text-sm text-gray-400"
-                      >
-                        {places.kilometers}km
-                      </Text>
-                      <View className="h-2 w-2 bg-gray-300 rounded-full "></View>
-                      <View
-                        className={` h-3 rounded-full
-${
-  places.crowd_status === "high"
-    ? "bg-red-500 w-20"
-    : places.crowd_status === "medium"
-    ? "bg-yellow-300 w-14"
-    : places.crowd_status === "low"
-    ? "bg-green-500 w-8"
-    : ""
-} ml-1`}
+              {isPopularPlaceLoading ?             Array.from({ length: 10 }).map((_, index) => (
+                  <View className="mt-2" key={index}>
+                    <View className="flex">
+                      <SkeletonLoader
+                        width={225}
+                        height={125}
+                         borderRadius={8}
                       />
+                      <View className="mt-2">
+                        <SkeletonLoader
+                          width={170}
+                          height={15}
+                           borderRadius={8}
+                        />
+                        <View className="mt-1">
+                          <SkeletonLoader
+                            width={230}
+                            height={48}
+                             borderRadius={8}
+                          />
+                        </View>
+                      </View>
                     </View>
                   </View>
-                </Pressable>
-              ))}
+                )) :  popularPlaces?.slice(0, 5).map((places, index) => (
+                  <Pressable
+                    key={index}
+                    className="mr-2 "
+                    onPress={() => handleSelectedPlacesToNavigate(places)}
+                  >
+                    <View className="rounded-xl overflow-hidden w-48 h-36">
+                      <Image
+                        source={{ uri: `${places.image_url}` }}
+                        className="w-full h-full "
+                      />
+                    </View>
+                    <View className=" flex pl-2">
+                      <Text
+                        style={{ fontFamily: "PoppinsBold", width: 140 }} // Adjust the width as needed
+                        className="text-md mt-2"
+                        numberOfLines={1} // Limit to one line
+                        ellipsizeMode="tail" // Adds the ellipsis at the end
+                      >
+                        {places.name}
+                      </Text>
+                      <View className="flex flex-row gap-1 items-center">
+                        <Text
+                          style={{ fontFamily: "PoppinsMedium" }}
+                          className="text-sm text-gray-400"
+                        >
+                          {places.kilometers}km
+                        </Text>
+                        <View className="h-2 w-2 bg-gray-300 rounded-full "></View>
+                        <View
+                          className={` h-3 rounded-full
+  ${
+    places.crowd_status === "high"
+      ? "bg-red-500 w-20"
+      : places.crowd_status === "medium"
+      ? "bg-yellow-300 w-14"
+      : places.crowd_status === "low"
+      ? "bg-green-500 w-8"
+      : ""
+  } ml-1`}
+                        />
+                      </View>
+                    </View>
+                  </Pressable>
+                ))}
             </ScrollView>
           </View>
 
@@ -713,54 +742,81 @@ ${
               horizontal
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={{ alignItems: "center" }}
-              className="mt-3 mb-5"
+              className="flex-row gap-3 mt-1.5"
             >
-              {suggestedGoodPlace?.map((places, index) => (
-                <Pressable
-                  key={index}
-                  className="mr-2 "
-                  onPress={() => handleSelectedPlacesToNavigate(places)}
-                >
-                  <View className="rounded-xl overflow-hidden w-48 h-36">
-                    {/* <Image source={{uri: `${places.image_url}`}} className="w-full h-full " /> */}
-                    <Image
-                      source={{ uri: places.image_url }}
-                      className="w-full h-full "
-                    />
-                  </View>
-                  <View className=" flex pl-2">
-                    <Text
-                      style={{ fontFamily: "PoppinsBold", width: 140 }} // Adjust the width as needed
-                      className="text-md mt-2"
-                      numberOfLines={1} // Limit to one line
-                      ellipsizeMode="tail" // Adds the ellipsis at the end
-                    >
-                      {places.name}
-                    </Text>
-                    <View className="flex flex-row gap-1 items-center">
-                      <Text
-                        style={{ fontFamily: "PoppinsMedium" }}
-                        className="text-sm text-gray-400"
-                      >
-                        {places.kilometers}km
-                      </Text>
-                      <View className="h-2 w-2 bg-gray-300 rounded-full "></View>
-                      <View
-                        className={` h-3 rounded-full
-${
-  places.crowd_status === "high"
-    ? "bg-red-500 w-20"
-    : places.crowd_status === "medium"
-    ? "bg-yellow-300 w-14"
-    : places.crowd_status === "low"
-    ? "bg-green-500 w-8"
-    : ""
-} ml-1`}
+              {isSuggestedPlaceLoading ? 
+                        Array.from({ length: 10 }).map((_, index) => (
+                            <View className="mt-2" key={index}>
+                                    <View className="mt-2" key={index}>
+                    <View className="flex">
+                      <SkeletonLoader
+                        width={225}
+                        height={125}
+                         borderRadius={8}
                       />
+                      <View className="mt-2">
+                        <SkeletonLoader
+                          width={170}
+                          height={15}
+                           borderRadius={8}
+                        />
+                        <View className="mt-1">
+                          <SkeletonLoader
+                            width={230}
+                            height={48}
+                             borderRadius={8}
+                          />
+                        </View>
+                      </View>
                     </View>
                   </View>
-                </Pressable>
-              ))}
+                            </View>
+                          )) :   suggestedGoodPlace?.map((places, index) => (
+                            <Pressable
+                              key={index}
+                              className="mr-2 "
+                              onPress={() => handleSelectedPlacesToNavigate(places)}
+                            >
+                              <View className="rounded-xl overflow-hidden w-48 h-36">
+                                {/* <Image source={{uri: `${places.image_url}`}} className="w-full h-full " /> */}
+                                <Image
+                                  source={{ uri: places.image_url }}
+                                  className="w-full h-full "
+                                />
+                              </View>
+                              <View className=" flex pl-2">
+                                <Text
+                                  style={{ fontFamily: "PoppinsBold", width: 140 }} // Adjust the width as needed
+                                  className="text-md mt-2"
+                                  numberOfLines={1} // Limit to one line
+                                  ellipsizeMode="tail" // Adds the ellipsis at the end
+                                >
+                                  {places.name}
+                                </Text>
+                                <View className="flex flex-row gap-1 items-center">
+                                  <Text
+                                    style={{ fontFamily: "PoppinsMedium" }}
+                                    className="text-sm text-gray-400"
+                                  >
+                                    {places.kilometers}km
+                                  </Text>
+                                  <View className="h-2 w-2 bg-gray-300 rounded-full "></View>
+                                  <View
+                                    className={` h-3 rounded-full
+            ${
+              places.crowd_status === "high"
+                ? "bg-red-500 w-20"
+                : places.crowd_status === "medium"
+                ? "bg-yellow-300 w-14"
+                : places.crowd_status === "low"
+                ? "bg-green-500 w-8"
+                : ""
+            } ml-1`}
+                                  />
+                                </View>
+                              </View>
+                            </Pressable>
+                          ))}
             </ScrollView>
           </View>
 
@@ -782,52 +838,79 @@ ${
               horizontal
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={{ alignItems: "center" }}
+              className="flex-row gap-2"
             >
-              {recommendedPlaces?.slice(0, 5).map((places, index) => (
-                <Pressable
-                  key={index}
-                  className="mr-2 "
-                  onPress={() => handleSelectedPlacesToNavigate(places)}
-                >
-                  <View className="rounded-xl overflow-hidden w-48 h-36">
-                    <Image
-                      source={{ uri: `${places.image_url}` }}
-                      className="w-full h-full "
-                    />
-                  </View>
-                  <View className=" flex pl-2">
-                    <Text
-                      style={{ fontFamily: "PoppinsBold", width: 140 }} // Adjust the width as needed
-                      className="text-md mt-2"
-                      numberOfLines={1} // Limit to one line
-                      ellipsizeMode="tail" // Adds the ellipsis at the end
-                    >
-                      {places.name}
-                    </Text>
-                    <View className="flex flex-row gap-1 items-center">
-                      <Text
-                        style={{ fontFamily: "PoppinsMedium" }}
-                        className="text-sm text-gray-400"
-                      >
-                        {places.kilometers}km
-                      </Text>
-                      <View className="h-2 w-2 bg-gray-300 rounded-full "></View>
-                      <View
-                        className={` h-3 rounded-full
-${
-  places.crowd_status === "high"
-    ? "bg-red-500 w-20"
-    : places.crowd_status === "medium"
-    ? "bg-yellow-300 w-14"
-    : places.crowd_status === "low"
-    ? "bg-green-500 w-8"
-    : ""
-} ml-1`}
+                 {isRecommendedPlaceLoading ?              Array.from({ length: 10 }).map((_, index) => (
+                  <View className="mt-2" key={index}>
+                          <View className="mt-2" key={index}>
+                    <View className="flex">
+                      <SkeletonLoader
+                        width={225}
+                        height={125}
+                         borderRadius={8}
                       />
+                      <View className="mt-2">
+                        <SkeletonLoader
+                          width={170}
+                          height={15}
+                           borderRadius={8}
+                        />
+                        <View className="mt-1">
+                          <SkeletonLoader
+                            width={230}
+                            height={48}
+                             borderRadius={8}
+                          />
+                        </View>
+                      </View>
                     </View>
                   </View>
-                </Pressable>
-              ))}
+                  </View>
+                )) :     recommendedPlaces?.slice(0, 5).map((places, index) => (
+                  <Pressable
+                    key={index}
+                    className="mr-2 "
+                    onPress={() => handleSelectedPlacesToNavigate(places)}
+                  >
+                    <View className="rounded-xl overflow-hidden w-48 h-36">
+                      <Image
+                        source={{ uri: `${places.image_url}` }}
+                        className="w-full h-full "
+                      />
+                    </View>
+                    <View className=" flex pl-2">
+                      <Text
+                        style={{ fontFamily: "PoppinsBold", width: 140 }} // Adjust the width as needed
+                        className="text-md mt-2"
+                        numberOfLines={1} // Limit to one line
+                        ellipsizeMode="tail" // Adds the ellipsis at the end
+                      >
+                        {places.name}
+                      </Text>
+                      <View className="flex flex-row gap-1 items-center">
+                        <Text
+                          style={{ fontFamily: "PoppinsMedium" }}
+                          className="text-sm text-gray-400"
+                        >
+                          {places.kilometers}km
+                        </Text>
+                        <View className="h-2 w-2 bg-gray-300 rounded-full "></View>
+                        <View
+                          className={` h-3 rounded-full
+  ${
+    places.crowd_status === "high"
+      ? "bg-red-500 w-20"
+      : places.crowd_status === "medium"
+      ? "bg-yellow-300 w-14"
+      : places.crowd_status === "low"
+      ? "bg-green-500 w-8"
+      : ""
+  } ml-1`}
+                        />
+                      </View>
+                    </View>
+                  </Pressable>
+                )) }
             </ScrollView>
           </View>
 
@@ -891,7 +974,31 @@ ${
                 </Text>
             <View className="flex flex-col mt-1 ">
               <ScrollView>
-                {randomReviews?.slice(0, 5).map((item, index) => (
+            {isRandomReviews ?   Array.from({ length: 5 }).map((_, index) => (
+                  <View className="mt-2" key={index}>
+                    <View className="flex-row">
+                      <SkeletonLoader
+                        width={70}
+                        height={70}
+                         borderRadius={88}
+                      />
+                      <View className="ml-2">
+                        <SkeletonLoader
+                          width={170}
+                          height={15}
+                          borderRadius={8}
+                        />
+                        <View className="mt-1">
+                          <SkeletonLoader
+                            width={230}
+                            height={48}
+                            borderRadius={8}
+                          />
+                        </View>
+                      </View>
+                    </View>
+                  </View>
+                )) :  randomReviews?.slice(0, 5).map((item, index) => (
                   <Animated.View
                     style={[{ opacity: fadeAnimValues[index] }]}
                     key={`${item.reviewer_name}-${index}`}

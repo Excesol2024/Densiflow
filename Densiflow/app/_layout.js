@@ -7,6 +7,7 @@ import Lodingscreen from '../components/Modal';
 import {  LoadingEffectsProvider } from '../context/Loadingeffect';
 import { useContext } from 'react';
 import Error from '../components/Error';
+import 'react-native-reanimated';
 
 const StackLayout = () => {
   return (
@@ -20,6 +21,7 @@ const StackLayout = () => {
       <Stack.Screen name={`places/Poppular`} options={{ headerShown: false }} />
       <Stack.Screen name={`places/Recommended`} options={{ headerShown: false }} />
       <Stack.Screen name={`search/Searchplace`} options={{ headerShown: false }} />
+      <Stack.Screen name={`places/SkeletonLoader `} options={{ headerShown: false }} />
     </Stack>
   );
 };
