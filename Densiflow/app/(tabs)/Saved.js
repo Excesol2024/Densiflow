@@ -18,7 +18,7 @@ import {
     Swipeable,
   } from "react-native-gesture-handler";
   import { useRouter } from "expo-router";
-import SkeletonLoader from "../places/SkeletonLoader";
+  import SkeletonLoader from "../../components/SkeletonLoader";
 
   
   const Saved = () => {
@@ -131,31 +131,38 @@ import SkeletonLoader from "../places/SkeletonLoader";
   
         {isLoading ?    <ScrollView style={{ flex: 1 }} className="mt-4">
                 <View className="flex-1 p-4 mb-16 mt-3">
-                  {Array.from({ length: 10 }).map((_, index) => (
-                    <View className="mt-2" key={index}>
-                         <View className="flex-row">
-                      <SkeletonLoader
-                        width={100}
-                        height={100}
-                        borderRadius={8}
-                      />
-                      <View className="ml-2">
-                        <SkeletonLoader
-                          width={160}
-                          height={15}
-                          borderRadius={5}
-                        />
-                        <View className="mt-1 w-full">
-                          <SkeletonLoader
-                             width={210}
-                            height={80}
-                            borderRadius={8}
-                          />
-                        </View>
-                      </View>
-                    </View>
-                    </View>
-                  ))}
+                {Array.from({ length: 10 }).map((_, index) => (
+        <View
+          className="flex-row items-start space-x-2 mb-3"
+          key={index}
+        >
+          {/* Left Skeleton (Avatar or Image) */}
+          <SkeletonLoader
+            width={90}
+            height={90}
+            borderRadius={8}
+          />
+          
+          {/* Right Section */}
+          <View className="flex-1">
+            {/* Top Skeleton (Title) */}
+            <View className="mb-1">
+            <SkeletonLoader
+              width={180}
+              height={15}
+              borderRadius={5}
+            />
+            </View>
+            
+            {/* Bottom Skeleton (Description or Button Placeholder) */}
+            <SkeletonLoader
+              width={'100%'}
+              height={70}
+              borderRadius={8}
+            />
+          </View>
+        </View>
+      ))}
                 </View>
               </ScrollView> :         filteredPlaces?.length > 0 ? (
               <View className="flex-1 p-3 mt-8 mb-20">

@@ -14,6 +14,7 @@ import { API } from "../../components/Protected/Api";
 import { useRouter } from "expo-router";
 import { LoadingEffectsContext } from "../../context/Loadingeffect";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import SkeletonLoader from "../../components/SkeletonLoader";
 
 const Poppular = () => {
   const { currentUser } = useContext(AuthenticatedContext);
@@ -101,39 +102,36 @@ const Poppular = () => {
         >
           {isPopularPlaceLoading
             ? Array.from({ length: Math.ceil(10 / 2) }).map((_, rowIndex) => (
-                <View key={rowIndex} className="flex-row justify-between">
-                  {/* {Array.from({ length: 2 }).map((_, columnIndex) => (
-                    <View key={columnIndex} className="w-1/2 p-2">
-                      <View className="mt-1">
-                        <View className="w-full">
-                          <Skeleton
-                            width="100%"
-                            height={120}
-                            colorMode="light"
-                            className=""
+              <View key={rowIndex} className="flex-row justify-between">
+                {Array.from({ length: 2 }).map((_, columnIndex) => (
+                  <View key={columnIndex} className="w-1/2 p-2">
+                    <View className="mt-1">
+                      <View className="w-full">
+                        <SkeletonLoader
+                          width={'100%'}
+                          height={120}
+                           borderRadius={8}
+                        />
+                      </View>
+                      <View className="mt-2">
+                        <SkeletonLoader
+                          width={120}
+                          height={15}
+                           borderRadius={8}
+                        />
+                        <View className="mt-1 w-full">
+                          <SkeletonLoader
+                          width={'100%'}
+                            height={48}
+                             borderRadius={8}
                           />
-                        </View>
-                        <View className="mt-2">
-                          <Skeleton
-                            width={120}
-                            height={15}
-                            colorMode="light"
-                            className=""
-                          />
-                          <View className="mt-1 w-full">
-                            <Skeleton
-                              width="100%"
-                              height={48}
-                              colorMode="light"
-                              className=""
-                            />
-                          </View>
                         </View>
                       </View>
                     </View>
-                  ))} */}
-                </View>
-              ))
+                  </View>
+                ))}
+              </View>
+            ))
             : Array.from(
                 { length: Math.ceil(popularPlaces.length / 2) },
                 (_, rowIndex) => (

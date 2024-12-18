@@ -24,7 +24,7 @@ import { LoadingEffectsContext } from "../../context/Loadingeffect";
 import { router } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { majorFestivals, nationalHoliday } from "../../components/events/Events";
-import SkeletonLoader from "../places/SkeletonLoader";
+import SkeletonLoader from "../../components/SkeletonLoader";
 
 const Home = () => {
   const [searchText, setSearchText] = useState("");
@@ -983,18 +983,20 @@ const Home = () => {
                          borderRadius={88}
                       />
                       <View className="ml-2">
-                        <SkeletonLoader
+                       <View className="mb-1">
+                       <SkeletonLoader
                           width={170}
                           height={15}
                           borderRadius={8}
                         />
-                        <View className="mt-1">
+                       </View>
+                 
                           <SkeletonLoader
-                            width={230}
+                            width={'100%'}
                             height={48}
                             borderRadius={8}
                           />
-                        </View>
+                 
                       </View>
                     </View>
                   </View>

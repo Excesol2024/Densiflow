@@ -13,6 +13,7 @@ import { API } from "../../components/Protected/Api";
 import { useRouter } from "expo-router";
 import { LoadingEffectsContext } from "../../context/Loadingeffect";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import SkeletonLoader from "../../components/SkeletonLoader";
 
 const Recommended = () => {
   const [recommendedPlaces, setRecommendedPlaces] = useState([]);
@@ -100,36 +101,33 @@ const Recommended = () => {
           {isRecommendedPlaceLoading
             ? Array.from({ length: Math.ceil(10 / 2) }).map((_, rowIndex) => (
                 <View key={rowIndex} className="flex-row justify-between">
-                  {/* {Array.from({ length: 2 }).map((_, columnIndex) => (
+                  {Array.from({ length: 2 }).map((_, columnIndex) => (
                     <View key={columnIndex} className="w-1/2 p-2">
                       <View className="mt-1">
                         <View className="w-full">
-                          <Skeleton
-                            width="100%"
+                          <SkeletonLoader
+                            width={'100%'}
                             height={120}
-                            colorMode="light"
-                            className=""
+                             borderRadius={8}
                           />
                         </View>
                         <View className="mt-2">
-                          <Skeleton
+                          <SkeletonLoader
                             width={120}
                             height={15}
-                            colorMode="light"
-                            className=""
+                             borderRadius={8}
                           />
                           <View className="mt-1 w-full">
-                            <Skeleton
-                              width="100%"
+                            <SkeletonLoader
+                             width={'100%'}
                               height={48}
-                              colorMode="light"
-                              className=""
+                               borderRadius={8}
                             />
                           </View>
                         </View>
                       </View>
                     </View>
-                  ))} */}
+                  ))}
                 </View>
               ))
             : Array.from(
