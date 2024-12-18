@@ -21,12 +21,11 @@ const Index = () => {
         setTimeout(() => {
           setIsShowSplashScreen(false);
         //  router.push('/(auth)/Login')
-        router.push('/(tabs)/Saved')
         }, 2000)
       }else if(Token && storedValue){
         setTimeout(() => {
           setIsShowSplashScreen(false);
-          router.push('/(tabs)/Saved')
+          router.push('/(tabs)/Home')
         }, 2000)
       }else if(Token && !storedValue){
         await AsyncStorage.removeItem('Authorization')

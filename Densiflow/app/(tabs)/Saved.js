@@ -26,10 +26,11 @@ import {
     const [filteredPlaces, setFilteredPlaces] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
     const { isSaved, setMapLocation } = useContext(LoadingEffectsContext);
-    const [isLoading, setIsLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
     // Fetch saved places from the API
     const fetchSavedPlaces = async () => {
+      setIsLoading(true)
       try {
         // Fetch the saved places from the API
         const response = await API.getSavedPlaces();
@@ -42,9 +43,14 @@ import {
           return dateB - dateA; // Descending: newest to oldest
         });
   
-        // Update the state with the sorted places
+        if(places){
+           // Update the state with the sorted places
         setSavedPlaces(sortedFiltered);
-        setFilteredPlaces(sortedFiltered); // Initialize filteredPlaces with all places
+        setFilteredPlaces(sortedFiltered);
+        setTimeout(() => {
+          setIsLoading(false)
+        }, 2000);
+        }
       } catch (error) {
         // Log any errors for debugging
         console.error("Error fetching saved places:", error);

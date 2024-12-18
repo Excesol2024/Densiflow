@@ -95,7 +95,12 @@ const Home = () => {
   const handleGetPopularPlaces = async () => {
     try {
       const response = await API.getPopularPlacess();
-      setPopularPlaces(response.data);
+      if(response.data){
+        setPopularPlaces(response.data);
+        setTimeout(() => {
+          setIsPopularLoading(false);
+        }, 2000);
+      }
     } catch (error) {
       console.log(error);
     }
@@ -104,7 +109,12 @@ const Home = () => {
   const handleGetRecommendedPlaces = async () => {
     try {
       const response = await API.getRecommededPlaces();
-      setRecommendedPlaces(response.data);
+      if(response.data){
+        setRecommendedPlaces(response.data);
+        setTimeout(() => {
+          setIsRecommendedLoading(false);
+        }, 2000);
+      }
     } catch (error) {
       console.log(error);
     }
@@ -209,7 +219,12 @@ const Home = () => {
     }
     try {
       const response = await API.getSuggestedPlaces();
-      setSuggestedGoodPlace(response.data);
+      if(response.data){
+        setSuggestedGoodPlace(response.data);
+        setTimeout(() => {
+          setIsSuggestedLoading(false);
+        }, 2000);
+      }
     } catch (error) {
       console.log(error);
     }

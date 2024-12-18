@@ -19,7 +19,8 @@ import {
 
 const Alerts = () => {
   const [combinedAlerts, setCombinedAlerts] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+
   const handleGetUserNotifications = async () => {
     try {
       const response = await API.userNotifications();
@@ -98,15 +99,22 @@ const Alerts = () => {
   };
 
   const refreshAlerts = async () => {
+    setIsLoading(true);
     const notifications = await handleGetUserNotifications();
     const appUpdates = await fetchAppUpdates();
 
     const combined = [...notifications, ...appUpdates].sort((a, b) => {
       const dateA = new Date(a.created_at);
       const dateB = new Date(b.created_at);
-      return dateB - dateA; // Sort from newest to oldest
+
+      return dateB - dateA; 
     });
 
+    if(combined){
+      setTimeout(() => {
+        setIsLoading(false)
+      }, 2000);
+    }
     setCombinedAlerts(combined);
   };
 
@@ -168,7 +176,7 @@ const Alerts = () => {
             {/* Bottom Skeleton (Description or Button Placeholder) */}
             <SkeletonLoader
               width={'100%'}
-              height={45}
+              height={43}
               borderRadius={8}
             />
           </View>

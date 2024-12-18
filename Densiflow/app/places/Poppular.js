@@ -26,7 +26,12 @@ const Poppular = () => {
   const handleGetPopularPlaces = async () => {
     try {
       const response = await API.getPopularPlacess();
-      setPopularPlaces(response.data);
+      if(response.data){
+        setPopularPlaces(response.data);
+        setTimeout(() => {
+          setIsPopularLoading(false)
+        }, 2000);
+      }
     } catch (error) {
       console.log(error);
     }

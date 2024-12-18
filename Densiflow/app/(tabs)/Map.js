@@ -32,15 +32,17 @@ import RedNotif from "../../components/svg/RedNotif";
 import Reviews from "../../components/svg/Reviews";
 import Reviewed from "../../components/svg/Reviewed";
 import { useRouter } from "expo-router";
+import SkeletonLoader from "../../components/SkeletonLoader";
 
 const Map = () => {
   const mapRef = useRef(null);
   const { currentUser } = useContext(AuthenticatedContext);
   const [placeFocus, setPlacesFocus] = useState("");
   const [placesTypes, setPlacesTypes] = useState([]);
-  const [isAlreadyNotify, setIsAlreadyNotify] = useState(false)
-
-  const [isAlreadyReview, setIsAlreadyReview] = useState(false)
+  const [isAlreadyNotify, setIsAlreadyNotify] = useState(false);
+  const [isSelectedTypesLoading, setSelectedTypesLoading] = useState(false);
+  const [isSelectedPlaceTypesLoading, setSelectedPlaceTypesLoading] = useState(false);
+  const [isAlreadyReview, setIsAlreadyReview] = useState(false);
   const router = useRouter();
 
   const {
@@ -55,13 +57,13 @@ const Map = () => {
     setNearbyPlaceTypes,
     handleSelectedPlaceToNotif,
     setIsReviewing,
-    handleSelectedPlaceToReview
+    handleSelectedPlaceToReview,
   } = useContext(LoadingEffectsContext);
 
-  const handleSettingUpReviews = (placedetails) =>{
-    setIsReviewing(true)
-    console.log(placedetails)
-  }
+  const handleSettingUpReviews = (placedetails) => {
+    setIsReviewing(true);
+    console.log(placedetails);
+  };
 
   const newMapLat = parseFloat(mapLocation.location?.lat);
   const newMapLong = parseFloat(mapLocation.location?.lng);
@@ -97,15 +99,23 @@ const Map = () => {
   ];
 
   const checkIfPlaceIsSavedAndNotify = async () => {
-    console.log("CHECKING PLACE", mapLocation.place_id)
+    console.log("CHECKING PLACE", mapLocation.place_id);
+    setSelectedPlaceTypesLoading(true);
     try {
-      const response = await API.findPlaceSavedNotifReview({ query: placesDetails.place_id})
-      console.log("RESPONSE DATA", response.data.reviewed)
-      setIsAlreadySaved(response.data.saved);
-      setIsAlreadyNotify(response.data.in_notifications);
-      setIsAlreadyReview(response.data.reviewed);
-      setIsClicked(true);
-      setSelectedPlaceTypes(placesDetails)
+      const response = await API.findPlaceSavedNotifReview({
+        query: mapLocation.place_id,
+      });
+      console.log("RESPONSE DATA", response.data.reviewed);
+      if(response.data){
+        setIsAlreadySaved(response.data.saved);
+        setIsAlreadyNotify(response.data.in_notifications);
+        setIsAlreadyReview(response.data.reviewed);
+        setIsClicked(true);
+        setSelectedPlaceTypes(mapLocation);
+        setTimeout(() => {
+          setSelectedPlaceTypesLoading(false);
+        }, 2000);
+      }
     } catch (error) {
       console.error("Error checking place and notifications:", error);
     }
@@ -113,7 +123,7 @@ const Map = () => {
 
   useEffect(() => {
     if (isValidLocation) {
-      checkIfPlaceIsSavedAndNotify()
+      checkIfPlaceIsSavedAndNotify();
       setIsClicked(true);
       setSelectedPlaceTypes(mapLocation);
       mapRef.current.animateToRegion(
@@ -175,6 +185,7 @@ const Map = () => {
 
   const handleSelectedPlacesTypes = async (placeName) => {
     setMapLocation([]);
+    setSelectedTypesLoading(true);
     setPlacesFocus(placeName);
     setIsAlreadySaved(false);
     setIsClicked(false);
@@ -184,8 +195,13 @@ const Map = () => {
 
     try {
       const response = await API.getPlacesTypes(body);
-      setPlacesTypes(response.data);
-      handleZoomOutPlacesTpyeLocation();
+      if(response.data){
+        setPlacesTypes(response.data);
+        handleZoomOutPlacesTpyeLocation();
+        setTimeout(() => {
+          setSelectedTypesLoading(false);
+        }, 2000);
+      }
     } catch (error) {
       console.log(error);
     }
@@ -385,7 +401,7 @@ const Map = () => {
   };
 
   const handleSearchFocus = () => {
-    router.push('/search/Searchplace')
+    router.push("/search/Searchplace");
   };
 
   const handleSelectedSearchedPlaceToNavigate = (lat, long) => {
@@ -399,21 +415,28 @@ const Map = () => {
     });
   };
 
-  
   const [isClicked, setIsClicked] = useState(false);
   const [selectedPlaceTypes, setSelectedPlaceTypes] = useState([]);
   const [isAlreadySaved, setIsAlreadySaved] = useState(false);
 
   const handleClickedSelectedPlacesTypes = async (placesDetails) => {
     console.log(placesDetails);
+    setSelectedPlaceTypesLoading(true)
     try {
-      const response = await API.findPlaceSavedNotifReview({ query: placesDetails.place_id})
-      console.log("RESPONSE DATA", response.data)
-      setIsAlreadySaved(response.data.saved);
-      setIsAlreadyNotify(response.data.in_notifications);
-      setIsAlreadyReview(response.data.reviewed);
-      setIsClicked(true);
-      setSelectedPlaceTypes(placesDetails)
+      const response = await API.findPlaceSavedNotifReview({
+        query: placesDetails.place_id,
+      });
+      if(response.data){
+        console.log("RESPONSE DATA", response.data);
+        setIsAlreadySaved(response.data.saved);
+        setIsAlreadyNotify(response.data.in_notifications);
+        setIsAlreadyReview(response.data.reviewed);
+        setIsClicked(true);
+        setSelectedPlaceTypes(placesDetails);
+        setTimeout(() => {
+          setSelectedPlaceTypesLoading(false);
+        }, 2000);
+      }
     } catch (error) {
       console.error("Error checking place and notifications:", error);
     }
@@ -433,14 +456,14 @@ const Map = () => {
       },
     };
 
-    console.log("SAVED PLACES BODY", body)
+    console.log("SAVED PLACES BODY", body);
 
     try {
       const response = await API.savedPlace(body);
       console.log(response.data);
       if (response.data) {
         setIsAlreadySaved(true);
-       setIsSaved(response.data);
+        setIsSaved(response.data);
       }
     } catch (error) {
       console.log(error);
@@ -479,7 +502,7 @@ const Map = () => {
 
         <Marker
           // onPress={() => handleMarkerPress("Place Title")}
-          onPress={()=> console.log(isAlreadyReview)}
+          onPress={() => console.log(isAlreadyReview)}
           coordinate={{
             latitude: initialRegion.latitude,
             longitude: initialRegion.longitude,
@@ -641,9 +664,30 @@ const Map = () => {
         </View>
       </View>
 
-      {/* SELECTED PLACES TYPES*/}
-
-      {isClicked ? (
+      {/* SELECTED ESTABLISHMENT TYPES*/}
+      {isSelectedTypesLoading ? 
+           <View className="flex-1 absolute w-full p-2 bottom-20 z-50">
+           <ScrollView horizontal className="flex-1 gap-2">
+             {Array.from({ length: 10 }).map((_, index) => (
+               <Pressable
+                 key={index}
+                 className="flex p-3 bg-white   items-center round rounded-2xl"
+               >
+                 <View className="pl-2 pr-2">
+                   <SkeletonLoader width={210} height={110} borderRadius={8} />
+                 </View>
+   
+                 <View className="ml-2 m-1.5">
+                   <SkeletonLoader width={210} height={15} borderRadius={8} />
+   
+                   <View className="mt-1.5">
+                     <SkeletonLoader width={210} height={15} borderRadius={8} />
+                   </View>
+                 </View>
+               </Pressable>
+             ))}
+           </ScrollView>
+         </View> :    isClicked ? (
         ""
       ) : (
         <View className="flex-1 absolute w-full p-2 bottom-20 z-50 ">
@@ -705,177 +749,217 @@ ${
           </ScrollView>
         </View>
       )}
+   
 
-      {isClicked ? (
+  
+
+        {isSelectedPlaceTypesLoading ? 
+         <View className="flex-1 absolute w-full p-3 bottom-20 z-50">
+         <View className="flex-row flex-1 space-x-2 mb-3 flex p-3 bg-white   items-center round rounded-2xl">
+           {/* Left Skeleton (Avatar or Image) */}
+           <SkeletonLoader width={90} height={90} borderRadius={8} />
+ 
+           {/* Right Section */}
+           <View className="flex-1">
+             {/* Top Skeleton (Title) */}
+             <View className="mb-1">
+               <SkeletonLoader width={150} height={12} borderRadius={5} />
+             </View>
+ 
+             <View className="mb-1">
+               <SkeletonLoader width={180} height={12} borderRadius={5} />
+             </View>
+ 
+             <View className="mb-1">
+               <SkeletonLoader width={120} height={12} borderRadius={5} />
+             </View>
+ 
+             <View className="mb-1">
+               <SkeletonLoader width={160} height={12} borderRadius={5} />
+             </View>
+ 
+             <View className="mb-1">
+               <SkeletonLoader width={120} height={12} borderRadius={5} />
+             </View>
+           </View>
+         </View>
+       </View> :   isClicked ? (
         <View className="flex-1 absolute w-full p-2 bottom-24 z-50 ">
           <View className="flex flex-row p-3 bg-white shadow-lg shadow-gray-900 rounded-2xl">
-          <View className="absolute right-3.5 top-8">
-            {isAlreadySaved ? (
-              <Pressable >
-                <Bookmark />
-              </Pressable>
-            ) : (
-              <Pressable
-                onPress={() => handleSavedPlaces()}
-              
-              >
-                <Bookmarks />
-              </Pressable>
-            )}
-              </View>
+            <View className="absolute right-3.5 top-8">
+              {isAlreadySaved ? (
+                <Pressable>
+                  <Bookmark />
+                </Pressable>
+              ) : (
+                <Pressable onPress={() => handleSavedPlaces()}>
+                  <Bookmarks />
+                </Pressable>
+              )}
+            </View>
             <View className="absolute right-3 top-16">
-             {isAlreadyNotify ? <RedNotif/> :
-              <Pressable
-              onPress={() => handleSettingUpNotifications(selectedPlaceTypes)}
-            >
-              <Alert />
-            </Pressable>}
+              {isAlreadyNotify ? (
+                <RedNotif />
+              ) : (
+                <Pressable
+                  onPress={() =>
+                    handleSettingUpNotifications(selectedPlaceTypes)
+                  }
+                >
+                  <Alert />
+                </Pressable>
+              )}
             </View>
             <View className="absolute right-3 bottom-8">
-             {isAlreadyReview ? <Reviewed/> :
-              <Pressable
-              onPress={() => handleSettingUpReview(selectedPlaceTypes)}
-            >
-              <Reviews />
-            </Pressable>}
-            </View>
-              <View className="flex-row mb-1.5 mt-1.5">
-              <View>
-              <Image
-                source={{ uri: selectedPlaceTypes.image_url }}
-                className="w-28 h-full rounded-xl"
-              />
-            </View>
-            <View className="ml-2">
-              <Text
-                style={{ fontFamily: "PoppinsBold", fontSize: 16 }}
-                className="w-40"
-                numberOfLines={1} // Limit to 1 line
-                ellipsizeMode="tail" // Add ellipsis if the text overflows
-                onPress={()=> console.log(isAlreadyReview)}
-              >
-                {selectedPlaceTypes.name}
-              </Text>
-              <Text
-                style={{ fontFamily: "PoppinsThin" }}
-                className="mb-1 text-sm w-40"
-                numberOfLines={1} // Limit to 1 line
-                ellipsizeMode="tail" // Add ellipsis if the text overflows
-              >
-                {selectedPlaceTypes.vicinity}
-              </Text>
-              {selectedPlaceTypes?.opening_hours?.open_now === false ? (
-                <Text
-                  style={{ fontFamily: "PoppinsBold" }}
-                  className="text-red-400"
-                >
-                  CLOSED
-                </Text>
-              ) : selectedPlaceTypes?.opening_hours?.open_now === true ? (
-                <Text
-                  style={{ fontFamily: "PoppinsBold" }}
-                  className="text-green-400"
-                >
-                  OPEN
-                </Text>
+              {isAlreadyReview ? (
+                <Reviewed />
               ) : (
-                <Text
-                  style={{ fontFamily: "PoppinsBold" }}
-                  className="text-red-400"
+                <Pressable
+                  onPress={() => handleSettingUpReview(selectedPlaceTypes)}
                 >
-                  CLOSED
-                </Text>
+                  <Reviews />
+                </Pressable>
               )}
-              <View className="flex flex-row gap-1 items-center">
-                <Kilometer />
-                <Text
-                  style={{ fontFamily: "PoppinsBold" }}
-                  className="text-secondary mt-1"
-                >
-                  {selectedPlaceTypes.kilometers} Kilometer
-                </Text>
-              </View>
-
-              {selectedPlaceTypes?.crowd_status === "low" ? (
-                <View className="flex flex-row gap-1 items-center">
-                  <FontAwesome
-                    name="dot-circle-o"
-                    size={14}
-                    color={`${
-                      selectedPlaceTypes?.opening_hours?.open_now === false ||
-                      selectedPlaceTypes?.opening_hours === null
-                        ? "gray"
-                        : "#68D391"
-                    }`}
-                  />
-                  <Text
-                    style={{ fontFamily: "PoppinsBold" }}
-                    className={`mt-1 ${
-                      selectedPlaceTypes?.opening_hours?.open_now === false ||
-                      selectedPlaceTypes?.opening_hours === null
-                        ? "text-gray-500"
-                        : "text-green-400"
-                    }`}
-                  >
-                    Not Crowded (5-15)
-                  </Text>
-                </View>
-              ) : selectedPlaceTypes?.crowd_status === "medium" ? (
-                <View className="flex flex-row gap-1 items-center">
-                  <FontAwesome
-                    name="dot-circle-o"
-                    size={14}
-                    color={`${
-                      selectedPlaceTypes?.opening_hours?.open_now === false ||
-                      selectedPlaceTypes?.opening_hours === null
-                        ? "gray"
-                        : "#F59E0B"
-                    }`}
-                  />
-                  <Text
-                    style={{ fontFamily: "PoppinsBold" }}
-                    className={`mt-1 ${
-                      selectedPlaceTypes?.opening_hours?.open_now === false ||
-                      selectedPlaceTypes?.opening_hours === null
-                        ? "text-gray-500"
-                        : "text-yellow-400"
-                    }`}
-                  >
-                    Moderately Busy (16-30)
-                  </Text>
-                </View>
-              ) : selectedPlaceTypes?.crowd_status === "high" ? (
-                <View className="flex flex-row gap-1 items-center">
-                  <FontAwesome
-                    name="dot-circle-o"
-                    size={14}
-                    color={`${
-                      selectedPlaceTypes?.opening_hours?.open_now === false ||
-                      selectedPlaceTypes?.opening_hours === null
-                        ? "gray"
-                        : "#EF4444"
-                    }`}
-                  />
-                  <Text
-                    style={{ fontFamily: "PoppinsBold" }}
-                    className={`mt-1 ${
-                      selectedPlaceTypes?.opening_hours?.open_now === false ||
-                      selectedPlaceTypes?.opening_hours === null
-                        ? "text-gray-500"
-                        : "text-red-400"
-                    }`}
-                  >
-                    Very Crowded (31+)
-                  </Text>
-                </View>
-              ) : null}
             </View>
+            <View className="flex-row mb-1.5 mt-1.5">
+              <View>
+                <Image
+                  source={{ uri: selectedPlaceTypes.image_url }}
+                  className="w-28 h-full rounded-xl"
+                />
               </View>
+              <View className="ml-2">
+                <Text
+                  style={{ fontFamily: "PoppinsBold", fontSize: 16 }}
+                  className="w-40"
+                  numberOfLines={1} // Limit to 1 line
+                  ellipsizeMode="tail" // Add ellipsis if the text overflows
+                  onPress={() => console.log(isAlreadyReview)}
+                >
+                  {selectedPlaceTypes.name}
+                </Text>
+                <Text
+                  style={{ fontFamily: "PoppinsThin" }}
+                  className="mb-1 text-sm w-40"
+                  numberOfLines={1} // Limit to 1 line
+                  ellipsizeMode="tail" // Add ellipsis if the text overflows
+                >
+                  {selectedPlaceTypes.vicinity}
+                </Text>
+                {selectedPlaceTypes?.opening_hours?.open_now === false ? (
+                  <Text
+                    style={{ fontFamily: "PoppinsBold" }}
+                    className="text-red-400"
+                  >
+                    CLOSED
+                  </Text>
+                ) : selectedPlaceTypes?.opening_hours?.open_now === true ? (
+                  <Text
+                    style={{ fontFamily: "PoppinsBold" }}
+                    className="text-green-400"
+                  >
+                    OPEN
+                  </Text>
+                ) : (
+                  <Text
+                    style={{ fontFamily: "PoppinsBold" }}
+                    className="text-red-400"
+                  >
+                    CLOSED
+                  </Text>
+                )}
+                <View className="flex flex-row gap-1 items-center">
+                  <Kilometer />
+                  <Text
+                    style={{ fontFamily: "PoppinsBold" }}
+                    className="text-secondary mt-1"
+                  >
+                    {selectedPlaceTypes.kilometers} Kilometer
+                  </Text>
+                </View>
+
+                {selectedPlaceTypes?.crowd_status === "low" ? (
+                  <View className="flex flex-row gap-1 items-center">
+                    <FontAwesome
+                      name="dot-circle-o"
+                      size={14}
+                      color={`${
+                        selectedPlaceTypes?.opening_hours?.open_now === false ||
+                        selectedPlaceTypes?.opening_hours === null
+                          ? "gray"
+                          : "#68D391"
+                      }`}
+                    />
+                    <Text
+                      style={{ fontFamily: "PoppinsBold" }}
+                      className={`mt-1 ${
+                        selectedPlaceTypes?.opening_hours?.open_now === false ||
+                        selectedPlaceTypes?.opening_hours === null
+                          ? "text-gray-500"
+                          : "text-green-400"
+                      }`}
+                    >
+                      Not Crowded (5-15)
+                    </Text>
+                  </View>
+                ) : selectedPlaceTypes?.crowd_status === "medium" ? (
+                  <View className="flex flex-row gap-1 items-center">
+                    <FontAwesome
+                      name="dot-circle-o"
+                      size={14}
+                      color={`${
+                        selectedPlaceTypes?.opening_hours?.open_now === false ||
+                        selectedPlaceTypes?.opening_hours === null
+                          ? "gray"
+                          : "#F59E0B"
+                      }`}
+                    />
+                    <Text
+                      style={{ fontFamily: "PoppinsBold" }}
+                      className={`mt-1 ${
+                        selectedPlaceTypes?.opening_hours?.open_now === false ||
+                        selectedPlaceTypes?.opening_hours === null
+                          ? "text-gray-500"
+                          : "text-yellow-400"
+                      }`}
+                    >
+                      Moderately Busy (16-30)
+                    </Text>
+                  </View>
+                ) : selectedPlaceTypes?.crowd_status === "high" ? (
+                  <View className="flex flex-row gap-1 items-center">
+                    <FontAwesome
+                      name="dot-circle-o"
+                      size={14}
+                      color={`${
+                        selectedPlaceTypes?.opening_hours?.open_now === false ||
+                        selectedPlaceTypes?.opening_hours === null
+                          ? "gray"
+                          : "#EF4444"
+                      }`}
+                    />
+                    <Text
+                      style={{ fontFamily: "PoppinsBold" }}
+                      className={`mt-1 ${
+                        selectedPlaceTypes?.opening_hours?.open_now === false ||
+                        selectedPlaceTypes?.opening_hours === null
+                          ? "text-gray-500"
+                          : "text-red-400"
+                      }`}
+                    >
+                      Very Crowded (31+)
+                    </Text>
+                  </View>
+                ) : null}
+              </View>
+            </View>
           </View>
         </View>
       ) : (
         ""
       )}
+
+      
     </View>
   );
 };

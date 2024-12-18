@@ -23,7 +23,12 @@ const Recommended = () => {
   const handleGetRecommendedPlaces = async () => {
     try {
       const response = await API.getRecommededPlaces();
-      setRecommendedPlaces(response.data);
+      if(response.data){
+        setRecommendedPlaces(response.data);
+        setTimeout(() => {
+          setIsRecommendedLoading(false);
+        }, 2000);
+      }
     } catch (error) {
       console.log(error);
     }
