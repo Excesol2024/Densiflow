@@ -23,7 +23,10 @@ import { AuthenticatedContext } from "../../context/Authenticateduser";
 import { LoadingEffectsContext } from "../../context/Loadingeffect";
 import { router } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { majorFestivals, nationalHoliday } from "../../components/events/Events";
+import {
+  majorFestivals,
+  nationalHoliday,
+} from "../../components/events/Events";
 import SkeletonLoader from "../../components/SkeletonLoader";
 
 const Home = () => {
@@ -39,55 +42,61 @@ const Home = () => {
   const [isRandomReviews, setIsRandomReviews] = useState(true);
   const { handleLoggedInUser, setSubscribed, currentUser } =
     useContext(AuthenticatedContext);
+  const {
+    setMapLocation,
+    setIsSelectingGender,
+    setUserAddress,
+    setPopularNearPlaces,
+    setRecommendedNearPlaces,
+  } = useContext(LoadingEffectsContext);
 
-//     const userCity = "Cebu City";
-// const userSubregion = ""; // Add more specificity if needed
-// const userLocation = `${userCity}${userSubregion ? `, ${userSubregion}` : ""}`;
+  //     const userCity = "Cebu City";
+  // const userSubregion = ""; // Add more specificity if needed
+  // const userLocation = `${userCity}${userSubregion ? `, ${userSubregion}` : ""}`;
 
-    const userLocation = `${userCity}, ${userSubregion}`;
-    const [filteredFestivals, setFilteredFestivals] = useState([]);
-    const userAddress = 'Cebu City'
+  const userLocation = `${userCity}, ${userSubregion}`;
+  const [filteredFestivals, setFilteredFestivals] = useState([]);
+  const userAddress = "Cebu City";
 
-    const getCurrentDate = () => {
-      const today = new Date();
-      const options = { month: "long", day: "numeric" };
-      return today.toLocaleDateString("en-US", options);
-      // return "January 1";
-    };
+  const getCurrentDate = () => {
+    const today = new Date();
+    const options = { month: "long", day: "numeric" };
+    return today.toLocaleDateString("en-US", options);
+    // return "January 1";
+  };
 
-    useEffect(() => {
-      const today = getCurrentDate();
-      setDateToday(today);
-  
-      // Filter festivals based on user city and date
-      const festivals = majorFestivals.filter((festival) => {
-        const matchesCity = festival.location === userAddress;
-  
-        const matchesDate =
-          festival.date.includes(today) || // Direct match
-          festival.date.includes(today.split(" ")[0]) || // Match month (e.g., "February")
-          (festival.date.includes("-") && // Match ranges (e.g., "January 15-21")
-            isDateInRange(today, festival.date));
-  
-        return matchesCity && matchesDate;
-      });
-  
-      setFilteredFestivals(festivals);
-    }, []);
-  
-    const isDateInRange = (today, dateRange) => {
-      const [start, end] = dateRange.split("-").map((date) => date.trim());
-      const currentDate = new Date(`${new Date().getFullYear()} ${today}`);
-      const startDate = new Date(`${new Date().getFullYear()} ${start}`);
-      const endDate = new Date(`${new Date().getFullYear()} ${end}`);
-      return currentDate >= startDate && currentDate <= endDate;
-    };
-  
-    // Filter holidays matching today's date
-    const filteredHolidays = nationalHoliday.filter(
-      (holiday) => holiday.date === dateToday
-    );
-    
+  useEffect(() => {
+    const today = getCurrentDate();
+    setDateToday(today);
+
+    // Filter festivals based on user city and date
+    const festivals = majorFestivals.filter((festival) => {
+      const matchesCity = festival.location === userAddress;
+
+      const matchesDate =
+        festival.date.includes(today) || // Direct match
+        festival.date.includes(today.split(" ")[0]) || // Match month (e.g., "February")
+        (festival.date.includes("-") && // Match ranges (e.g., "January 15-21")
+          isDateInRange(today, festival.date));
+
+      return matchesCity && matchesDate;
+    });
+
+    setFilteredFestivals(festivals);
+  }, []);
+
+  const isDateInRange = (today, dateRange) => {
+    const [start, end] = dateRange.split("-").map((date) => date.trim());
+    const currentDate = new Date(`${new Date().getFullYear()} ${today}`);
+    const startDate = new Date(`${new Date().getFullYear()} ${start}`);
+    const endDate = new Date(`${new Date().getFullYear()} ${end}`);
+    return currentDate >= startDate && currentDate <= endDate;
+  };
+
+  // Filter holidays matching today's date
+  const filteredHolidays = nationalHoliday.filter(
+    (holiday) => holiday.date === dateToday
+  );
 
   const [popularPlaces, setPopularPlaces] = useState([]);
   const [recommendedPlaces, setRecommendedPlaces] = useState([]);
@@ -95,22 +104,24 @@ const Home = () => {
   const handleGetPopularPlaces = async () => {
     try {
       const response = await API.getPopularPlacess();
-      if(response.data){
+      if (response.data) {
         setPopularPlaces(response.data);
+        setPopularNearPlaces(response.data);
         setTimeout(() => {
           setIsPopularLoading(false);
         }, 2000);
       }
     } catch (error) {
-      console.log(error);
+      console.log("ERROR FETCHING POPULAR PLACES", error.messages);
     }
   };
 
   const handleGetRecommendedPlaces = async () => {
     try {
       const response = await API.getRecommededPlaces();
-      if(response.data){
+      if (response.data) {
         setRecommendedPlaces(response.data);
+        setRecommendedNearPlaces(response.data)
         setTimeout(() => {
           setIsRecommendedLoading(false);
         }, 2000);
@@ -139,7 +150,7 @@ const Home = () => {
 
       setUserCity(response[0].city);
       setUserSubregion(response[0].subregion);
-      setUserAddress(`${response[0].city}, ${response[0].subregion}`)
+      setUserAddress(`${response[0].city}, ${response[0].subregion}`);
     }
   };
 
@@ -174,8 +185,6 @@ const Home = () => {
       console.log("FEMALE");
     }
   };
-
-
 
   useEffect(() => {
     // handleGetPopularPlaces();
@@ -219,7 +228,7 @@ const Home = () => {
     }
     try {
       const response = await API.getSuggestedPlaces();
-      if(response.data){
+      if (response.data) {
         setSuggestedGoodPlace(response.data);
         setTimeout(() => {
           setIsSuggestedLoading(false);
@@ -230,32 +239,11 @@ const Home = () => {
     }
   };
 
-  const [locationsPermission, setLocationPermission] = useState(false);
-  const [notificationsPermission, setNotificationsPermission] = useState(false);
-  const [mapsPermission, setMapsPermission] = useState(false);
-  const [messageSent, setMessageSent] = useState(false);
-  const { setMapLocation, setIsSelectingGender, setUserAddress } = useContext(
-    LoadingEffectsContext
-  );
-
   const handleSearchFocus = () => {
-    router.push('/search/Searchplace')
+    router.push("/search/Searchplace");
   };
 
   const handleSelectedPlacesToNavigate = (place) => {
-    console.log("SELECTD PLACE", place.kilometers);
-    handleRecentVisited(
-      place.name,
-      place.vicinity,
-      place.kilometers,
-      place.location.lat,
-      place.location.lng
-    );
-    setMapLocation(place);
-    router.push("/Map");
-  };
-
-  const handleSelectedSearchedPlaceToNavigate = (place) => {
     console.log("SELECTD PLACE", place.kilometers);
     handleRecentVisited(
       place.name,
@@ -322,52 +310,12 @@ const Home = () => {
   };
 
   const [randomReviews, setRandomReviews] = useState([]);
-  
 
   const handleGetRandomReviews = async () => {
     try {
       const response = await API.randomReviews({ location: userLocation });
       setRandomReviews(response.data);
       setFadeAnimValues(response.data.map(() => new Animated.Value(1)));
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const [comments, setComments] = useState("");
-  const [errorComments, setErrorComments] = useState("");
-
-  const handleReviewsInputChange = (field, value) => {
-    // Update the specific field's value
-    if (field === "comments") {
-      setComments(value);
-    }
-
-    // Clear the error for the specific field
-    if (errorComments[field]) {
-      setErrorComments((prevErrors) => ({ ...prevErrors, [field]: "" }));
-    }
-  };
-
-  const createReviewsforPlace = async () => {
-    if (comments === "") {
-      setErrorComments("This field is required!");
-      return;
-    }
-    const body = {
-      review: {
-        comments: comments,
-        location: userLocation,
-      },
-    };
-    console.log(body);
-    try {
-      const response = await API.createUserReviews(body);
-      if (response.data) {
-        setComments("");
-        Alert.alert("Successfully added Reviews");
-        handleGetRandomReviews();
-      }
     } catch (error) {
       console.log(error);
     }
@@ -427,9 +375,6 @@ const Home = () => {
         "https://firebasestorage.googleapis.com/v0/b/exceproducts.appspot.com/o/n1.png?alt=media&token=1b760e14-65e7-4adb-aa26-ee5ddf2946fc",
     },
   ];
-
- 
-  
 
   return (
     <SafeAreaView className="flex-1 bg-white">
@@ -539,78 +484,96 @@ const Home = () => {
             >
               Today in your Area
             </Text>
-              
-            <View className="p-2">
-  {filteredHolidays.length > 0 || filteredFestivals.length > 0 ? (
-    <>
-      {/* Render Holidays */}
-      {filteredHolidays.map((item, index) => (
-        <View
-          key={`holiday-${index}`}
-          className="flex-row bg-white rounded-xl p-3 mt-3 shadow-lg shadow-gray-700 items-center"
-        >
-          <Image
-            className="w-24 h-28 rounded-xl"
-            source={{
-              uri: item.image_url || "https://via.placeholder.com/150",
-            }}
-          />
-          <View className="ml-2 flex-1">
-            <Text className="text-lg" style={{ fontFamily: "PoppinsBold" }}>
-              {item.name}
-            </Text>
-            <Text style={{ fontFamily: "PoppinsMedium" }} numberOfLines={4}>{item.description}</Text>
-          </View>
-        </View>
-      ))}
 
-      {/* Render Festivals */}
-      {filteredFestivals.map((item, index) => (
-        <View
-          key={`festival-${index}`}
-          className="flex-row bg-white rounded-xl p-3 mt-3 shadow-lg shadow-gray-700 items-center"
-        >
-          <Image
-            className="w-24 h-28 rounded-xl"
-            source={{
-              uri: item.image_url || "https://via.placeholder.com/150",
-            }}
-          />
-          <View className="ml-2 flex-1">
-            <Text className="text-lg" style={{ fontFamily: "PoppinsBold" }}>
-              {item.name}
-            </Text>
-            <Text style={{ fontFamily: "PoppinsMedium" }}>{item.description}</Text>
-          </View>
-        </View>
-      ))}
-    </>
-  ) : (
-    <Text
-      style={{ fontFamily: "PoppinsMedium" }}
-      className="text-md text-center mt-2 text-gray-400"
-    >
-      No events today, but your area has so much to offer! Try exploring some
-      popular spots.
-    </Text>
-  )}
-</View>
-          
+            <View className="p-2">
+              {filteredHolidays.length > 0 || filteredFestivals.length > 0 ? (
+                <>
+                  {/* Render Holidays */}
+                  {filteredHolidays.map((item, index) => (
+                    <View
+                      key={`holiday-${index}`}
+                      className="flex-row bg-white rounded-xl p-3 mt-3 shadow-lg shadow-gray-700 items-center"
+                    >
+                      <Image
+                        className="w-24 h-28 rounded-xl"
+                        source={{
+                          uri:
+                            item.image_url || "https://via.placeholder.com/150",
+                        }}
+                      />
+                      <View className="ml-2 flex-1">
+                        <Text
+                          className="text-lg"
+                          style={{ fontFamily: "PoppinsBold" }}
+                        >
+                          {item.name}
+                        </Text>
+                        <Text
+                          style={{ fontFamily: "PoppinsMedium" }}
+                          numberOfLines={4}
+                        >
+                          {item.description}
+                        </Text>
+                      </View>
+                    </View>
+                  ))}
+
+                  {/* Render Festivals */}
+                  {filteredFestivals.map((item, index) => (
+                    <View
+                      key={`festival-${index}`}
+                      className="flex-row bg-white rounded-xl p-3 mt-3 shadow-lg shadow-gray-700 items-center"
+                    >
+                      <Image
+                        className="w-24 h-28 rounded-xl"
+                        source={{
+                          uri:
+                            item.image_url || "https://via.placeholder.com/150",
+                        }}
+                      />
+                      <View className="ml-2 flex-1">
+                        <Text
+                          className="text-lg"
+                          style={{ fontFamily: "PoppinsBold" }}
+                        >
+                          {item.name}
+                        </Text>
+                        <Text style={{ fontFamily: "PoppinsMedium" }}>
+                          {item.description}
+                        </Text>
+                      </View>
+                    </View>
+                  ))}
+                </>
+              ) : (
+                <Text
+                  style={{ fontFamily: "PoppinsMedium" }}
+                  className="text-md text-center mt-2 text-gray-400"
+                >
+                  No events today, but your area has so much to offer! Try
+                  exploring some popular spots.
+                </Text>
+              )}
+            </View>
           </View>
 
           {/**POPULAR*/}
           <View className="mt-4">
-          <View className="flex-row mb-1 justify-between">
+            <View className="flex-row mb-1 justify-between">
               <Text className="text-lg" style={{ fontFamily: "PoppinsBold" }}>
                 Popular Near You
               </Text>
-              <Text
-                onPress={() => router.push("/places/Poppular")}
-                className="text-lg text-secondary"
-                style={{ fontFamily: "PoppinsBold" }}
-              >
-                See all
-              </Text>
+              {popularPlaces.length > 0 ? (
+                <Text
+                  onPress={() => router.push("/places/Poppular")}
+                  className="text-lg text-secondary"
+                  style={{ fontFamily: "PoppinsBold" }}
+                >
+                  See all
+                </Text>
+              ) : (
+                ""
+              )}
             </View>
             <ScrollView
               horizontal
@@ -618,61 +581,63 @@ const Home = () => {
               contentContainerStyle={{ alignItems: "center" }}
               className="flex-row gap-3"
             >
-              {isPopularPlaceLoading ?             Array.from({ length: 10 }).map((_, index) => (
-                  <View className="mt-2" key={index}>
-                    <View className="flex">
-                      <SkeletonLoader
-                        width={225}
-                        height={125}
-                         borderRadius={8}
-                      />
-                      <View className="mt-2">
+              {isPopularPlaceLoading
+                ? Array.from({ length: 10 }).map((_, index) => (
+                    <View className="mt-2" key={index}>
+                      <View className="flex">
                         <SkeletonLoader
-                          width={170}
-                          height={15}
-                           borderRadius={8}
+                          width={225}
+                          height={125}
+                          borderRadius={8}
                         />
-                        <View className="mt-1">
+                        <View className="mt-2">
                           <SkeletonLoader
-                            width={230}
-                            height={48}
-                             borderRadius={8}
+                            width={170}
+                            height={15}
+                            borderRadius={8}
                           />
+                          <View className="mt-1">
+                            <SkeletonLoader
+                              width={230}
+                              height={48}
+                              borderRadius={8}
+                            />
+                          </View>
                         </View>
                       </View>
                     </View>
-                  </View>
-                )) :  popularPlaces?.slice(0, 5).map((places, index) => (
-                  <Pressable
-                    key={index}
-                    className="mr-2 "
-                    onPress={() => handleSelectedPlacesToNavigate(places)}
-                  >
-                    <View className="rounded-xl overflow-hidden w-48 h-36">
-                      <Image
-                        source={{ uri: `${places.image_url}` }}
-                        className="w-full h-full "
-                      />
-                    </View>
-                    <View className=" flex pl-2">
-                      <Text
-                        style={{ fontFamily: "PoppinsBold", width: 140 }} // Adjust the width as needed
-                        className="text-md mt-2"
-                        numberOfLines={1} // Limit to one line
-                        ellipsizeMode="tail" // Adds the ellipsis at the end
-                      >
-                        {places.name}
-                      </Text>
-                      <View className="flex flex-row gap-1 items-center">
+                  ))
+                : popularPlaces?.slice(0, 5).map((places, index) => (
+                    <Pressable
+                      key={index}
+                      className="mr-2 "
+                      onPress={() => handleSelectedPlacesToNavigate(places)}
+                    >
+                      <View className="rounded-xl overflow-hidden w-48 h-36">
+                        <Image
+                          source={{ uri: `${places.image_url}` }}
+                          className="w-full h-full "
+                        />
+                      </View>
+                      <View className=" flex pl-2">
                         <Text
-                          style={{ fontFamily: "PoppinsMedium" }}
-                          className="text-sm text-gray-400"
+                          style={{ fontFamily: "PoppinsBold", width: 140 }} // Adjust the width as needed
+                          className="text-md mt-2"
+                          numberOfLines={1} // Limit to one line
+                          ellipsizeMode="tail" // Adds the ellipsis at the end
                         >
-                          {places.kilometers}km
+                          {places.name}
                         </Text>
-                        <View className="h-2 w-2 bg-gray-300 rounded-full "></View>
-                        <View
-                          className={` h-3 rounded-full
+                        <View className="flex flex-row gap-1 items-center">
+                          <Text
+                            style={{ fontFamily: "PoppinsMedium" }}
+                            className="text-sm text-gray-400"
+                          >
+                            {places.kilometers}km
+                          </Text>
+                          <View className="h-2 w-2 bg-gray-300 rounded-full "></View>
+                          <View
+                            className={` h-3 rounded-full
   ${
     places.crowd_status === "high"
       ? "bg-red-500 w-20"
@@ -682,76 +647,82 @@ const Home = () => {
       ? "bg-green-500 w-8"
       : ""
   } ml-1`}
-                        />
+                          />
+                        </View>
                       </View>
-                    </View>
-                  </Pressable>
-                ))}
+                    </Pressable>
+                  ))}
             </ScrollView>
           </View>
 
-
           {/**SUGGESTED PLACE */}
           <View key={currentCategory} className="flex-1 mt-8">
-         
-            {currentCategory === "coffee" ?    <View className="flex-row items-center gap-4 flex-1 relative">
-              <Image
-                source={require("../../assets/tabs/cuate.png")}
-                className="h-26"
-              />
-              <View>
-                <Text
-                  style={{ fontFamily: "PoppinsBold" }}
-                  className="text-lg break-words text-secondary"
-                >
-                  “Quiet cafes for
-                </Text>
-                <Text
-                  style={{ fontFamily: "PoppinsBold" }}
-                  className="text-lg break-words text-secondary"
-                >
-                  your morning coffee”
-                </Text>
+            {currentCategory === "coffee" ? (
+              <View className="flex-row items-center gap-4 flex-1 relative">
+                <Image
+                  source={require("../../assets/tabs/cuate.png")}
+                  className="h-26"
+                />
+                <View>
+                  <Text
+                    style={{ fontFamily: "PoppinsBold" }}
+                    className="text-lg break-words text-secondary"
+                  >
+                    “Quiet cafes for
+                  </Text>
+                  <Text
+                    style={{ fontFamily: "PoppinsBold" }}
+                    className="text-lg break-words text-secondary"
+                  >
+                    your morning coffee”
+                  </Text>
+                </View>
               </View>
-            </View> : currentCategory === "lunch" ?   <View className="flex-row items-center gap-4 flex-1 relative">
-              <Image
-                source={require("../../assets/tabs/pana.png")}
-                className="h-26"
-              />
-              <View>
-                <Text
-                  style={{ fontFamily: "PoppinsBold" }}
-                  className="text-lg break-words text-secondary"
-                >
-                 “Perfect lunch spots
-                </Text>
-                <Text
-                  style={{ fontFamily: "PoppinsBold" }}
-                  className="text-lg break-words text-secondary"
-                >
-                 with moderate crowds”
-                </Text>
+            ) : currentCategory === "lunch" ? (
+              <View className="flex-row items-center gap-4 flex-1 relative">
+                <Image
+                  source={require("../../assets/tabs/pana.png")}
+                  className="h-26"
+                />
+                <View>
+                  <Text
+                    style={{ fontFamily: "PoppinsBold" }}
+                    className="text-lg break-words text-secondary"
+                  >
+                    “Perfect lunch spots
+                  </Text>
+                  <Text
+                    style={{ fontFamily: "PoppinsBold" }}
+                    className="text-lg break-words text-secondary"
+                  >
+                    with moderate crowds”
+                  </Text>
+                </View>
               </View>
-            </View> : currentCategory === "dinner" ?    <View className="flex-row items-center gap-4 flex-1 relative">
-              <Image
-                source={require("../../assets/tabs/dinner.png")}
-                className="h-26"
-              />
-              <View>
-                <Text
-                  style={{ fontFamily: "PoppinsBold" }}
-                  className="text-lg break-words text-secondary"
-                >
-              “Popular dinner spots 
-                </Text>
-                <Text
-                  style={{ fontFamily: "PoppinsBold" }}
-                  className="text-lg break-words text-secondary"
-                >
-                 that fill up quickly”
-                </Text>
+            ) : currentCategory === "dinner" ? (
+              <View className="flex-row items-center gap-4 flex-1 relative">
+                <Image
+                  source={require("../../assets/tabs/dinner.png")}
+                  className="h-26"
+                />
+                <View>
+                  <Text
+                    style={{ fontFamily: "PoppinsBold" }}
+                    className="text-lg break-words text-secondary"
+                  >
+                    “Popular dinner spots
+                  </Text>
+                  <Text
+                    style={{ fontFamily: "PoppinsBold" }}
+                    className="text-lg break-words text-secondary"
+                  >
+                    that fill up quickly”
+                  </Text>
+                </View>
               </View>
-            </View> : ''}
+            ) : (
+              ""
+            )}
 
             <ScrollView
               horizontal
@@ -759,65 +730,66 @@ const Home = () => {
               contentContainerStyle={{ alignItems: "center" }}
               className="flex-row gap-3 mt-1.5"
             >
-              {isSuggestedPlaceLoading ? 
-                        Array.from({ length: 10 }).map((_, index) => (
-                            <View className="mt-2" key={index}>
-                                    <View className="mt-2" key={index}>
-                    <View className="flex">
-                      <SkeletonLoader
-                        width={225}
-                        height={125}
-                         borderRadius={8}
-                      />
-                      <View className="mt-2">
-                        <SkeletonLoader
-                          width={170}
-                          height={15}
-                           borderRadius={8}
-                        />
-                        <View className="mt-1">
+              {isSuggestedPlaceLoading
+                ? Array.from({ length: 10 }).map((_, index) => (
+                    <View className="mt-2" key={index}>
+                      <View className="mt-2" key={index}>
+                        <View className="flex">
                           <SkeletonLoader
-                            width={230}
-                            height={48}
-                             borderRadius={8}
+                            width={225}
+                            height={125}
+                            borderRadius={8}
                           />
+                          <View className="mt-2">
+                            <SkeletonLoader
+                              width={170}
+                              height={15}
+                              borderRadius={8}
+                            />
+                            <View className="mt-1">
+                              <SkeletonLoader
+                                width={230}
+                                height={48}
+                                borderRadius={8}
+                              />
+                            </View>
+                          </View>
                         </View>
                       </View>
                     </View>
-                  </View>
-                            </View>
-                          )) :   suggestedGoodPlace?.map((places, index) => (
-                            <Pressable
-                              key={index}
-                              className="mr-2 "
-                              onPress={() => handleSelectedPlacesToNavigate(places)}
-                            >
-                              <View className="rounded-xl overflow-hidden w-48 h-36">
-                                {/* <Image source={{uri: `${places.image_url}`}} className="w-full h-full " /> */}
-                                <Image
-                                  source={{ uri: places.image_url }}
-                                  className="w-full h-full "
-                                />
-                              </View>
-                              <View className=" flex pl-2">
-                                <Text
-                                  style={{ fontFamily: "PoppinsBold", width: 140 }} // Adjust the width as needed
-                                  className="text-md mt-2"
-                                  numberOfLines={1} // Limit to one line
-                                  ellipsizeMode="tail" // Adds the ellipsis at the end
-                                >
-                                  {places.name}
-                                </Text>
-                                <View className="flex flex-row gap-1 items-center">
-                                  <Text
-                                    style={{ fontFamily: "PoppinsMedium" }}
-                                    className="text-sm text-gray-400"
-                                  >
-                                    {places.kilometers}km
-                                  </Text>
-                                  <View className="h-2 w-2 bg-gray-300 rounded-full "></View>
-                                  <View
-                                    className={` h-3 rounded-full
+                  ))
+                : suggestedGoodPlace?.map((places, index) => (
+                    <Pressable
+                      key={index}
+                      className="mr-2 "
+                      onPress={() => handleSelectedPlacesToNavigate(places)}
+                    >
+                      <View className="rounded-xl overflow-hidden w-48 h-36">
+                        {/* <Image source={{uri: `${places.image_url}`}} className="w-full h-full " /> */}
+                        <Image
+                          source={{ uri: places.image_url }}
+                          className="w-full h-full "
+                        />
+                      </View>
+                      <View className=" flex pl-2">
+                        <Text
+                          style={{ fontFamily: "PoppinsBold", width: 140 }} // Adjust the width as needed
+                          className="text-md mt-2"
+                          numberOfLines={1} // Limit to one line
+                          ellipsizeMode="tail" // Adds the ellipsis at the end
+                        >
+                          {places.name}
+                        </Text>
+                        <View className="flex flex-row gap-1 items-center">
+                          <Text
+                            style={{ fontFamily: "PoppinsMedium" }}
+                            className="text-sm text-gray-400"
+                          >
+                            {places.kilometers}km
+                          </Text>
+                          <View className="h-2 w-2 bg-gray-300 rounded-full "></View>
+                          <View
+                            className={` h-3 rounded-full
             ${
               places.crowd_status === "high"
                 ? "bg-red-500 w-20"
@@ -827,27 +799,31 @@ const Home = () => {
                 ? "bg-green-500 w-8"
                 : ""
             } ml-1`}
-                                  />
-                                </View>
-                              </View>
-                            </Pressable>
-                          ))}
+                          />
+                        </View>
+                      </View>
+                    </Pressable>
+                  ))}
             </ScrollView>
           </View>
 
-               {/**RECOMMENDED*/}
-               <View className="mt-3">
+          {/**RECOMMENDED*/}
+          <View className="mt-3">
             <View className="flex-row mb-1 justify-between">
               <Text className="text-lg" style={{ fontFamily: "PoppinsBold" }}>
                 Recommended
               </Text>
-              <Text
-                onPress={() => router.push("/places/Recommended")}
-                className="text-lg text-secondary"
-                style={{ fontFamily: "PoppinsBold" }}
-              >
-                See all
-              </Text>
+              {recommendedPlaces.length > 0 ? (
+                <Text
+                  onPress={() => router.push("/places/Recommended")}
+                  className="text-lg text-secondary"
+                  style={{ fontFamily: "PoppinsBold" }}
+                >
+                  See all
+                </Text>
+              ) : (
+                ""
+              )}
             </View>
             <ScrollView
               horizontal
@@ -855,63 +831,65 @@ const Home = () => {
               contentContainerStyle={{ alignItems: "center" }}
               className="flex-row gap-2"
             >
-                 {isRecommendedPlaceLoading ?              Array.from({ length: 10 }).map((_, index) => (
-                  <View className="mt-2" key={index}>
-                          <View className="mt-2" key={index}>
-                    <View className="flex">
-                      <SkeletonLoader
-                        width={225}
-                        height={125}
-                         borderRadius={8}
-                      />
-                      <View className="mt-2">
-                        <SkeletonLoader
-                          width={170}
-                          height={15}
-                           borderRadius={8}
-                        />
-                        <View className="mt-1">
+              {isRecommendedPlaceLoading
+                ? Array.from({ length: 10 }).map((_, index) => (
+                    <View className="mt-2" key={index}>
+                      <View className="mt-2" key={index}>
+                        <View className="flex">
                           <SkeletonLoader
-                            width={230}
-                            height={48}
-                             borderRadius={8}
+                            width={225}
+                            height={125}
+                            borderRadius={8}
                           />
+                          <View className="mt-2">
+                            <SkeletonLoader
+                              width={170}
+                              height={15}
+                              borderRadius={8}
+                            />
+                            <View className="mt-1">
+                              <SkeletonLoader
+                                width={230}
+                                height={48}
+                                borderRadius={8}
+                              />
+                            </View>
+                          </View>
                         </View>
                       </View>
                     </View>
-                  </View>
-                  </View>
-                )) :     recommendedPlaces?.slice(0, 5).map((places, index) => (
-                  <Pressable
-                    key={index}
-                    className="mr-2 "
-                    onPress={() => handleSelectedPlacesToNavigate(places)}
-                  >
-                    <View className="rounded-xl overflow-hidden w-48 h-36">
-                      <Image
-                        source={{ uri: `${places.image_url}` }}
-                        className="w-full h-full "
-                      />
-                    </View>
-                    <View className=" flex pl-2">
-                      <Text
-                        style={{ fontFamily: "PoppinsBold", width: 140 }} // Adjust the width as needed
-                        className="text-md mt-2"
-                        numberOfLines={1} // Limit to one line
-                        ellipsizeMode="tail" // Adds the ellipsis at the end
-                      >
-                        {places.name}
-                      </Text>
-                      <View className="flex flex-row gap-1 items-center">
+                  ))
+                : recommendedPlaces?.slice(0, 5).map((places, index) => (
+                    <Pressable
+                      key={index}
+                      className="mr-2 "
+                      onPress={() => handleSelectedPlacesToNavigate(places)}
+                    >
+                      <View className="rounded-xl overflow-hidden w-48 h-36">
+                        <Image
+                          source={{ uri: `${places.image_url}` }}
+                          className="w-full h-full "
+                        />
+                      </View>
+                      <View className=" flex pl-2">
                         <Text
-                          style={{ fontFamily: "PoppinsMedium" }}
-                          className="text-sm text-gray-400"
+                          style={{ fontFamily: "PoppinsBold", width: 140 }} // Adjust the width as needed
+                          className="text-md mt-2"
+                          numberOfLines={1} // Limit to one line
+                          ellipsizeMode="tail" // Adds the ellipsis at the end
                         >
-                          {places.kilometers}km
+                          {places.name}
                         </Text>
-                        <View className="h-2 w-2 bg-gray-300 rounded-full "></View>
-                        <View
-                          className={` h-3 rounded-full
+                        <View className="flex flex-row gap-1 items-center">
+                          <Text
+                            style={{ fontFamily: "PoppinsMedium" }}
+                            className="text-sm text-gray-400"
+                          >
+                            {places.kilometers}km
+                          </Text>
+                          <View className="h-2 w-2 bg-gray-300 rounded-full "></View>
+                          <View
+                            className={` h-3 rounded-full
   ${
     places.crowd_status === "high"
       ? "bg-red-500 w-20"
@@ -921,11 +899,11 @@ const Home = () => {
       ? "bg-green-500 w-8"
       : ""
   } ml-1`}
-                        />
+                          />
+                        </View>
                       </View>
-                    </View>
-                  </Pressable>
-                )) }
+                    </Pressable>
+                  ))}
             </ScrollView>
           </View>
 
@@ -981,73 +959,74 @@ const Home = () => {
           </View>
 
           <View className=" flex-1 mb-20">
-          <Text
-                  style={{ fontFamily: "PoppinsBold" }}
-                  className="text-lg break-words"
-                >
+            <Text
+              style={{ fontFamily: "PoppinsBold" }}
+              className="text-lg break-words"
+            >
               Featured Feedback
-                </Text>
+            </Text>
             <View className="flex flex-col mt-1 ">
               <ScrollView>
-            {isRandomReviews ?   Array.from({ length: 5 }).map((_, index) => (
-                  <View className="mt-2" key={index}>
-                    <View className="flex-row">
-                      <SkeletonLoader
-                        width={70}
-                        height={70}
-                         borderRadius={88}
-                      />
-                      <View className="ml-2">
-                       <View className="mb-1">
-                       <SkeletonLoader
-                          width={170}
-                          height={15}
-                          borderRadius={8}
-                        />
-                       </View>
-                 
+                {isRandomReviews
+                  ? Array.from({ length: 5 }).map((_, index) => (
+                      <View className="mt-2" key={index}>
+                        <View className="flex-row">
                           <SkeletonLoader
-                            width={'100%'}
-                            height={48}
-                            borderRadius={8}
+                            width={70}
+                            height={70}
+                            borderRadius={88}
                           />
-                 
+                          <View className="ml-2">
+                            <View className="mb-1">
+                              <SkeletonLoader
+                                width={170}
+                                height={15}
+                                borderRadius={8}
+                              />
+                            </View>
+
+                            <SkeletonLoader
+                              width={"100%"}
+                              height={48}
+                              borderRadius={8}
+                            />
+                          </View>
+                        </View>
                       </View>
-                    </View>
-                  </View>
-                )) :  randomReviews?.slice(0, 5).map((item, index) => (
-                  <Animated.View
-                    style={[{ opacity: fadeAnimValues[index] }]}
-                    key={`${item.reviewer_name}-${index}`}
-                    className="flex-row gap-2 mt-2"
-                  >
-                    <Text
-                      style={{ fontFamily: "PoppinsThin" }}
-                      className="absolute right-1 text-gray-500 text-md"
-                    >
-                      {item.date}
-                    </Text>
-                    <Image
-                      source={{ uri: item.photo_url }}
-                      className="w-14 h-14 rounded-full"
-                    />
-                    <View className="flex-1">
-                      <Text
-                        style={{ fontFamily: "PoppinsThin" }}
-                        className="text-xl text-secondary w-48"
-                        numberOfLines={1}
+                    ))
+                  : randomReviews?.slice(0, 5).map((item, index) => (
+                      <Animated.View
+                        style={[{ opacity: fadeAnimValues[index] }]}
+                        key={`${item.reviewer_name}-${index}`}
+                        className="flex-row gap-2 mt-2"
                       >
-                        {item.reviewer_name}
-                      </Text>
-                      <Text
-                        style={{ fontFamily: "PoppinsMedium" }}
-                        className="text-md"
-                      >
-                        “{item.name} - {item.review_text}”
-                      </Text>
-                    </View>
-                  </Animated.View>
-                ))}
+                        <Text
+                          style={{ fontFamily: "PoppinsThin" }}
+                          className="absolute right-1 text-gray-500 text-md"
+                        >
+                          {item.date}
+                        </Text>
+                        <Image
+                          source={{ uri: item.photo_url }}
+                          className="w-14 h-14 rounded-full"
+                        />
+                        <View className="flex-1">
+                          <Text
+                            style={{ fontFamily: "PoppinsThin" }}
+                            className="text-xl text-secondary w-48"
+                            numberOfLines={1}
+                          >
+                            {item.reviewer_name}
+                          </Text>
+                          <Text
+                            style={{ fontFamily: "PoppinsMedium" }}
+                            className="text-md"
+                          >
+                            “{item.name} - {item.review_text}”
+                          </Text>
+                        </View>
+                      </Animated.View>
+                    ))}
               </ScrollView>
             </View>
           </View>

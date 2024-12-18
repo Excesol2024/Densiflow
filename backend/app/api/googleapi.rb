@@ -774,7 +774,7 @@ class Googleapi
       "gas" => "https://firebasestorage.googleapis.com/v0/b/densiflowapp.appspot.com/o/icons%2FGas%20Station.png?alt=media&token=5e64109f-3e6b-46c0-89e1-e19578c7b651",
       "hair_care" => "https://firebasestorage.googleapis.com/v0/b/densiflowapp.appspot.com/o/icons%2FHair%20Care.png?alt=media&token=d9e88011-9b06-42b9-a244-fc75db166b95",
       "home_goods_store" => "https://firebasestorage.googleapis.com/v0/b/densiflowapp.appspot.com/o/icons%2FHome%20Goods%20Store.png?alt=media&token=aaa77645-d679-4da1-8515-3fb7c3ed2107",
-      "hotel" => "https://firebasestorage.googleapis.com/v0/b/densiflowapp.appspot.com/o/icons%2FHotel.png?alt=media&token=65b42bbc-f8f4-4b7c-b583-841599f8e9b2",
+      "lodging" => "https://firebasestorage.googleapis.com/v0/b/densiflowapp.appspot.com/o/icons%2FHotel.png?alt=media&token=65b42bbc-f8f4-4b7c-b583-841599f8e9b2",
       "library" => "https://firebasestorage.googleapis.com/v0/b/densiflowapp.appspot.com/o/icons%2FLibrary.png?alt=media&token=2643bf2a-197d-49a6-8f74-6df0e80f38d4",
       "movie_theater" => "https://firebasestorage.googleapis.com/v0/b/densiflowapp.appspot.com/o/icons%2FMovie%20Theater.png?alt=media&token=ab68b01e-c91e-4c33-b01b-6b2a250bbb85",
       "museum" => "https://firebasestorage.googleapis.com/v0/b/densiflowapp.appspot.com/o/icons%2FMuseum.png?alt=media&token=327f946f-039f-4d2a-9320-05b17c8d20b2",

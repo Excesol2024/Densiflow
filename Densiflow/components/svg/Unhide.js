@@ -1,16 +1,16 @@
 import * as React from "react";
-import Svg, { Path, Rect } from "react-native-svg";
+import Svg, { Rect, Defs, Pattern, Use, Image } from "react-native-svg";
 const Unhide = (props) => (
   <Svg
-    width={24}
+  width={24}
     height={24}
-    viewBox="0 0 90 90"
+    viewBox="0 0 59 74"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
     xmlnsXlink="http://www.w3.org/1999/xlink"
     {...props}
   >
-    <Rect width={90} height={90} fill="url(#pattern0_247_946)" />
+    <Rect width={59} height={74} fill="url(#pattern0_247_946)" />
     <Defs>
       <Pattern
         id="pattern0_247_946"
@@ -18,7 +18,10 @@ const Unhide = (props) => (
         width={1}
         height={1}
       >
-        <Use xlinkHref="#image0_247_946" transform="scale(0.0111111)" />
+        <Use
+          xlinkHref="#image0_247_946"
+          transform="matrix(0.0111111 0 0 0.00885886 0 0.101351)"
+        />
       </Pattern>
       <Image
         id="image0_247_946"

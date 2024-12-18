@@ -17,24 +17,14 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import SkeletonLoader from "../../components/SkeletonLoader";
 
 const Poppular = () => {
-  const { currentUser } = useContext(AuthenticatedContext);
-  const [popularPlaces, setPopularPlaces] = useState([]);
   const router = useRouter();
   const [isPopularPlaceLoading, setIsPopularLoading] = useState(true);
-  const { setMapLocation } = useContext(LoadingEffectsContext);
+  const { setMapLocation, popularNearPlaces } = useContext(LoadingEffectsContext);
 
   const handleGetPopularPlaces = async () => {
-    try {
-      const response = await API.getPopularPlacess();
-      if(response.data){
-        setPopularPlaces(response.data);
-        setTimeout(() => {
-          setIsPopularLoading(false)
-        }, 2000);
-      }
-    } catch (error) {
-      console.log(error);
-    }
+    setTimeout(() => {
+      setIsPopularLoading(false)
+    }, 2500);
   };
 
   const handleSelectedPlacesToNavigate = (place) => {
@@ -44,7 +34,7 @@ const Poppular = () => {
 
   useEffect(() => {
     handleGetPopularPlaces();
-  }, []);
+  }, [popularNearPlaces]);
 
   const handleRecentVisited = async (name, address, km, lat, long) => {
     try {
@@ -138,13 +128,13 @@ const Poppular = () => {
               </View>
             ))
             : Array.from(
-                { length: Math.ceil(popularPlaces.length / 2) },
+                { length: Math.ceil(popularNearPlaces.length / 2) },
                 (_, rowIndex) => (
                   <View
                     key={rowIndex}
                     className="flex-row justify-between mb-4"
                   >
-                    {popularPlaces
+                    {popularNearPlaces
                       .slice(rowIndex * 2, rowIndex * 2 + 2)
                       .map((place, index) => (
                         <Pressable

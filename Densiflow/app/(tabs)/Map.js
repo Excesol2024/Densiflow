@@ -165,7 +165,7 @@ const Map = () => {
     { value: "gas", name: "Gas Station" },
     { value: "hair_care", name: "Hair Care" },
     { value: "home_goods_store", name: "Home Goods Store" },
-    { value: "hotel", name: "Hotel" },
+    { value: "lodging", name: "Hotel" },
     { value: "library", name: "Library" },
     { value: "movie_theater", name: "Movie Theater" },
     { value: "museum", name: "Museum" },
@@ -687,7 +687,7 @@ const Map = () => {
                </Pressable>
              ))}
            </ScrollView>
-         </View> :    isClicked ? (
+         </View> :    isClicked  ? (
         ""
       ) : (
         <View className="flex-1 absolute w-full p-2 bottom-20 z-50 ">

@@ -16,22 +16,14 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import SkeletonLoader from "../../components/SkeletonLoader";
 
 const Recommended = () => {
-  const [recommendedPlaces, setRecommendedPlaces] = useState([]);
   const router = useRouter();
   const [isRecommendedPlaceLoading, setIsRecommendedLoading] = useState(true);
-  const { setMapLocation } = useContext(LoadingEffectsContext);
+  const { setMapLocation, recommendedNearPlaces } = useContext(LoadingEffectsContext);
+
   const handleGetRecommendedPlaces = async () => {
-    try {
-      const response = await API.getRecommededPlaces();
-      if(response.data){
-        setRecommendedPlaces(response.data);
         setTimeout(() => {
           setIsRecommendedLoading(false);
         }, 2000);
-      }
-    } catch (error) {
-      console.log(error);
-    }
   };
 
   const handleSelectedPlacesToNavigate = (place) => {
@@ -41,7 +33,7 @@ const Recommended = () => {
 
   useEffect(() => {
     handleGetRecommendedPlaces();
-  }, []);
+  }, [recommendedNearPlaces]);
 
   const handleRecentVisited = async (name, address, km, lat, long) => {
     try {
@@ -136,13 +128,13 @@ const Recommended = () => {
                 </View>
               ))
             : Array.from(
-                { length: Math.ceil(recommendedPlaces.length / 2) },
+                { length: Math.ceil(recommendedNearPlaces.length / 2) },
                 (_, rowIndex) => (
                   <View
                     key={rowIndex}
                     className="flex-row justify-between mb-4"
                   >
-                    {recommendedPlaces
+                    {recommendedNearPlaces
                       .slice(rowIndex * 2, rowIndex * 2 + 2)
                       .map((place, index) => (
                         <Pressable

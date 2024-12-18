@@ -1,4 +1,4 @@
-import { View, Text, Pressable, ScrollView, Linking, Share } from 'react-native'
+import { View, Text, Pressable, ScrollView, Linking, Share, Alert } from 'react-native'
 import React, { useContext, useState, useEffect } from 'react'
 import AntDesign from "@expo/vector-icons/AntDesign";
 import First from '../../components/svg/profile/First';
@@ -16,6 +16,7 @@ import Toggle from "react-native-toggle-input";
 import Subscription from '../../components/svg/profile/Subscription';
 import * as Location from 'expo-location';
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import StickArrow from '../../components/svg/StickArrow';
 
 const Profile = () => {
   const router = useRouter();
@@ -30,13 +31,6 @@ const Profile = () => {
     if (initializing) setInitializing(false);
   }
 
-  const handleOffNotifications = () => {
-
-  }
-
-  const handleOnNotifications = () => {
-    
-  }
 
   const handleOnLoactions = async() => {
     console.log("LOCATIONS");
@@ -106,6 +100,16 @@ const Profile = () => {
     router.push('/(auth)/Forgotpassword')
   }
 
+  const openAppSettings = async () => {
+    try {
+      // Attempt to open the app's settings page
+      await Linking.openSettings();
+    } catch (error) {
+      console.error('Error opening settings:', error);
+      Alert.alert('Error', 'Unable to open settings. Please update permissions manually.');
+    }
+  };
+
   return (
     <View className="flex-1 bg-white">
        <View className="flex-2 flex-row top-10 gap-3 items-center p-2">
@@ -132,41 +136,23 @@ const Profile = () => {
                 <Text style={{ fontFamily: "PoppinsMedium" }} className="text-lg mt-2">Change Password</Text>
               </View>
             </Pressable>
-             <Pressable onPress={()=>{router.replace('/(profile)/Privacy')}}>
+             <Pressable onPress={()=>openAppSettings()}>
              <View className="flex-row items-center mb-4 justify-between">
                <View className="flex-row gap-3 items-center">
                <Third/>
                <Text style={{ fontFamily: "PoppinsMedium" }} className="text-lg pl-1">Notifications</Text>
                </View>
-               <Toggle
-                toggle={isToggle}
-                setToggle={setIsToggle}
-                color={"#007AFF"}
-                size={15}
-                filled={true}
-                circleColor={"white"}
-                // onTrue={}
-                // onFalse={}
-              />
+                <StickArrow/>
               </View>
              </Pressable>
 
-             <Pressable onPress={()=>{Linking.openSettings()}}>
+             <Pressable onPress={()=>openAppSettings()}>
              <View className="flex-row items-center justify-between">
                <View className="flex-row gap-3 items-center">
                <Fourth/>
                <Text style={{ fontFamily: "PoppinsMedium" }} className="text-lg pl-1">My Location and Sharing</Text>
                </View>
-               <Toggle
-                toggle={isToggleLocation}
-                setToggle={setIsToggleLocation}
-                color={"#007AFF"}
-                size={15}
-                filled={true}
-                circleColor={"white"}
-                onTrue={handleOnLoactions}
-                onFalse={handleOffLocations}
-              />
+               <StickArrow/>
               </View>
              </Pressable>
              

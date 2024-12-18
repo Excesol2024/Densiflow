@@ -36,7 +36,10 @@ export const LoadingEffectsProvider = ({ children }) => {
   const [mapLocation, setMapLocation] = useState([]);
 
   const [isReviewing, setIsReviewing] = useState(false);
-  const [userAddress, setUserAddress] = useState('')
+  const [userAddress, setUserAddress] = useState('');
+
+  const [popularNearPlaces, setPopularNearPlaces] = useState([]);
+  const [recommendedNearPlaces, setRecommendedNearPlaces] = useState([]);
 
   useEffect(() => {
     handleSetMap();
@@ -121,7 +124,9 @@ export const LoadingEffectsProvider = ({ children }) => {
         setPlaceDetails,
         isReviewing, setIsReviewing,
         handleSelectedPlaceToReview,
-        userAddress, setUserAddress
+        userAddress, setUserAddress,
+        popularNearPlaces, setPopularNearPlaces,
+        recommendedNearPlaces, setRecommendedNearPlaces
       }}
     >
       {children}
