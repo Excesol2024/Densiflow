@@ -26,7 +26,7 @@ import {
     const [filteredPlaces, setFilteredPlaces] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
     const { isSaved, setMapLocation } = useContext(LoadingEffectsContext);
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
     const router = useRouter();
     // Fetch saved places from the API
     const fetchSavedPlaces = async () => {

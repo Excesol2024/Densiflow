@@ -8,14 +8,9 @@ import {
   SafeAreaView,
   Pressable,
   Alert,
-  ActivityIndicator,
   Animated,
-  Easing,
-  Modal,
 } from "react-native";
 import AntDesign from "@expo/vector-icons/AntDesign";
-import { LinearGradient } from "expo-linear-gradient";
-import NextSvg from "../../components/svg/next";
 import * as Location from "expo-location";
 import { API } from "../../components/Protected/Api";
 import Notif from "../../components/svg/Notif";
@@ -187,9 +182,9 @@ const Home = () => {
   };
 
   useEffect(() => {
-    // handleGetPopularPlaces();
-    // handleGetRecommendedPlaces();
-    // updatePlaceBasedOnTime();
+    handleGetPopularPlaces();
+    handleGetRecommendedPlaces();
+    updatePlaceBasedOnTime();
     handleIsSelectingGender();
     getUserCurrentLocation();
     getCurrentDate();
@@ -808,7 +803,7 @@ const Home = () => {
           </View>
 
           {/**RECOMMENDED*/}
-          <View className="mt-3">
+          <View className="mt-5">
             <View className="flex-row mb-1 justify-between">
               <Text className="text-lg" style={{ fontFamily: "PoppinsBold" }}>
                 Recommended
@@ -917,7 +912,7 @@ const Home = () => {
                 recentVisited?.map((recent, index) => (
                   <View
                     key={index}
-                    className="flex flex-row mt-2 w-full justify-center"
+                    className="flex flex-row mt-2 relative w-full justify-start"
                   >
                     <View className=" rounded-full justify-center">
                       <Image
@@ -925,7 +920,7 @@ const Home = () => {
                         className="h-10 w-10"
                       />
                     </View>
-                    <View className="w-56 mt-2 ml-2 mr-2">
+                    <View className="w-52 mt-2 ml-2 mr-2">
                       <Text
                         style={{ fontFamily: "PoppinsBold" }}
                         className="text-md"
@@ -935,22 +930,25 @@ const Home = () => {
                       <Text
                         style={{ fontFamily: "PoppinsThin" }}
                         className="text-sm"
+                        numberOfLines={1}
                       >
                         {recent.address}
                       </Text>
                     </View>
+                    <View className="absolute right-2 top-3">
                     <Text
                       style={{ fontFamily: "PoppinsThin" }}
                       className="text-md text-gray-400"
                     >
                       {recent.km} km
                     </Text>
+                    </View>
                   </View>
                 ))
               ) : (
                 <Text
                   style={{ fontFamily: "PoppinsThin" }}
-                  className="text-lg mt-3 mb-10 text-gray-400 text-center"
+                  className="text-md mt-3 mb-10 text-gray-400 text-center"
                 >
                   You haven't visited any spots yet. Start exploring!
                 </Text>

@@ -27,6 +27,14 @@ const Recommended = () => {
   };
 
   const handleSelectedPlacesToNavigate = (place) => {
+    console.log("SELECTD PLACE", place.kilometers);
+    handleRecentVisited(
+      place.name,
+      place.vicinity,
+      place.kilometers,
+      place.location.lat,
+      place.location.lng
+    );
     setMapLocation(place);
     router.push("/Map");
   };

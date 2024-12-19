@@ -30,7 +30,7 @@ const apiHelper = async (endpoint, method, body = {}, params = {}) => {
   try {
     const response = await axios({
       method: method,
-      url: `${newServeUrl}${url}`,
+      url: `${SERVER_URL}${url}`,
       headers: headers,
       data: body,   // Send data if there's a request body (POST, PUT)
       params: method === 'GET' || 'DELETE' ? params : {}, // Attach params only for GET requests

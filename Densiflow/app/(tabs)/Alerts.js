@@ -19,7 +19,7 @@ import {
 
 const Alerts = () => {
   const [combinedAlerts, setCombinedAlerts] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const handleGetUserNotifications = async () => {
     try {

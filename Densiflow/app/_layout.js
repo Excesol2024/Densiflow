@@ -21,7 +21,6 @@ const StackLayout = () => {
       <Stack.Screen name={`places/Poppular`} options={{ headerShown: false }} />
       <Stack.Screen name={`places/Recommended`} options={{ headerShown: false }} />
       <Stack.Screen name={`search/Searchplace`} options={{ headerShown: false }} />
-      <Stack.Screen name={`places/SkeletonLoader `} options={{ headerShown: false }} />
     </Stack>
   );
 };

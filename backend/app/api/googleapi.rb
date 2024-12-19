@@ -471,7 +471,7 @@ class Googleapi
   
 
 
-  def fetch_places(query)
+  def fetch_places(query, lat, long)
     return [] if query.blank?
   
     api_url = "https://maps.googleapis.com/maps/api/place/autocomplete/json?input=#{query}&key=#{@api_key}"
@@ -490,10 +490,14 @@ class Googleapi
         details_response = Net::HTTP.get(place_uri)
         place_details = JSON.parse(details_response)
         result = place_details["result"]
-  
+        
         photos = result["photos"] || []
         photo_count = photos.length
-  
+
+        place_location = result.dig("geometry", "location")
+        place_lat = place_location["lat"]
+        place_lng = place_location["lng"]
+        distance = haversine_distance(lat, long, place_lat, place_lng)
         # Determine photo_url based on photo_count
         if photo_count > 2
           photo_reference = photos.first["photo_reference"]
@@ -571,6 +575,7 @@ class Googleapi
   
         # Return the place only if it is an establishment
         {
+          location: place_location,
           name: place.dig("structured_formatting", "main_text"),
           image_url: photo_url,
           subname: place["description"],
@@ -585,7 +590,8 @@ class Googleapi
           user_ratings_total: user_ratings_total,
           photo_count: photo_count,
           opening_hours: result["opening_hours"],
-          vicinity: result["vicinity"]
+          vicinity: result["vicinity"],
+          kilometers: distance.round(2),
         }
       end
   

@@ -20,7 +20,7 @@ import FacebookIcon from "../../components/svg/Facebook";
 import auth from "@react-native-firebase/auth";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { LoginManager, AccessToken } from "react-native-fbsdk-next";
-
+import { WEBCLIENTID } from '@env'
 
 const Account = () => {
   const router = useRouter();
@@ -54,7 +54,7 @@ const Account = () => {
   useEffect(() => {
     GoogleSignin.configure({
       webClientId:
-        "401998714323-e76k10at7c8qm1e6fpm0n71kf01upj9q.apps.googleusercontent.com",
+      WEBCLIENTID,
     });
   }, []);
 

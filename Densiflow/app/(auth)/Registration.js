@@ -20,6 +20,7 @@ import { LoadingEffectsContext } from '../../context/Loadingeffect';
 import Unhide from '../../components/svg/Unhide';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AuthenticatedContext } from '../../context/Authenticateduser';
+import { WEBCLIENTID } from '@env'
 
 const Registration = () => {
   const [name, setName] = useState('');
@@ -49,7 +50,7 @@ const Registration = () => {
 
   useEffect(()=>{
     GoogleSignin.configure({
-      webClientId: '401998714323-e76k10at7c8qm1e6fpm0n71kf01upj9q.apps.googleusercontent.com',
+      webClientId: WEBCLIENTID,
     });
    },[])
 

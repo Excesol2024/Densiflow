@@ -73,6 +73,8 @@ const Details = () => {
     }
   };
 
+  const image_url = 'https://firebasestorage.googleapis.com/v0/b/densiflowapp.appspot.com/o/pngtree-user-profile-avatar-vector-admin-png-image_5289693.png?alt=media&token=f79d7410-5741-471e-9a97-7e150f2ab91e';
+
   return (
     <View className="flex-1 p-4">
          <View className="mt-8 flex-row items-center">
@@ -90,7 +92,7 @@ const Details = () => {
     <View className="flex-1 mt-10 items-center">
     <View className="flex justify-center items-center w-44">
    
-    <Image source={{ uri: currentUser.user.photo_url }}  style={{
+    <Image source={{ uri: currentUser?.user?.photo_url ?? image_url, }}  style={{
     height: 144, // h-36 in Tailwind is 144px
     width: 144,  // w-36 in Tailwind is 144px
     borderRadius: 72,  // Rounded full circle for a 144x144 image

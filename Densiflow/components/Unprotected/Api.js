@@ -14,7 +14,7 @@ const apiHelper = async (endpoint, method, body, params)=>{
     try {
         const response = await axios({
             method: method,
-            url: `${newServeUrl}${endpoint}`,
+            url: `${SERVER_URL}${endpoint}`,
             headers: headers,
             data: body,
             params: params

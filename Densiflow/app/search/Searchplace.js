@@ -34,7 +34,8 @@ const Searchplace = () => {
   const [searchText, setSearchText] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [recentSearches, setRecentSearches] = useState([]);
-  const [isNoResults, setIsNoResults] = useState(false)
+  const [isNoResults, setIsNoResults] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const { setIsSearching, setNearbyPlaceTypes, setMapLocation } = useContext(
     LoadingEffectsContext
@@ -69,12 +70,56 @@ const Searchplace = () => {
 
 
   const handleNavigateToMap = (place) => {
-    router.push('/Map')
+    router.push('/Map');
+    handleRecentVisited(
+      place.name,
+      place.vicinity,
+      place.kilometers,
+      place.location.lat,
+      place.location.lng
+    );
     setMapLocation(place)
     setIsSearching(false);
     setSearchResults([]);
     setIsTyping(false);
   }
+
+  const handleRecentVisited = async (name, address, km, lat, long) => {
+    try {
+      // Retrieve the current list of recent visits from AsyncStorage
+      const existingVisits = await AsyncStorage.getItem("recentVisited");
+      let visits = existingVisits ? JSON.parse(existingVisits) : [];
+
+      // Create a new visit object
+      const newVisit = { name, address, km, lat, long };
+
+      // Check if the visit is already in the list
+      const isDuplicate = visits.some(
+        (visit) =>
+          visit.name === newVisit.name && visit.address === newVisit.address
+      );
+
+      // If it's a duplicate, do not add it to the list
+      if (isDuplicate) {
+        console.log("Visit already exists in recent visits");
+        return;
+      }
+
+      // Add the new visit to the beginning of the list if it's not a duplicate
+      visits.unshift(newVisit);
+
+      // Limit the list to 4 items
+      if (visits.length > 4) {
+        visits.pop(); // Remove the last (oldest) visit
+      }
+
+      // Save the updated list back to AsyncStorage
+      await AsyncStorage.setItem("recentVisited", JSON.stringify(visits));
+      console.log("Recent visit saved successfully");
+    } catch (error) {
+      console.error("Failed to save recent visit:", error);
+    }
+  };
 
   useEffect(() => {
     const loadRecentSearches = async () => {
@@ -104,15 +149,17 @@ const Searchplace = () => {
   };
 
   const handleSearchPlaces = async () => {
-    console.log("IS TYPING");
+    setIsLoading(true)
     setIsTyping(true);
     try {
       const response = await API.getSearchedPlaces({ query: searchText });
       if(response.data.length <= 0){
         setIsNoResults(true)
+        setIsLoading(false);
         handleSearch()
       } else {
         setSearchResults(response.data);
+        setIsLoading(false);
         handleSearch();
       }
     } catch (error) {
@@ -127,9 +174,11 @@ const Searchplace = () => {
       const response = await API.getSearchedPlaces({ query: placeName });
       if(response.data.length <= 0){
         setIsNoResults(true)
+        setIsLoading(false)
         handleSearch()
       } else {
         setSearchResults(response.data);
+        setIsLoading(false);
         handleSearch();
       }
     } catch (error) {
@@ -143,7 +192,7 @@ const Searchplace = () => {
     setIsTyping(false);
   };
 
-  const isLoading = !searchResults || searchResults.length === 0;
+
 
   const handleSelectedNearbyPlaceTypes = (placeName) => {
     console.log(placeName);

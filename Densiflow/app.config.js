@@ -1,6 +1,5 @@
 
 import 'dotenv/config';
-console.log('Google API Key:', process.env.GOOGLE_MAP_API_KEY);
 
 export default {
   expo: {
@@ -44,10 +43,10 @@ export default {
       [
         "react-native-fbsdk-next",
         {
-          appID: "570385798986898",
-          clientToken: "721a833985ba4fc39bd28e9a23752780",
+          appID: process.env.APP_ID ,
+          clientToken: process.env.CLIENT_TOKEN,
           displayName: "SIGN UP IF YOU HAVENT SIGN UP",
-          scheme: "fb570385798986898",
+          scheme: process.env.SCHEME,
           advertiserIDCollectionEnabled: false,
           autoLogAppEventsEnabled: false,
           isAutoInitEnabled: true,
@@ -72,14 +71,14 @@ export default {
       [
         "react-native-google-mobile-ads",
         {
-          "androidAppId": "ca-app-pub-5194664435495552~7528590557",
+          "androidAppId": process.env.ANDROID_APP_ID,
           // "iosAppId": "ca-app-pub-xxxxxxxx~xxxxxxxx"
         }
       ]
     ],
     extra: {
       eas: {
-        projectId: "67aff93e-33f4-48c3-9f07-958375977b40"
+        projectId: process.env.PROJECT_ID 
       }
     },
     updates: {

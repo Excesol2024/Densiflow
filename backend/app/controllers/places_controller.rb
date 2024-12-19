@@ -45,7 +45,7 @@ class PlacesController < ApplicationController
     if current_user
       query = params[:query]
       google_service = Googleapi.new(nil)
-      places = google_service.fetch_places(query)
+      places = google_service.fetch_places(query, current_user.lat, current_user.long)
       render json: places
     else
       render json: { error: 'User must be logged in' }, status: :unauthorized
