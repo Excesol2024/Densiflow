@@ -83,7 +83,7 @@ function Home() {
       </div>
 
       {/* Main Content */}
-      <div className="flex flex-col relative px-6 lg:px-36 lg:pr-16 py-8 ">
+      <div className="flex flex-col relative px-6 lg:px-36 lg:pr- py-8 ">
         <div className="flex flex-col lg:flex-row  gap-5 ">
           {/* Left Content: Text and Form */}
           <div className="flex-1 lg:max-w-[40rem] max-w-full w-full lg:text-left 2xl:mt-10 md:mt-5 mb-9">
@@ -208,7 +208,7 @@ function Home() {
             <img
               src="/max.png"
               alt="Densiflow App Preview"
-              className="w-full lg:w-[53rem] md:flex hidden mx-auto"
+              className="w-full lg:w-[57rem] md:flex hidden mx-auto"
             />
             <img
               src="/newone.png"
