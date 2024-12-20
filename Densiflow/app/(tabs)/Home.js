@@ -185,13 +185,13 @@ const Home = () => {
     handleGetPopularPlaces();
     handleGetRecommendedPlaces();
     updatePlaceBasedOnTime();
-    handleIsSelectingGender();
     getUserCurrentLocation();
     getCurrentDate();
   }, []);
 
   useEffect(() => {
     getCurrentUserWeather();
+    handleIsSelectingGender();
     handleDayOrNight();
   }, []);
 
@@ -309,8 +309,11 @@ const Home = () => {
   const handleGetRandomReviews = async () => {
     try {
       const response = await API.randomReviews({ location: userLocation });
-      setRandomReviews(response.data);
-      setFadeAnimValues(response.data.map(() => new Animated.Value(1)));
+      if(response.data){
+        setRandomReviews(response.data);
+        setFadeAnimValues(response.data.map(() => new Animated.Value(1)));
+        setIsRandomReviews(false);
+      }
     } catch (error) {
       console.log(error);
     }
@@ -351,7 +354,7 @@ const Home = () => {
 
   useEffect(() => {
     getRecentVisited();
-    // handleGetRandomReviews();
+    handleGetRandomReviews();
   }, []);
 
   const happeningToday = [
