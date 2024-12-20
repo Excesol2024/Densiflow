@@ -294,10 +294,10 @@ const Map = () => {
   };
 
   const initialRegion = {
-    latitude: 8.1130595, // Example latitude
-    longitude: 122.6678314, // Example longitude
-    latitudeDelta: 0.005, // Smaller value for more zoom
-    longitudeDelta: 0.005, // Adjust for zoom level (smaller means more zoomed in)
+    latitude: currentUser?.user.lat, 
+    longitude: currentUser?.user.long, 
+    latitudeDelta: 0.005, 
+    longitudeDelta: 0.005,
   };
 
   const toggleMapType = () => {

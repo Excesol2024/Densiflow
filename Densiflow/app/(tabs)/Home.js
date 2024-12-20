@@ -127,13 +127,7 @@ const Home = () => {
   };
 
   const getUserCurrentLocation = async () => {
-    let { status } = await Location.requestForegroundPermissionsAsync();
-
-    if (status !== "granted") {
-      Alert.alert("Permission Denied");
-      return;
-    }
-
+ 
     let { coords } = await Location.getCurrentPositionAsync();
 
     if (coords) {
